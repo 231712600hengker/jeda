@@ -11,8 +11,6 @@ export const STRESSOR_LABELS: Record<string, string> = {
 export async function generateDummyCheckins(userId: string, days = 7) {
   const sleepQuantities = ['4-6 Jam', '6-8 Jam', '6-8 Jam', '< 4 Jam', '6-8 Jam', '> 8 Jam', '4-6 Jam']
   const sleepQualities = ['Cukup', 'Sangat Nyenyak', 'Cukup', 'Sering terbangun/Gelisah', 'Cukup', 'Sangat Nyenyak', 'Cukup']
-  const stressorPool = ['teknis', 'manajemen_waktu', 'bimbingan', 'infrastruktur', 'personal']
-
   const samplePattern = [
     { a1: 2, a2: 2, fm: 7, fp: 6, p1: 2, p2: 2, stressors: ['teknis', 'manajemen_waktu'] },
     { a1: 2, a2: 1, fm: 6, fp: 5, p1: 3, p2: 3, stressors: ['teknis'] },
@@ -69,4 +67,3 @@ export async function generateDummyCheckins(userId: string, days = 7) {
 
   return createdCheckins
 }
-

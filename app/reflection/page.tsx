@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { getOrCreateUser } from '@/lib/user'
 
@@ -22,17 +23,19 @@ function getFriendlyReflectionError(error: unknown) {
 }
 
 export default function ReflectionPage() {
+  const router = useRouter()
   const [reflection, setReflection] = useState('')
   const [weekStart, setWeekStart] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [savedMessage, setSavedMessage] = useState('')
 
   useEffect(() => {
     async function loadReflection() {
       const storedUserId = localStorage.getItem('jeda_user_id')
       if (!storedUserId) {
-        window.location.href = '/'
+        router.push('/')
         return
       }
 
@@ -45,14 +48,14 @@ export default function ReflectionPage() {
         .eq('week_start', currentWeek)
         .maybeSingle()
 
-      if (loadError && loadError.code !== 'PGRST116') setError('Refleksi belum dapat dimuat. Pastikan tabel weekly_reflections sudah dibuat di Supabase.')
+      if (loadError && loadError.code !== 'PGRST116') setError('Refleksi belum dapat dimuat. Pastikan tabel weekly_reflections dan policy aksesnya sudah dibuat di Supabase.')
 
       if (data) setReflection(data.reflection)
       setLoading(false)
     }
 
     loadReflection()
-  }, [])
+  }, [router])
 
   async function saveReflection() {
     const trimmedReflection = reflection.trim()
@@ -60,15 +63,18 @@ export default function ReflectionPage() {
 
     setSaving(true)
     setError('')
+    setSavedMessage('')
 
     try {
-      const userId = await getOrCreateUser()
+      const userId = localStorage.getItem('jeda_user_id') ?? await getOrCreateUser()
       const { error: saveError } = await supabase.from('weekly_reflections').upsert(
         { user_id: userId, week_start: weekStart, reflection: trimmedReflection, updated_at: new Date().toISOString() },
         { onConflict: 'user_id,week_start' },
       )
 
       if (saveError) throw saveError
+      setReflection(trimmedReflection)
+      setSavedMessage('Refleksi minggu ini sudah tersimpan.')
     } catch (saveError) {
       setError(getFriendlyReflectionError(saveError))
     } finally {
@@ -85,9 +91,10 @@ export default function ReflectionPage() {
         <h1 className="mt-2 font-serif text-3xl leading-tight">Apa yang ingin kamu bawa dari minggu ini?</h1>
         <p className="mt-3 text-sm leading-6 text-earth-600">Tidak perlu rapi atau panjang. Tulis satu hal yang terasa penting, sulit, atau patut dihargai.</p>
         {loading ? <p className="mt-8 text-sm text-earth-500">Menyiapkan ruang refleksi...</p> : <>
-          <textarea value={reflection} onChange={(event) => { setReflection(event.target.value); setError('') }} maxLength={2000} rows={9} placeholder="Contoh: Minggu ini aku menyadari bahwa..." className="mt-8 w-full resize-y border border-sand-300 bg-sand-50 p-4 text-sm leading-6 text-earth-800 outline-none placeholder:text-earth-400 focus:border-sage-500" />
+          <textarea value={reflection} onChange={(event) => { setReflection(event.target.value); setError(''); setSavedMessage('') }} maxLength={2000} rows={9} placeholder="Contoh: Minggu ini aku menyadari bahwa..." className="mt-8 w-full resize-y border border-sand-300 bg-sand-50 p-4 text-sm leading-6 text-earth-800 outline-none placeholder:text-earth-400 focus:border-sage-500" />
           <div className="mt-2 flex items-center justify-between text-xs text-earth-500"><span>{reflection.length}/2000 karakter</span></div>
           {error && <p className="mt-4 border-l-4 border-lavender-400 bg-lavender-50 px-4 py-3 text-sm leading-6 text-lavender-900">{error}</p>}
+          {savedMessage && <p className="mt-4 border-l-4 border-sage-400 bg-sage-50 px-4 py-3 text-sm leading-6 text-sage-900">{savedMessage}</p>}
           <button onClick={saveReflection} disabled={saving || !reflection.trim()} className="mt-7 w-full bg-sage-700 py-3.5 text-sm font-semibold text-white transition hover:bg-sage-800 disabled:cursor-not-allowed disabled:opacity-50">{saving ? 'Menyimpan refleksi...' : 'Simpan refleksi minggu ini'}</button>
         </>}
       </section>

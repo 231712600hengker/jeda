@@ -20,11 +20,35 @@ create index if not exists weekly_reflections_user_week_idx
 grant usage on schema public to anon, authenticated;
 grant select, insert, update, delete on public.weekly_reflections to anon, authenticated;
 
--- Jika database Anda memiliki RLS aktif pada tabel ini, pastikan policy yang ada
--- mengizinkan pengguna anon atau authenticated mengakses record miliknya sendiri.
--- Atau aktifkan RLS bila memang belum aktif:
--- alter table public.weekly_reflections enable row level security;
+-- Jeda memakai kode anonim buatan aplikasi, bukan Supabase Auth. Karena anon key
+-- tidak membawa auth.uid(), policy "milik sendiri" tidak bisa divalidasi oleh RLS.
+-- Untuk setup riset/prototipe ini, samakan dengan akses tabel Jeda lain: anon dan
+-- authenticated boleh membaca/menulis. Jika aplikasi dipakai publik, pindahkan
+-- operasi tulis ke server action/API route dengan service role dan validasi kode.
+alter table public.weekly_reflections enable row level security;
 
--- Jeda memakai kode anonim buatan aplikasi, bukan Supabase Auth. Samakan akses
--- tabel ini dengan kebijakan tabel Jeda yang sudah ada pada proyek Anda.
--- Jangan menambahkan kebijakan RLS publik baru bila tabel existing memakai aturan lain.
+drop policy if exists "weekly_reflections_anon_select" on public.weekly_reflections;
+drop policy if exists "weekly_reflections_anon_insert" on public.weekly_reflections;
+drop policy if exists "weekly_reflections_anon_update" on public.weekly_reflections;
+drop policy if exists "weekly_reflections_anon_delete" on public.weekly_reflections;
+
+create policy "weekly_reflections_anon_select"
+  on public.weekly_reflections for select
+  to anon, authenticated
+  using (true);
+
+create policy "weekly_reflections_anon_insert"
+  on public.weekly_reflections for insert
+  to anon, authenticated
+  with check (true);
+
+create policy "weekly_reflections_anon_update"
+  on public.weekly_reflections for update
+  to anon, authenticated
+  using (true)
+  with check (true);
+
+create policy "weekly_reflections_anon_delete"
+  on public.weekly_reflections for delete
+  to anon, authenticated
+  using (true);

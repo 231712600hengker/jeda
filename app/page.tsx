@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
@@ -14,11 +14,7 @@ export default function LandingPage() {
   const [showConsent, setShowConsent] = useState(false);
   const [consentChecked, setConsentChecked] = useState(false);
   const [newCode, setNewCode] = useState("");
-  const [hasStoredSession, setHasStoredSession] = useState(false);
-
-  useEffect(() => {
-    setHasStoredSession(Boolean(localStorage.getItem("jeda_user_id")));
-  }, []);
+  const [hasStoredSession] = useState(() => typeof window !== "undefined" && Boolean(localStorage.getItem("jeda_user_id")));
 
   async function createAnonymousUser() {
     setLoading(true);

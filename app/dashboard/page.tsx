@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import {
   ResponsiveContainer,
   LineChart,
@@ -18,7 +19,7 @@ import {
 } from 'recharts'
 import { supabase } from '@/lib/supabase'
 import { getOrCreateUser } from '@/lib/user'
-import { Checkin, CheckinStressor, ChartDataPoint, StressorCount, AlertRecord } from '@/lib/types'
+import { Checkin, CheckinStressor, ChartDataPoint, AlertRecord } from '@/lib/types'
 import { STRESSOR_LABELS } from '@/lib/dummy-data'
 
 type Range = '7' | '30' | 'all'
@@ -42,12 +43,12 @@ function createDemoCheckins(): Checkin[] {
 }
 
 export default function DashboardPage() {
+  const router = useRouter()
   const [checkins, setCheckins] = useState<Checkin[]>([])
   const [stressors, setStressors] = useState<CheckinStressor[]>([])
   const [stressorData, setStressorData] = useState<{ nama: string; jumlah: number }[]>([])
   const [activeAlerts, setActiveAlerts] = useState<AlertRecord[]>([])
-  const [anonCode, setAnonCode] = useState<string>('')
-  const [userId, setUserId] = useState<string>('')
+  const [anonCode] = useState(() => typeof window !== 'undefined' ? localStorage.getItem('jeda_anon_code') || '' : '')
   const [loading, setLoading] = useState(true)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [demoCheckins, setDemoCheckins] = useState<Checkin[] | null>(null)
@@ -61,7 +62,6 @@ export default function DashboardPage() {
     setErrorMsg(null)
     try {
       const uid = await getOrCreateUser()
-      setUserId(uid)
 
       const { data: cData, error: cErr } = await supabase
         .from('checkins')
@@ -133,12 +133,13 @@ export default function DashboardPage() {
   useEffect(() => {
     const storedUserId = localStorage.getItem('jeda_user_id')
     if (!storedUserId) {
-      window.location.href = '/'
+      router.push('/')
       return
     }
-    setAnonCode(localStorage.getItem('jeda_anon_code') || '')
-    loadData()
-  }, [])
+    queueMicrotask(() => {
+      void loadData()
+    })
+  }, [router])
 
   function handleGenerateDummy() {
     if (demoCheckins) {
@@ -229,18 +230,6 @@ export default function DashboardPage() {
 
   const filteredChartData = selectedRange === 'all' ? chartData : chartData.slice(-Number(selectedRange))
 
-  // Hitung Stressor paling sering
-  const stressorMap: Record<string, number> = {}
-  stressors.forEach((s) => {
-    stressorMap[s.category] = (stressorMap[s.category] || 0) + 1
-  })
-
-  const stressorStats: StressorCount[] = Object.entries(STRESSOR_LABELS).map(([key, label]) => ({
-    category: key,
-    label,
-    count: stressorMap[key] || 0,
-  })).sort((a, b) => b.count - a.count)
-
   // Metrik Ringkasan
   const latestCheckin = activeCheckins.length > 0 ? activeCheckins[activeCheckins.length - 1] : null
   const today = new Date().toISOString().split('T')[0]
@@ -322,7 +311,7 @@ export default function DashboardPage() {
           </div>
           <div className="flex items-center gap-3">
             <button
-              onClick={() => (window.location.href = '/checkin')}
+              onClick={() => router.push('/checkin')}
               className="bg-sage-700 text-white px-4 py-2 text-sm font-semibold hover:bg-sage-800 transition cursor-pointer shadow-sm"
             >
               + Isi Jurnal Hari Ini
@@ -331,7 +320,7 @@ export default function DashboardPage() {
               onClick={() => {
                 localStorage.removeItem('jeda_user_id')
                 localStorage.removeItem('jeda_anon_code')
-                window.location.href = '/'
+                router.push('/')
               }}
               className="border border-sand-300 text-earth-700 px-4 py-2 text-sm font-semibold hover:bg-sand-100 transition cursor-pointer"
             >
