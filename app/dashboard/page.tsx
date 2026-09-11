@@ -233,6 +233,8 @@ export default function DashboardPage() {
   const today = new Date().toISOString().split('T')[0]
   const needsDailyReminder = !loading && latestCheckin?.checkin_date !== today
   const latestAnxiety = latestCheckin ? latestCheckin.anxiety_1 + latestCheckin.anxiety_2 : null
+  const latestFatigueAverage = latestCheckin ? (latestCheckin.fatigue_mental + latestCheckin.fatigue_physical) / 2 : null
+  const latestProgressAverage = latestCheckin ? (latestCheckin.progress_1 + latestCheckin.progress_2) / 2 : null
   const avgMentalFatigue =
     activeCheckins.length > 0
       ? (activeCheckins.reduce((sum, c) => sum + c.fatigue_mental, 0) / activeCheckins.length).toFixed(1)
@@ -252,6 +254,55 @@ export default function DashboardPage() {
   }
 
   const anxietyBadge = getAnxietyBadge(latestAnxiety)
+
+  function getMaintenanceInsight() {
+    if (!latestCheckin || latestAnxiety === null || latestFatigueAverage === null || latestProgressAverage === null) {
+      return {
+        label: 'Mulai dari satu catatan',
+        title: 'Belum ada pola yang bisa dibaca',
+        description: 'Satu check-in hari ini sudah cukup untuk mulai membangun peta kecil tentang stres, energi, tidur, dan progresmu.',
+        action: 'Isi jurnal pertama',
+        href: '/checkin',
+      }
+    }
+
+    const stableAnxiety = latestAnxiety <= 3
+    const stableFatigue = latestFatigueAverage < 7
+    const stableProgress = latestProgressAverage >= 3
+    const stableSleep = latestCheckin.sleep_quantity === '6-8 Jam' || latestCheckin.sleep_quantity === '> 8 Jam'
+
+    if (stableAnxiety && stableFatigue && stableProgress) {
+      return {
+        label: 'Zona stabil',
+        title: 'Ritmemu sedang cukup sehat',
+        description: stableSleep
+          ? 'Kecemasan, energi, tidur, dan progres terlihat berada di rentang yang mendukung. Jaga momentum ini dengan satu prioritas kecil untuk besok.'
+          : 'Kecemasan dan progres terlihat cukup baik. Tidur belum ideal, jadi jaga ritme ini dengan target yang realistis dan waktu pulih yang cukup.',
+        action: 'Refleksikan yang perlu dijaga',
+        href: '/reflection',
+      }
+    }
+
+    if (stableProgress && !stableFatigue) {
+      return {
+        label: 'Perlu dijaga',
+        title: 'Progres ada, energi mulai terkikis',
+        description: 'Kamu masih bergerak, tetapi tubuh atau mental tampak meminta jeda. Pilih satu tugas kecil dan tentukan batas berhenti hari ini.',
+        action: 'Catat kondisi terbaru',
+        href: '/checkin',
+      }
+    }
+
+    return {
+      label: 'Zona pemantauan',
+      title: 'Ada bagian yang perlu ditemani pelan-pelan',
+      description: 'Data hari terakhir belum menunjukkan bahaya otomatis, tetapi ada tanda yang layak diperhatikan. Gunakan dashboard ini untuk membaca pola, bukan menghakimi diri.',
+      action: 'Isi check-in hari ini',
+      href: '/checkin',
+    }
+  }
+
+  const maintenanceInsight = getMaintenanceInsight()
 
   // 3. Buat Fungsi untuk Menutup Notifikasi (Acknowledge)
   async function handleAcknowledge(alertId: string) {
@@ -454,6 +505,17 @@ export default function DashboardPage() {
 
         {!loading && activeCheckins.length > 0 && (
           <>
+            <section className="grid gap-4 border border-sand-200 bg-white p-5 shadow-sm md:grid-cols-[1fr_auto] md:items-center">
+              <div>
+                <p className="text-sm font-semibold text-sage-700">{maintenanceInsight.label}</p>
+                <h2 className="mt-2 font-serif text-2xl font-semibold text-earth-900">{maintenanceInsight.title}</h2>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-earth-600">{maintenanceInsight.description}</p>
+              </div>
+              <Link href={maintenanceInsight.href} className="bg-sage-700 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-sage-800">
+                {maintenanceInsight.action}
+              </Link>
+            </section>
+
             {/* Stat Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-white p-4 rounded-xl border border-sand-200 shadow-sm">
