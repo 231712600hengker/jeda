@@ -82,7 +82,7 @@ export default function ReflectionPage() {
     }
   }
 
-  return <div className="min-h-screen bg-sand-50 text-earth-900 pb-16">
+  return <div className="flex-1 bg-sand-50 text-earth-900 pb-16">
     <header className="sticky top-0 z-10 border-b border-sand-200 bg-sand-50/95 backdrop-blur"><div className="mx-auto flex max-w-2xl items-center justify-between px-5 py-4"><Link href="/dashboard" className="font-serif text-2xl font-semibold text-earth-800 hover:text-sage-700">Jeda</Link><Link href="/dashboard" className="text-sm font-semibold text-sage-700 hover:text-sage-900">Ke dashboard</Link></div></header>
     <main className="mx-auto max-w-xl px-5 py-10">
       <Link href="/dashboard" className="text-sm font-semibold text-earth-600 hover:text-sage-700">Kembali ke ringkasan</Link>

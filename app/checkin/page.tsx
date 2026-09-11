@@ -121,7 +121,7 @@ export default function CheckinPage() {
     }
   }
 
-  return <div className="min-h-screen bg-sand-50 text-earth-900 pb-16">
+  return <div className="flex-1 bg-sand-50 text-earth-900 pb-16">
     <header className="sticky top-0 z-10 border-b border-sand-200 bg-sand-50/95 backdrop-blur"><div className="mx-auto flex max-w-2xl items-center justify-between px-5 py-4"><Link href="/dashboard" className="font-serif text-2xl font-semibold text-earth-800 transition hover:text-sage-700">Jeda</Link><Link href="/dashboard" className="text-sm font-semibold text-sage-700 transition hover:text-sage-900">Ke dashboard</Link></div></header>
     <main className="mx-auto max-w-xl px-5 py-10">
       {!done && <Link href="/dashboard" className="mb-7 inline-block text-sm font-semibold text-earth-600 transition hover:text-sage-700">Kembali ke ringkasan</Link>}
@@ -145,9 +145,9 @@ export default function CheckinPage() {
       case 'date':
         return <Question title="Hari ini" prompt="Untuk tanggal berapa catatan ini dibuat?"><input id="checkin-date" type="date" value={checkinDate} onChange={(event) => setCheckinDate(event.target.value)} className="mt-5 w-full border border-sand-300 bg-sand-50 px-3 py-3 text-sm text-earth-800 outline-none focus:border-sage-500" /></Question>
       case 'anxiety_1':
-        return <Question title="Pikiran" prompt="Seberapa sering kamu merasa cemas atau tegang tentang skripsi dalam 24 jam terakhir?"><NumberSelect value={anxiety1} onChange={setAnxiety1} /></Question>
+        return <Question title="Pikiran" prompt="Sepanjang hari ini, seberapa sering kamu merasa cemas atau tegang tentang skripsi?"><NumberSelect value={anxiety1} onChange={setAnxiety1} /></Question>
       case 'anxiety_2':
-        return <Question title="Pikiran" prompt="Seberapa sering kekhawatiran itu terasa sulit dikendalikan?"><NumberSelect value={anxiety2} onChange={setAnxiety2} /></Question>
+        return <Question title="Pikiran" prompt="Sepanjang hari ini, seberapa sulit kamu mengendalikan kekhawatiran itu?"><NumberSelect value={anxiety2} onChange={setAnxiety2} /></Question>
       case 'fatigue_mental':
         return <Question title="Tubuh dan energi" prompt="Seberapa lelah mentalmu sekarang?"><RangeField value={fatigueMental} onChange={setFatigueMental} low="Segar" high="Sangat lelah" max={10} /></Question>
       case 'fatigue_physical':
@@ -185,7 +185,7 @@ function DoneView({ alertInfo, onReset }: { alertInfo: AlertInfo; onReset: () =>
 }
 
 function NumberSelect({ value, onChange }: { value: number; onChange: (value: number) => void }) {
-  return <select value={value} onChange={(event) => onChange(Number(event.target.value))} className="mt-5 w-full border border-sand-300 bg-white px-3 py-3 text-sm font-normal text-earth-800 outline-none focus:border-sage-500"><option value={0}>Tidak pernah</option><option value={1}>Beberapa hari</option><option value={2}>Lebih dari separuh hari</option><option value={3}>Hampir setiap hari</option></select>
+  return <select value={value} onChange={(event) => onChange(Number(event.target.value))} className="mt-5 w-full border border-sand-300 bg-white px-3 py-3 text-sm font-normal text-earth-800 outline-none focus:border-sage-500"><option value={0}>Tidak sama sekali</option><option value={1}>Sesekali, sebentar</option><option value={2}>Cukup sering</option><option value={3}>Hampir sepanjang hari</option></select>
 }
 
 function TextSelect({ value, onChange, options }: { value: string; onChange: (value: string) => void; options: string[] }) {

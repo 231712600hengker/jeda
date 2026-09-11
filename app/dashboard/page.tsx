@@ -267,7 +267,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-sand-50 text-earth-900 pb-16">
+    <div className="flex-1 bg-sand-50 text-earth-900 pb-16">
       {/* Top Navigation */}
       <header className="bg-sand-50/95 border-b border-sand-200 sticky top-0 z-10 backdrop-blur">
         <div className="max-w-5xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">

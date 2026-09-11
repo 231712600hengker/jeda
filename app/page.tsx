@@ -91,7 +91,7 @@ export default function LandingPage() {
 
   if (newCode) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-sand-50 p-5 text-earth-900">
+      <div className="flex flex-1 items-center justify-center bg-sand-50 p-5 text-earth-900">
         <section className="max-w-md w-full border border-sand-200 bg-white p-7 shadow-sm sm:p-9">
           <p className="text-sm font-semibold text-sage-700">Kode anonim berhasil dibuat</p>
           <h1 className="mt-2 font-serif text-3xl font-semibold text-earth-900">Simpan kode ini dulu.</h1>
@@ -105,7 +105,7 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-sand-50 p-5 text-earth-900">
+    <div className="flex flex-1 items-center justify-center bg-sand-50 p-5 text-earth-900">
       <div className="max-w-md w-full border border-sand-200 bg-white p-7 shadow-sm sm:p-9">
         <p className="text-sm font-semibold text-sage-700 mb-3">Untuk mahasiswa yang sedang menyelesaikan skripsi</p>
         <h1 className="font-serif text-4xl font-semibold text-earth-900 mb-3">Jeda</h1>
