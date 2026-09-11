@@ -1,26 +1,20 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+:root { --background: #fbf9f5; --foreground: #2b231c; }
 
-@theme inline {
+/* @theme removed; Tailwind-compatible theme variables are declared in :root instead. */
+:root {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
+  --font-serif: Georgia, 'Times New Roman', serif;
   --font-mono: var(--font-geist-mono);
+  --color-sand-50: #fbf9f5; --color-sand-100: #f4efe6; --color-sand-200: #e8ded0; --color-sand-300: #dbcab6; --color-sand-400: #cbb49b; --color-sand-500: #b59b7f; --color-sand-600: #9c8065; --color-sand-700: #7d6550; --color-sand-800: #5c4a3b; --color-sand-900: #3d3127;
+  --color-sage-50: #f3f6f3; --color-sage-100: #e4ece4; --color-sage-200: #c9d9ca; --color-sage-300: #a9c2aa; --color-sage-400: #88a78a; --color-sage-500: #6b8d6d; --color-sage-600: #557357; --color-sage-700: #445c46; --color-sage-800: #354737; --color-sage-900: #243226;
+  --color-earth-50: #f8f6f4; --color-earth-100: #ede7e1; --color-earth-200: #dbd0c4; --color-earth-300: #c5b5a4; --color-earth-400: #ab9783; --color-earth-500: #8f7964; --color-earth-600: #73604f; --color-earth-700: #5a4b3d; --color-earth-800: #42362c; --color-earth-900: #2b231c;
+  --color-lavender-50: #f8f6fa; --color-lavender-100: #eee8f6; --color-lavender-200: #ded3ed; --color-lavender-300: #c6b6dc; --color-lavender-400: #aa95c7; --color-lavender-500: #8d75af; --color-lavender-600: #745a96; --color-lavender-700: #5b4478; --color-lavender-800: #44325a; --color-lavender-900: #302240;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+* { border-radius: 0; }
+body { background: var(--background); color: var(--foreground); font-family: var(--font-geist-sans), Arial, sans-serif; }
+button, input, select { font: inherit; }

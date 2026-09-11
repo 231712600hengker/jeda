@@ -21,6 +21,11 @@ import { getOrCreateUser } from '@/lib/user'
 import { Checkin, CheckinStressor, ChartDataPoint, StressorCount, AlertRecord } from '@/lib/types'
 import { generateDummyCheckins, STRESSOR_LABELS } from '@/lib/dummy-data'
 
+// Tombol data simulasi hanya tampil kalau flag ini diaktifkan lewat env var.
+// JANGAN aktifkan di environment yang dipakai untuk pilot test sungguhan,
+// supaya partisipan tidak bisa tidak sengaja mengotori data asli mereka.
+const DEMO_DATA_ENABLED = process.env.NEXT_PUBLIC_ENABLE_DEMO_DATA === 'true'
+
 export default function DashboardPage() {
   const [checkins, setCheckins] = useState<Checkin[]>([])
   const [stressors, setStressors] = useState<CheckinStressor[]>([])
@@ -128,6 +133,58 @@ export default function DashboardPage() {
     })
   }
 
+  function exportCSV() {
+    if (checkins.length === 0) return
+
+    const stressorsByCheckin: Record<string, string[]> = {}
+    stressors.forEach((s) => {
+      if (!stressorsByCheckin[s.checkin_id]) stressorsByCheckin[s.checkin_id] = []
+      stressorsByCheckin[s.checkin_id].push(STRESSOR_LABELS[s.category] || s.category)
+    })
+
+    const headers = [
+      'tanggal',
+      'anxiety_1',
+      'anxiety_2',
+      'total_kecemasan',
+      'kelelahan_mental',
+      'kelelahan_fisik',
+      'durasi_tidur',
+      'kualitas_tidur',
+      'progres_bermakna',
+      'kejelasan_langkah',
+      'sumber_stres',
+    ]
+
+    const rows = checkins.map((c) => [
+      c.checkin_date,
+      c.anxiety_1,
+      c.anxiety_2,
+      c.anxiety_1 + c.anxiety_2,
+      c.fatigue_mental,
+      c.fatigue_physical,
+      c.sleep_quantity,
+      c.sleep_quality,
+      c.progress_1,
+      c.progress_2,
+      (stressorsByCheckin[c.id] || []).join('; '),
+    ])
+
+    const csvContent = [headers, ...rows]
+      .map((row) => row.map((val) => `"${String(val).replace(/"/g, '""')}"`).join(','))
+      .join('\n')
+
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `jeda-checkins-${anonCode || 'export'}-${new Date().toISOString().split('T')[0]}.csv`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  }
+
   // Format data untuk grafik
   const chartData: ChartDataPoint[] = checkins.map((item) => {
     const parts = item.checkin_date.split('-')
@@ -175,10 +232,10 @@ export default function DashboardPage() {
       : '-'
 
   function getAnxietyBadge(score: number | null) {
-    if (score === null) return { text: 'Belum ada', color: 'bg-neutral-100 text-neutral-600' }
-    if (score <= 2) return { text: 'Rendah (Terkendali)', color: 'bg-emerald-100 text-emerald-800' }
-    if (score <= 4) return { text: 'Sedang (Perlu Perhatian)', color: 'bg-amber-100 text-amber-800' }
-    return { text: 'Tinggi (Waktunya Berjeda)', color: 'bg-rose-100 text-rose-800' }
+    if (score === null) return { text: 'Belum ada catatan', color: 'bg-sand-100 text-earth-600' }
+    if (score <= 2) return { text: 'Terasa terkendali', color: 'bg-sage-100 text-sage-800' }
+    if (score <= 4) return { text: 'Perlu perhatian', color: 'bg-lavender-100 text-lavender-800' }
+    return { text: 'Waktunya beri jeda', color: 'bg-lavender-200 text-lavender-900' }
   }
 
   const anxietyBadge = getAnxietyBadge(latestAnxiety)
@@ -197,9 +254,9 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50 text-neutral-900 pb-16">
+    <div className="min-h-screen bg-sand-50 text-earth-900 pb-16">
       {/* Top Navigation */}
-      <header className="bg-white border-b border-neutral-200 sticky top-0 z-10">
+      <header className="bg-sand-50/95 border-b border-sand-200 sticky top-0 z-10 backdrop-blur">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/" className="text-xl font-bold tracking-tight text-neutral-800 hover:text-blue-600 transition">
@@ -213,7 +270,7 @@ export default function DashboardPage() {
           <div className="flex items-center gap-3 text-sm">
             <Link
               href="/checkin"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-3.5 py-1.5 rounded-lg shadow-sm transition"
+              className="bg-sage-700 hover:bg-sage-800 text-white font-medium px-3.5 py-2 shadow-sm transition"
             >
               + Check-in Hari Ini
             </Link>
@@ -224,17 +281,17 @@ export default function DashboardPage() {
       {/* Main Content */}
       <main className="max-w-5xl mx-auto px-4 pt-6 space-y-8">
         {/* 1. Bar Navigasi & Kode Akses */}
-        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-neutral-200 pb-4">
-          <div className="text-neutral-500 text-sm">
+        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-sand-200 pb-5">
+          <div className="text-earth-600 text-sm">
             Kode Akses:{' '}
-            <span className="font-mono font-bold text-neutral-800 bg-neutral-100 px-2.5 py-1 rounded-md border border-neutral-200">
+            <span className="font-mono font-bold text-earth-800 bg-sand-100 px-2.5 py-1 border border-sand-200">
               {anonCode || '-'}
             </span>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={() => (window.location.href = '/checkin')}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition cursor-pointer shadow-sm"
+              className="bg-sage-700 text-white px-4 py-2 text-sm font-semibold hover:bg-sage-800 transition cursor-pointer shadow-sm"
             >
               + Isi Jurnal Hari Ini
             </button>
@@ -244,7 +301,7 @@ export default function DashboardPage() {
                 localStorage.removeItem('jeda_anon_code')
                 window.location.href = '/'
               }}
-              className="bg-neutral-200 text-neutral-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-neutral-300 transition cursor-pointer"
+              className="border border-sand-300 text-earth-700 px-4 py-2 text-sm font-semibold hover:bg-sand-100 transition cursor-pointer"
             >
               Keluar
             </button>
@@ -254,9 +311,9 @@ export default function DashboardPage() {
         {/* Banner / Title & Actions */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Riwayat & Tren Kesejahteraan</h1>
-            <p className="text-neutral-500 text-sm mt-1">
-              Pantau dinamika emosi, beban fisik, dan progres pengerjaan skripsimu dari waktu ke waktu.
+            <h1 className="font-serif text-3xl font-semibold tracking-tight">Pola yang kamu catat</h1>
+            <p className="text-earth-600 text-sm mt-2">
+              Lihat kecenderungan hari-hari yang terasa ringan maupun berat, tanpa perlu menghakimi diri sendiri.
             </p>
           </div>
 
@@ -269,13 +326,23 @@ export default function DashboardPage() {
               🔄 Refresh
             </button>
             <button
-              onClick={handleGenerateDummy}
-              disabled={isGenerating || loading}
-              className="text-xs px-3 py-1.5 border border-purple-300 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition disabled:opacity-50"
-              title="Tambahkan data simulasi 7 hari untuk melihat grafik lebih lengkap"
+              onClick={exportCSV}
+              disabled={checkins.length === 0}
+              className="text-xs px-3 py-1.5 border border-emerald-300 bg-emerald-50 text-emerald-700 rounded-lg hover:bg-emerald-100 transition disabled:opacity-50"
+              title="Unduh seluruh riwayat check-in sebagai CSV"
             >
-              {isGenerating ? 'Menambahkan...' : '✨ Tambah Data Simulasi (7 Hari)'}
+              ⬇️ Ekspor CSV
             </button>
+            {DEMO_DATA_ENABLED && (
+              <button
+                onClick={handleGenerateDummy}
+                disabled={isGenerating || loading}
+                className="text-xs px-3 py-1.5 border border-purple-300 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition disabled:opacity-50"
+                title="Tambahkan data simulasi 7 hari untuk melihat grafik lebih lengkap"
+              >
+                {isGenerating ? 'Menambahkan...' : '✨ Tambah Data Simulasi (7 Hari)'}
+              </button>
+            )}
           </div>
         </div>
 
@@ -341,13 +408,15 @@ export default function DashboardPage() {
               >
                 Mulai Check-in Sekarang
               </Link>
-              <button
-                onClick={handleGenerateDummy}
-                disabled={isGenerating}
-                className="bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-medium px-4 py-2 rounded-lg text-sm transition"
-              >
-                {isGenerating ? 'Membuat Data...' : 'Isi Data Simulasi (7 Hari)'}
-              </button>
+              {DEMO_DATA_ENABLED && (
+                <button
+                  onClick={handleGenerateDummy}
+                  disabled={isGenerating}
+                  className="bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-medium px-4 py-2 rounded-lg text-sm transition"
+                >
+                  {isGenerating ? 'Membuat Data...' : 'Isi Data Simulasi (7 Hari)'}
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -596,4 +665,3 @@ export default function DashboardPage() {
     </div>
   )
 }
-
