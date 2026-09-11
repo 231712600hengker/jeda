@@ -5,14 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { getOrCreateUser } from '@/lib/user'
-
-const STRESSOR_OPTIONS = [
-  { value: 'teknis', label: 'Beban teknis atau kognitif' },
-  { value: 'bimbingan', label: 'Bimbingan atau birokrasi' },
-  { value: 'manajemen_waktu', label: 'Manajemen waktu' },
-  { value: 'infrastruktur', label: 'Lingkungan atau fasilitas' },
-  { value: 'personal', label: 'Hal personal di luar skripsi' },
-]
+import { SLEEP_QUALITY_OPTIONS, SLEEP_QUANTITY_OPTIONS, STRESSOR_OPTIONS } from '@/lib/constants'
 
 type Intervention = { title: string; description: string; steps: string[] }
 type AlertInfo = { triggered: boolean; reasons: string[]; intervention: Intervention | null }
@@ -160,9 +153,9 @@ export default function CheckinPage() {
       case 'fatigue_physical':
         return <Question title="Tubuh dan energi" prompt="Seberapa lelah fisikmu sekarang?"><RangeField value={fatiguePhysical} onChange={setFatiguePhysical} low="Bugar" high="Sangat lelah" max={10} /></Question>
       case 'sleep_quantity':
-        return <Question title="Tidur" prompt="Berapa lama kamu tidur semalam?"><TextSelect value={sleepQuantity} onChange={setSleepQuantity} options={['< 4 Jam', '4-6 Jam', '6-8 Jam', '> 8 Jam']} /></Question>
+        return <Question title="Tidur" prompt="Berapa lama kamu tidur semalam?"><TextSelect value={sleepQuantity} onChange={setSleepQuantity} options={[...SLEEP_QUANTITY_OPTIONS]} /></Question>
       case 'sleep_quality':
-        return <Question title="Tidur" prompt="Bagaimana kualitas tidurmu semalam?"><TextSelect value={sleepQuality} onChange={setSleepQuality} options={['Sering terbangun atau gelisah', 'Cukup', 'Sangat nyenyak']} /></Question>
+        return <Question title="Tidur" prompt="Bagaimana kualitas tidurmu semalam?"><TextSelect value={sleepQuality} onChange={setSleepQuality} options={[...SLEEP_QUALITY_OPTIONS]} /></Question>
       case 'progress_1':
         return <Question title="Skripsi hari ini" prompt="Seberapa terasa kamu membuat kemajuan yang berarti?"><RangeField value={progress1} onChange={setProgress1} low="Belum terasa" high="Sangat terasa" max={5} /></Question>
       case 'progress_2':

@@ -1,16 +1,9 @@
 import { supabase } from './supabase'
-
-export const STRESSOR_LABELS: Record<string, string> = {
-  teknis: 'Beban Teknis/Kognitif',
-  bimbingan: 'Bimbingan & Birokrasi',
-  manajemen_waktu: 'Manajemen Waktu',
-  infrastruktur: 'Infrastruktur & Lingkungan',
-  personal: 'Personal',
-}
+import { SLEEP_QUALITY_OPTIONS, SLEEP_QUANTITY_OPTIONS } from './constants'
 
 export async function generateDummyCheckins(userId: string, days = 7) {
   const sleepQuantities = ['4-6 Jam', '6-8 Jam', '6-8 Jam', '< 4 Jam', '6-8 Jam', '> 8 Jam', '4-6 Jam']
-  const sleepQualities = ['Cukup', 'Sangat Nyenyak', 'Cukup', 'Sering terbangun/Gelisah', 'Cukup', 'Sangat Nyenyak', 'Cukup']
+  const sleepQualities = ['Cukup', 'Sangat nyenyak', 'Cukup', 'Sering terbangun atau gelisah', 'Cukup', 'Sangat nyenyak', 'Cukup']
   const samplePattern = [
     { a1: 2, a2: 2, fm: 7, fp: 6, p1: 2, p2: 2, stressors: ['teknis', 'manajemen_waktu'] },
     { a1: 2, a2: 1, fm: 6, fp: 5, p1: 3, p2: 3, stressors: ['teknis'] },
@@ -40,8 +33,8 @@ export async function generateDummyCheckins(userId: string, days = 7) {
         anxiety_2: pattern.a2,
         fatigue_mental: pattern.fm,
         fatigue_physical: pattern.fp,
-        sleep_quantity: sleepQuantities[i % sleepQuantities.length],
-        sleep_quality: sleepQualities[i % sleepQualities.length],
+        sleep_quantity: sleepQuantities[i % sleepQuantities.length] ?? SLEEP_QUANTITY_OPTIONS[2],
+        sleep_quality: sleepQualities[i % sleepQualities.length] ?? SLEEP_QUALITY_OPTIONS[1],
         progress_1: pattern.p1,
         progress_2: pattern.p2,
       })

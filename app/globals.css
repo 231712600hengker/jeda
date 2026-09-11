@@ -14,6 +14,5 @@
   --color-lavender-50: #f8f6fa; --color-lavender-100: #eee8f6; --color-lavender-200: #ded3ed; --color-lavender-300: #c6b6dc; --color-lavender-400: #aa95c7; --color-lavender-500: #8d75af; --color-lavender-600: #745a96; --color-lavender-700: #5b4478; --color-lavender-800: #44325a; --color-lavender-900: #302240;
 }
 
-* { border-radius: 0; }
 body { background: var(--background); color: var(--foreground); font-family: var(--font-geist-sans), Arial, sans-serif; }
 button, input, select { font: inherit; }

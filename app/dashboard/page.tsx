@@ -20,10 +20,9 @@ import {
 import { supabase } from '@/lib/supabase'
 import { getOrCreateUser } from '@/lib/user'
 import { Checkin, CheckinStressor, ChartDataPoint, AlertRecord } from '@/lib/types'
-import { STRESSOR_LABELS } from '@/lib/dummy-data'
+import { SLEEP_QUALITY_OPTIONS, STRESSOR_LABELS } from '@/lib/constants'
 
 type Range = '7' | '30' | 'all'
-const DEMO_DATA_ENABLED = false
 
 function createDemoCheckins(): Checkin[] {
   const pattern = [
@@ -36,7 +35,7 @@ function createDemoCheckins(): Checkin[] {
     return {
       id: `demo-${index}`, user_id: 'demo', checkin_date: date.toISOString().split('T')[0],
       anxiety_1: anxiety1, anxiety_2: anxiety2, fatigue_mental: mental, fatigue_physical: physical,
-      sleep_quantity: index === 3 ? '4-6 Jam' : '6-8 Jam', sleep_quality: index === 3 ? 'Sering terbangun/Gelisah' : 'Cukup',
+      sleep_quantity: index === 3 ? '4-6 Jam' : '6-8 Jam', sleep_quality: index === 3 ? SLEEP_QUALITY_OPTIONS[0] : SLEEP_QUALITY_OPTIONS[1],
       progress_1: progress1, progress_2: progress2,
     }
   })
@@ -55,7 +54,6 @@ export default function DashboardPage() {
   const [selectedRange, setSelectedRange] = useState<Range>('30')
   const [exporting, setExporting] = useState(false)
   const [actionMessage, setActionMessage] = useState<string | null>(null)
-  const [isGenerating] = useState(false)
 
   async function loadData() {
     setLoading(true)
@@ -272,17 +270,17 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-sand-50 text-earth-900 pb-16">
       {/* Top Navigation */}
       <header className="bg-sand-50/95 border-b border-sand-200 sticky top-0 z-10 backdrop-blur">
-        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-xl font-bold tracking-tight text-neutral-800 hover:text-blue-600 transition">
+            <Link href="/" className="text-xl font-bold tracking-tight text-earth-800 hover:text-sage-700 transition">
               Jeda 🍃
             </Link>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
+            <span className="text-xs font-semibold px-2 py-0.5 rounded bg-sage-50 text-sage-800 border border-sage-200">
               Dashboard
             </span>
           </div>
 
-          <div className="flex items-center gap-3 text-sm">
+          <div className="flex flex-wrap items-center gap-3 text-sm">
             <Link
               href="/reflection"
               className="border border-sand-300 px-3.5 py-2 font-semibold text-earth-700 transition hover:bg-sand-100"
@@ -357,16 +355,6 @@ export default function DashboardPage() {
             <button onClick={handleGenerateDummy} disabled={loading} className="border border-lavender-300 bg-lavender-50 px-3 py-2 text-xs font-semibold text-lavender-800 transition hover:bg-lavender-100 disabled:cursor-not-allowed disabled:opacity-50" title="Tampilkan atau tutup contoh data 7 hari tanpa menyimpan apa pun">
               {demoCheckins ? 'Kembali ke data saya' : 'Lihat data simulasi'}
             </button>
-            {DEMO_DATA_ENABLED && (
-              <button
-                onClick={handleGenerateDummy}
-                disabled={isGenerating || loading}
-                className="text-xs px-3 py-1.5 border border-purple-300 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition disabled:opacity-50"
-                title="Tambahkan data simulasi 7 hari untuk melihat grafik lebih lengkap"
-              >
-                {isGenerating ? 'Menambahkan...' : '✨ Tambah Data Simulasi (7 Hari)'}
-              </button>
-            )}
           </div>
         </div>
 
@@ -404,26 +392,26 @@ export default function DashboardPage() {
             {activeAlerts.map((alert) => (
               <div
                 key={alert.id}
-                className="bg-red-50 border-l-4 border-red-500 p-4 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between sm:items-center gap-3"
+              className="bg-lavender-50 border-l-4 border-lavender-500 p-4 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between sm:items-center gap-3"
               >
                 <div>
-                  <h3 className="text-red-800 font-bold flex items-center gap-2">
+                  <h3 className="text-lavender-900 font-bold flex items-center gap-2">
                     <span>🚨</span>
                     <span>Peringatan: Skor Kritis Terdeteksi</span>
                   </h3>
-                  <p className="text-red-700 text-sm mt-0.5">
+                  <p className="text-lavender-800 text-sm mt-0.5">
                     Sistem mendeteksi tingkat kecemasan/kelelahan yang tinggi pada check-in Anda. 
                     Mohon pertimbangkan untuk beristirahat atau berkonsultasi jika kondisi berlanjut.
                   </p>
                   {typeof alert.trigger_detail === 'object' && alert.trigger_detail?.reason && (
-                    <p className="text-red-600 text-xs mt-1 font-medium">
+                    <p className="text-lavender-700 text-xs mt-1 font-medium">
                       Pemicu: {alert.trigger_detail.reason}
                     </p>
                   )}
                 </div>
                 <button 
                   onClick={() => alert.id && handleAcknowledge(alert.id)}
-                  className="bg-red-100 text-red-800 px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-red-200 transition shrink-0 self-start sm:self-center cursor-pointer"
+                  className="bg-lavender-100 text-lavender-900 px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-lavender-200 transition shrink-0 self-start sm:self-center cursor-pointer"
                 >
                   Tutup
                 </button>
@@ -440,35 +428,26 @@ export default function DashboardPage() {
 
         {/* Loading State */}
         {loading && (
-          <div className="p-12 text-center text-neutral-400 font-medium">
+          <div className="p-12 text-center text-earth-400 font-medium">
             Memuat data check-in...
           </div>
         )}
 
         {/* Empty State */}
         {!loading && activeCheckins.length === 0 && (
-          <div className="bg-white border border-neutral-200 rounded-2xl p-8 text-center max-w-lg mx-auto shadow-sm my-8">
+          <div className="bg-white border border-sand-200 rounded-2xl p-8 text-center max-w-lg mx-auto shadow-sm my-8">
             <div className="text-4xl mb-3">🌱</div>
             <h2 className="text-lg font-semibold mb-1">Belum Ada Riwayat Check-in</h2>
-            <p className="text-neutral-500 text-sm mb-6">
+            <p className="text-earth-500 text-sm mb-6">
               Mulai rekam kondisi harimu atau gunakan tombol simulasi untuk melihat visualisasi grafik langsung.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-3">
               <Link
                 href="/checkin"
-                className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg text-sm transition"
+                className="bg-sage-700 hover:bg-sage-800 text-white font-medium px-4 py-2 rounded-lg text-sm transition"
               >
                 Mulai Check-in Sekarang
               </Link>
-              {DEMO_DATA_ENABLED && (
-                <button
-                  onClick={handleGenerateDummy}
-                  disabled={isGenerating}
-                  className="bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-medium px-4 py-2 rounded-lg text-sm transition"
-                >
-                  {isGenerating ? 'Membuat Data...' : 'Isi Data Simulasi (7 Hari)'}
-                </button>
-              )}
             </div>
           </div>
         )}
@@ -477,8 +456,8 @@ export default function DashboardPage() {
           <>
             {/* Stat Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-sm">
-                <p className="text-xs text-neutral-500 font-medium uppercase">Kecemasan Terakhir</p>
+              <div className="bg-white p-4 rounded-xl border border-sand-200 shadow-sm">
+                <p className="text-xs text-earth-500 font-medium uppercase">Kecemasan Terakhir</p>
                 <div className="mt-2 flex items-baseline gap-2">
                   <span className="text-2xl font-bold">{latestAnxiety !== null ? `${latestAnxiety}/6` : '-'}</span>
                 </div>
@@ -489,55 +468,55 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-sm">
-                <p className="text-xs text-neutral-500 font-medium uppercase">Rata-rata Kelelahan Mental</p>
+              <div className="bg-white p-4 rounded-xl border border-sand-200 shadow-sm">
+                <p className="text-xs text-earth-500 font-medium uppercase">Rata-rata Kelelahan Mental</p>
                 <div className="mt-2 flex items-baseline gap-1">
                   <span className="text-2xl font-bold">{avgMentalFatigue}</span>
-                  <span className="text-xs text-neutral-400">/ 10</span>
+                  <span className="text-xs text-earth-400">/ 10</span>
                 </div>
-                <p className="text-xs text-neutral-500 mt-2">
+                <p className="text-xs text-earth-500 mt-2">
                   {Number(avgMentalFatigue) >= 7 ? '⚠️ Indikasi kelelahan tinggi' : 'Tingkat kelelahan wajar'}
                 </p>
               </div>
 
-              <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-sm">
-                <p className="text-xs text-neutral-500 font-medium uppercase">Rata-rata Progres</p>
+              <div className="bg-white p-4 rounded-xl border border-sand-200 shadow-sm">
+                <p className="text-xs text-earth-500 font-medium uppercase">Rata-rata Progres</p>
                 <div className="mt-2 flex items-baseline gap-1">
                   <span className="text-2xl font-bold">{avgProgress}</span>
-                  <span className="text-xs text-neutral-400">/ 5</span>
+                  <span className="text-xs text-earth-400">/ 5</span>
                 </div>
-                <p className="text-xs text-neutral-500 mt-2">Momentum pengerjaan</p>
+                <p className="text-xs text-earth-500 mt-2">Momentum pengerjaan</p>
               </div>
 
-              <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-sm">
-                <p className="text-xs text-neutral-500 font-medium uppercase">Total Riwayat</p>
+              <div className="bg-white p-4 rounded-xl border border-sand-200 shadow-sm">
+                <p className="text-xs text-earth-500 font-medium uppercase">Total Riwayat</p>
                 <div className="mt-2 flex items-baseline gap-1">
                   <span className="text-2xl font-bold">{activeCheckins.length}</span>
-                  <span className="text-xs text-neutral-500">hari tercatat</span>
+                  <span className="text-xs text-earth-500">hari tercatat</span>
                 </div>
-                <p className="text-xs text-neutral-500 mt-2">
+                <p className="text-xs text-earth-500 mt-2">
                   Tidur semalam: {latestCheckin?.sleep_quantity || '-'}
                 </p>
               </div>
             </div>
 
             {/* Chart 1: Kelelahan Mental vs Fisik */}
-            <div className="bg-white p-5 rounded-2xl border border-neutral-200 shadow-sm space-y-4">
+            <div className="bg-white p-5 rounded-2xl border border-sand-200 shadow-sm space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
-                  <h3 className="font-semibold text-base text-neutral-800">Tren Kelelahan Mental & Fisik</h3>
-                  <p className="text-xs text-neutral-500">Skala 1 (Sangat Bugar) hingga 10 (Burnout / Sangat Lelah)</p>
+                  <h3 className="font-semibold text-base text-earth-800">Tren Kelelahan Mental & Fisik</h3>
+                  <p className="text-xs text-earth-500">Skala 1 (Sangat Bugar) hingga 10 (Burnout / Sangat Lelah)</p>
                 </div>
-                <div className="text-xs text-neutral-400">
+                <div className="text-xs text-earth-400">
                   {filteredChartData.length} titik data
                 </div>
               </div>
               <div className="w-full h-72">
                 <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={filteredChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="displayDate" tick={{ fontSize: 12, fill: '#737373' }} />
-                    <YAxis domain={[1, 10]} ticks={[1, 3, 5, 7, 10]} tick={{ fontSize: 12, fill: '#737373' }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e8ded0" />
+                    <XAxis dataKey="displayDate" tick={{ fontSize: 12, fill: '#73604f' }} />
+                    <YAxis domain={[1, 10]} ticks={[1, 3, 5, 7, 10]} tick={{ fontSize: 12, fill: '#73604f' }} />
                     <Tooltip
                       contentStyle={{ backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e5e5e5', fontSize: '12px' }}
                       formatter={(val, name) => [
@@ -553,17 +532,17 @@ export default function DashboardPage() {
                     <Line
                       type="monotone"
                       dataKey="fatigueMental"
-                      stroke="#8b5cf6"
+                      stroke="#745a96"
                       strokeWidth={2.5}
-                      dot={{ r: 4, fill: '#8b5cf6' }}
+                      dot={{ r: 4, fill: '#745a96' }}
                       activeDot={{ r: 6 }}
                     />
                     <Line
                       type="monotone"
                       dataKey="fatiguePhysical"
-                      stroke="#06b6d4"
+                      stroke="#557357"
                       strokeWidth={2.5}
-                      dot={{ r: 4, fill: '#06b6d4' }}
+                      dot={{ r: 4, fill: '#557357' }}
                       activeDot={{ r: 6 }}
                     />
                   </LineChart>
@@ -572,11 +551,11 @@ export default function DashboardPage() {
             </div>
 
             {/* Chart 2: Tren Kecemasan */}
-            <div className="bg-white p-5 rounded-2xl border border-neutral-200 shadow-sm space-y-4">
+            <div className="bg-white p-5 rounded-2xl border border-sand-200 shadow-sm space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
-                  <h3 className="font-semibold text-base text-neutral-800">Tren Tingkat Kecemasan</h3>
-                  <p className="text-xs text-neutral-500">Skor Gabungan (0 = Tenang, 6 = Sangat Cemas/Gelisah)</p>
+                  <h3 className="font-semibold text-base text-earth-800">Tren Tingkat Kecemasan</h3>
+                  <p className="text-xs text-earth-500">Skor Gabungan (0 = Tenang, 6 = Sangat Cemas/Gelisah)</p>
                 </div>
               </div>
               <div className="w-full h-64">
@@ -584,13 +563,13 @@ export default function DashboardPage() {
                   <AreaChart data={filteredChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <defs>
                       <linearGradient id="anxietyGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.4} />
-                        <stop offset="95%" stopColor="#f59e0b" stopOpacity={0.0} />
+                        <stop offset="5%" stopColor="#aa95c7" stopOpacity={0.38} />
+                        <stop offset="95%" stopColor="#aa95c7" stopOpacity={0.0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="displayDate" tick={{ fontSize: 12, fill: '#737373' }} />
-                    <YAxis domain={[0, 6]} ticks={[0, 2, 4, 6]} tick={{ fontSize: 12, fill: '#737373' }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e8ded0" />
+                    <XAxis dataKey="displayDate" tick={{ fontSize: 12, fill: '#73604f' }} />
+                    <YAxis domain={[0, 6]} ticks={[0, 2, 4, 6]} tick={{ fontSize: 12, fill: '#73604f' }} />
                     <Tooltip
                       contentStyle={{ backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e5e5e5', fontSize: '12px' }}
                       formatter={(val) => [`${val} / 6`, 'Total Skor Kecemasan']}
@@ -599,11 +578,11 @@ export default function DashboardPage() {
                     <Area
                       type="monotone"
                       dataKey="totalAnxiety"
-                      stroke="#f59e0b"
+                      stroke="#8d75af"
                       strokeWidth={2.5}
                       fillOpacity={1}
                       fill="url(#anxietyGrad)"
-                      dot={{ r: 4, fill: '#f59e0b' }}
+                      dot={{ r: 4, fill: '#8d75af' }}
                       activeDot={{ r: 6 }}
                     />
                   </AreaChart>
@@ -612,19 +591,19 @@ export default function DashboardPage() {
             </div>
 
             {/* Chart 3: Progres & Kejelasan Langkah */}
-            <div className="bg-white p-5 rounded-2xl border border-neutral-200 shadow-sm space-y-4">
+            <div className="bg-white p-5 rounded-2xl border border-sand-200 shadow-sm space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
-                  <h3 className="font-semibold text-base text-neutral-800">Tren Progres & Arah Skripsi</h3>
-                  <p className="text-xs text-neutral-500">Skala 1 (Stuck / Bingung) hingga 5 (Kemajuan Signifikan / Sangat Jelas)</p>
+                  <h3 className="font-semibold text-base text-earth-800">Tren Progres & Arah Skripsi</h3>
+                  <p className="text-xs text-earth-500">Skala 1 (Stuck / Bingung) hingga 5 (Kemajuan Signifikan / Sangat Jelas)</p>
                 </div>
               </div>
               <div className="w-full h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={filteredChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="displayDate" tick={{ fontSize: 12, fill: '#737373' }} />
-                    <YAxis domain={[1, 5]} ticks={[1, 2, 3, 4, 5]} tick={{ fontSize: 12, fill: '#737373' }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e8ded0" />
+                    <XAxis dataKey="displayDate" tick={{ fontSize: 12, fill: '#73604f' }} />
+                    <YAxis domain={[1, 5]} ticks={[1, 2, 3, 4, 5]} tick={{ fontSize: 12, fill: '#73604f' }} />
                     <Tooltip
                       contentStyle={{ backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e5e5e5', fontSize: '12px' }}
                       formatter={(val, name) => [
@@ -640,17 +619,17 @@ export default function DashboardPage() {
                     <Line
                       type="monotone"
                       dataKey="progressMeaningful"
-                      stroke="#10b981"
+                      stroke="#557357"
                       strokeWidth={2.5}
-                      dot={{ r: 4, fill: '#10b981' }}
+                      dot={{ r: 4, fill: '#557357' }}
                       activeDot={{ r: 6 }}
                     />
                     <Line
                       type="monotone"
                       dataKey="progressNextStep"
-                      stroke="#3b82f6"
+                      stroke="#9c8065"
                       strokeWidth={2.5}
-                      dot={{ r: 4, fill: '#3b82f6' }}
+                      dot={{ r: 4, fill: '#9c8065' }}
                       activeDot={{ r: 6 }}
                     />
                   </LineChart>
@@ -660,10 +639,10 @@ export default function DashboardPage() {
 
             {/* 4. Analisis Pemicu Stres (Bar Chart) */}
             {stressorData.length > 0 && (
-              <div className="bg-white p-5 rounded-2xl border border-neutral-200 shadow-sm space-y-4">
+              <div className="bg-white p-5 rounded-2xl border border-sand-200 shadow-sm space-y-4">
                 <div>
-                  <h3 className="font-semibold text-base text-neutral-800">Frekuensi Pemicu Stres</h3>
-                  <p className="text-xs text-neutral-500">
+                  <h3 className="font-semibold text-base text-earth-800">Frekuensi Pemicu Stres</h3>
+                  <p className="text-xs text-earth-500">
                     Analisis pemicu stres yang paling sering dicatat selama pengerjaan skripsi.
                   </p>
                 </div>
@@ -675,13 +654,13 @@ export default function DashboardPage() {
                       layout="vertical"
                       margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                      <XAxis type="number" allowDecimals={false} tick={{ fontSize: 12, fill: '#737373' }} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e8ded0" />
+                      <XAxis type="number" allowDecimals={false} tick={{ fontSize: 12, fill: '#73604f' }} />
                       <YAxis
                         dataKey="nama"
                         type="category"
                         width={140}
-                        tick={{ fontSize: 11, fill: '#525252' }}
+                        tick={{ fontSize: 11, fill: '#5a4b3d' }}
                       />
                       <Tooltip
                         contentStyle={{
@@ -692,20 +671,20 @@ export default function DashboardPage() {
                         }}
                         formatter={(val) => [`${val} kali`, 'Frekuensi']}
                       />
-                      <Bar dataKey="jumlah" fill="#8b5cf6" radius={[0, 4, 4, 0]} barSize={20} />
+                      <Bar dataKey="jumlah" fill="#745a96" radius={[0, 4, 4, 0]} barSize={20} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
 
                 {/* Grid Rincian Badge */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 pt-2 border-t border-neutral-100">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 pt-2 border-t border-sand-100">
                   {stressorData.map((item) => (
                     <div
                       key={item.nama}
-                      className="p-2.5 rounded-xl border border-neutral-100 bg-neutral-50/70 flex flex-col justify-between"
+                      className="p-2.5 rounded-xl border border-sand-200 bg-sand-50/70 flex flex-col justify-between"
                     >
-                      <span className="text-xs font-medium text-neutral-600 line-clamp-1">{item.nama}</span>
-                      <span className="text-sm font-bold text-purple-700 mt-1">{item.jumlah}x</span>
+                      <span className="text-xs font-medium text-earth-600 line-clamp-1">{item.nama}</span>
+                      <span className="text-sm font-bold text-lavender-700 mt-1">{item.jumlah}x</span>
                     </div>
                   ))}
                 </div>
