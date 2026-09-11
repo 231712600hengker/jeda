@@ -1,97 +1,118 @@
-import Link from 'next/link'
+"use client";
 
-export default function Home() {
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
+
+export default function LandingPage() {
+  const router = useRouter();
+  const [inputCode, setInputCode] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+
+  // Cek apakah user sudah login sebelumnya di browser ini
+  useEffect(() => {
+    const existingId = localStorage.getItem("jeda_user_id");
+    if (existingId) {
+      router.push("/dashboard");
+    }
+  }, [router]);
+
+  async function generateNewCode() {
+    setLoading(true);
+    // Buat kode acak 6 karakter, misal: JEDA-A1B2C3
+    const newCode = "JEDA-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+    
+    const { data, error } = await supabase
+      .from("users")
+      .insert([{ anonymous_code: newCode }])
+      .select()
+      .single();
+
+    if (error) {
+      setErrorMsg("Gagal membuat kode anonim. Coba lagi.");
+      setLoading(false);
+      return;
+    }
+
+    // Simpan data ke browser
+    localStorage.setItem("jeda_user_id", data.id);
+    localStorage.setItem("jeda_anon_code", data.anonymous_code);
+    
+    // Beri peringatan agar user mencatat kodenya
+    alert(`PENTING: Kode Anda adalah ${newCode}\n\nHarap simpan/screenshot kode ini untuk mengakses riwayat Anda di perangkat lain.`);
+    router.push("/checkin");
+  }
+
+  async function loginExistingCode() {
+    if (!inputCode) return;
+    setLoading(true);
+    setErrorMsg("");
+
+    const { data, error } = await supabase
+      .from("users")
+      .select("id, anonymous_code")
+      .eq("anonymous_code", inputCode.trim().toUpperCase())
+      .single();
+
+    if (error || !data) {
+      setErrorMsg("Kode tidak ditemukan. Silakan periksa kembali.");
+      setLoading(false);
+      return;
+    }
+
+    localStorage.setItem("jeda_user_id", data.id);
+    localStorage.setItem("jeda_anon_code", data.anonymous_code);
+    router.push("/dashboard");
+  }
+
   return (
-    <div className="min-h-screen bg-neutral-50 text-neutral-900 flex flex-col justify-between">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur border-b border-neutral-200 sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">🍃</span>
-            <span className="text-xl font-bold tracking-tight text-neutral-900">Jeda</span>
-          </div>
-          <div className="flex items-center gap-4 text-sm font-medium">
-            <Link
-              href="/dashboard"
-              className="text-neutral-600 hover:text-blue-600 transition"
-            >
-              Dashboard
-            </Link>
-            <Link
-              href="/checkin"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl transition shadow-sm"
-            >
-              Check-in
-            </Link>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+      <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full text-center">
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">Jeda.</h1>
+        <p className="text-gray-600 mb-8">Platform pemantauan kesejahteraan psikologis anonim.</p>
 
-      {/* Hero Section */}
-      <main className="max-w-4xl mx-auto px-6 py-16 text-center my-auto space-y-8">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-800 text-xs font-medium">
-          <span>🌱</span>
-          <span>Pendamping Kesejahteraan Mahasiswa Skripsi</span>
-        </div>
-
-        <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-neutral-900 leading-tight">
-          Tetap Waras & Bertumbuh <br className="hidden sm:inline" />
-          di Tengah Perjalanan Skripsi
-        </h1>
-
-        <p className="max-w-2xl mx-auto text-base sm:text-lg text-neutral-600 leading-relaxed">
-          Skripsi adalah maraton mental. Luangkan 2 menit setiap hari untuk mengenali tingkat kecemasan,
-          kelelahan kognitif, dan melihat progresmu secara visual tanpa penghakiman.
-        </p>
-
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-          <Link
-            href="/checkin"
-            className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3.5 rounded-xl text-base shadow-sm transition"
+        {/* Bagian Pengguna Baru */}
+        <div className="mb-8 p-4 border rounded-lg bg-blue-50">
+          <h2 className="font-semibold text-blue-900 mb-2">Baru pertama kali?</h2>
+          <p className="text-sm text-blue-700 mb-4">Dapatkan kode anonim untuk mulai melacak kondisi Anda secara privat.</p>
+          <button
+            onClick={generateNewCode}
+            disabled={loading}
+            className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition disabled:opacity-50"
           >
-            Mulai Check-in Hari Ini (2 Menit)
-          </Link>
-          <Link
-            href="/dashboard"
-            className="w-full sm:w-auto bg-white hover:bg-neutral-100 text-neutral-800 font-medium px-8 py-3.5 rounded-xl text-base border border-neutral-300 transition"
+            {loading ? "Memproses..." : "Buat Kode Anonim Baru"}
+          </button>
+        </div>
+
+        <div className="relative flex py-2 items-center mb-6">
+          <div className="flex-grow border-t border-gray-300"></div>
+          <span className="flex-shrink-0 mx-4 text-gray-400 text-sm">ATAU</span>
+          <div className="flex-grow border-t border-gray-300"></div>
+        </div>
+
+        {/* Bagian Pengguna Lama */}
+        <div className="text-left">
+          <label className="block text-gray-700 text-sm font-bold mb-2">
+            Punya kode anonim?
+          </label>
+          <input
+            type="text"
+            value={inputCode}
+            onChange={(e) => setInputCode(e.target.value)}
+            placeholder="Contoh: JEDA-A1B2C3"
+            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 uppercase"
+          />
+          {errorMsg && <p className="text-red-500 text-sm mt-2">{errorMsg}</p>}
+          <button
+            onClick={loginExistingCode}
+            disabled={loading || !inputCode}
+            className="w-full mt-4 bg-gray-800 text-white font-bold py-2 px-4 rounded hover:bg-gray-900 transition disabled:opacity-50"
           >
-            Lihat Dashboard & Tren 📊
-          </Link>
+            {loading ? "Memproses..." : "Masuk"}
+          </button>
         </div>
-
-        {/* Value Props / Highlights */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-12 text-left">
-          <div className="bg-white p-6 rounded-2xl border border-neutral-200 shadow-sm">
-            <div className="text-2xl mb-3">⏱️</div>
-            <h3 className="font-semibold text-neutral-900 mb-1">Cepat & Tanpa Beban</h3>
-            <p className="text-sm text-neutral-500">
-              Cukup 2 menit dengan skala terukur (kecemasan, kelelahan mental, tidur, dan progres harian).
-            </p>
-          </div>
-
-          <div className="bg-white p-6 rounded-2xl border border-neutral-200 shadow-sm">
-            <div className="text-2xl mb-3">📈</div>
-            <h3 className="font-semibold text-neutral-900 mb-1">Visualisasi Grafik Tren</h3>
-            <p className="text-sm text-neutral-500">
-              Lihat dinamika kelelahan dan kecemasanmu dari waktu ke waktu secara objektif dengan grafik interaktif.
-            </p>
-          </div>
-
-          <div className="bg-white p-6 rounded-2xl border border-neutral-200 shadow-sm">
-            <div className="text-2xl mb-3">🛡️</div>
-            <h3 className="font-semibold text-neutral-900 mb-1">100% Anonim & Privat</h3>
-            <p className="text-sm text-neutral-500">
-              Identitas disimpan dengan aman secara anonim di perangkatmu tanpa perlu login rumit.
-            </p>
-          </div>
-        </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="border-t border-neutral-200 bg-white py-6 text-center text-xs text-neutral-400">
-        Jeda — Ruang Bernapas Pejuang Skripsi.
-      </footer>
+      </div>
     </div>
-  )
+  );
 }

@@ -26,6 +26,7 @@ export default function DashboardPage() {
   const [stressors, setStressors] = useState<CheckinStressor[]>([])
   const [stressorData, setStressorData] = useState<{ nama: string; jumlah: number }[]>([])
   const [activeAlerts, setActiveAlerts] = useState<AlertRecord[]>([])
+  const [anonCode, setAnonCode] = useState<string>('')
   const [userId, setUserId] = useState<string>('')
   const [loading, setLoading] = useState(true)
   const [isGenerating, startGenerateTransition] = useTransition()
@@ -104,7 +105,14 @@ export default function DashboardPage() {
     }
   }
 
+  // 3. Amankan Rute (Route Protection)
   useEffect(() => {
+    const storedUserId = localStorage.getItem('jeda_user_id')
+    if (!storedUserId) {
+      window.location.href = '/'
+      return
+    }
+    setAnonCode(localStorage.getItem('jeda_anon_code') || '')
     loadData()
   }, [])
 
@@ -215,6 +223,34 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <main className="max-w-5xl mx-auto px-4 pt-6 space-y-8">
+        {/* 1. Bar Navigasi & Kode Akses */}
+        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-neutral-200 pb-4">
+          <div className="text-neutral-500 text-sm">
+            Kode Akses:{' '}
+            <span className="font-mono font-bold text-neutral-800 bg-neutral-100 px-2.5 py-1 rounded-md border border-neutral-200">
+              {anonCode || '-'}
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => (window.location.href = '/checkin')}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition cursor-pointer shadow-sm"
+            >
+              + Isi Jurnal Hari Ini
+            </button>
+            <button
+              onClick={() => {
+                localStorage.removeItem('jeda_user_id')
+                localStorage.removeItem('jeda_anon_code')
+                window.location.href = '/'
+              }}
+              className="bg-neutral-200 text-neutral-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-neutral-300 transition cursor-pointer"
+            >
+              Keluar
+            </button>
+          </div>
+        </div>
+
         {/* Banner / Title & Actions */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>

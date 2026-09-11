@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { getOrCreateUser } from '@/lib/user'
@@ -14,6 +14,15 @@ const STRESSOR_OPTIONS = [
 ]
 
 export default function CheckinPage() {
+  // 3. Amankan Rute (Route Protection)
+  useEffect(() => {
+    const userId = localStorage.getItem('jeda_user_id')
+    if (!userId) {
+      window.location.href = '/'
+      return
+    }
+  }, [])
+
   const [checkinDate, setCheckinDate] = useState(() => new Date().toISOString().split('T')[0])
   const [anxiety1, setAnxiety1] = useState(0)
   const [anxiety2, setAnxiety2] = useState(0)
@@ -137,6 +146,16 @@ export default function CheckinPage() {
       </header>
 
       <main className="max-w-xl mx-auto p-6">
+        {/* 2. Tombol Kembali ke Dashboard */}
+        <div className="mb-4 flex justify-between items-center">
+          <button
+            onClick={() => (window.location.href = '/dashboard')}
+            className="text-blue-600 hover:text-blue-800 text-sm font-semibold flex items-center gap-1 cursor-pointer transition"
+          >
+            ← Kembali ke Dashboard
+          </button>
+        </div>
+
         {done ? (
           <div className="bg-white border border-neutral-200 rounded-2xl p-8 text-center shadow-sm space-y-5 my-8">
             <div className="text-4xl">{alertInfo.triggered ? '⚠️' : '✨'}</div>

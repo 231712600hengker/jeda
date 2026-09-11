@@ -4,7 +4,7 @@ export async function getOrCreateUser(): Promise<string> {
   const existingId = localStorage.getItem('jeda_user_id')
   if (existingId) return existingId
 
-  const anonymousCode = 'user_' + Math.random().toString(36).substring(2, 10)
+  const anonymousCode = 'JEDA-' + Math.random().toString(36).substring(2, 8).toUpperCase()
 
   const { data, error } = await supabase
     .from('users')
@@ -17,5 +17,6 @@ export async function getOrCreateUser(): Promise<string> {
   }
 
   localStorage.setItem('jeda_user_id', data.id)
+  localStorage.setItem('jeda_anon_code', data.anonymous_code)
   return data.id
 }
