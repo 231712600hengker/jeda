@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
@@ -13,23 +13,21 @@ export default function LandingPage() {
   const [errorMsg, setErrorMsg] = useState("");
   const [showConsent, setShowConsent] = useState(false);
   const [consentChecked, setConsentChecked] = useState(false);
+  const [newCode, setNewCode] = useState("");
+  const [hasStoredSession, setHasStoredSession] = useState(false);
 
-  // Cek apakah user sudah login sebelumnya di browser ini
   useEffect(() => {
-    const existingId = localStorage.getItem("jeda_user_id");
-    if (existingId) {
-      router.push("/dashboard");
-    }
-  }, [router]);
+    setHasStoredSession(Boolean(localStorage.getItem("jeda_user_id")));
+  }, []);
 
   async function createAnonymousUser() {
     setLoading(true);
     // Buat kode acak 6 karakter, misal: JEDA-A1B2C3
-    const newCode = "JEDA-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+    const generatedCode = "JEDA-" + Math.random().toString(36).substring(2, 8).toUpperCase();
 
     const { data, error } = await supabase
       .from("users")
-      .insert([{ anonymous_code: newCode }])
+      .insert([{ anonymous_code: generatedCode }])
       .select()
       .single();
 
@@ -43,9 +41,8 @@ export default function LandingPage() {
     localStorage.setItem("jeda_user_id", data.id);
     localStorage.setItem("jeda_anon_code", data.anonymous_code);
 
-    // Beri peringatan agar user mencatat kodenya
-    alert(`PENTING: Kode Anda adalah ${newCode}\n\nHarap simpan/screenshot kode ini untuk mengakses riwayat Anda di perangkat lain.`);
-    router.push("/checkin");
+    setNewCode(data.anonymous_code);
+    setLoading(false);
   }
 
   // Tombol "Buat Kode Anonim Baru" masuk sini dulu, bukan langsung createAnonymousUser
@@ -63,6 +60,15 @@ export default function LandingPage() {
     localStorage.setItem(CONSENT_KEY, new Date().toISOString());
     setShowConsent(false);
     createAnonymousUser();
+  }
+
+  function continueWithNewCode() {
+    setNewCode("");
+    router.push("/checkin");
+  }
+
+  function continueExistingSession() {
+    router.push("/dashboard");
   }
 
   async function loginExistingCode() {
@@ -87,12 +93,34 @@ export default function LandingPage() {
     router.push("/dashboard");
   }
 
+  if (newCode) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-sand-50 p-5 text-earth-900">
+        <section className="max-w-md w-full border border-sand-200 bg-white p-7 shadow-sm sm:p-9">
+          <p className="text-sm font-semibold text-sage-700">Kode anonim berhasil dibuat</p>
+          <h1 className="mt-2 font-serif text-3xl font-semibold text-earth-900">Simpan kode ini dulu.</h1>
+          <p className="mt-3 text-sm leading-6 text-earth-600">Kode ini adalah satu-satunya cara untuk membuka riwayatmu dari perangkat lain.</p>
+          <div className="mt-7 border border-sage-300 bg-sage-50 px-5 py-4 text-center font-mono text-2xl font-bold tracking-wide text-sage-900">{newCode}</div>
+          <button onClick={continueWithNewCode} className="mt-7 w-full bg-sage-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-sage-800">Saya sudah menyimpan kode ini</button>
+          <button onClick={() => setNewCode("")} className="mt-3 w-full border border-sand-300 px-4 py-3 text-sm font-semibold text-earth-700 transition hover:bg-sand-50">Kembali</button>
+        </section>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-sand-50 p-5 text-earth-900">
       <div className="max-w-md w-full border border-sand-200 bg-white p-7 shadow-sm sm:p-9">
         <p className="text-sm font-semibold text-sage-700 mb-3">Untuk mahasiswa yang sedang menyelesaikan skripsi</p>
         <h1 className="font-serif text-4xl font-semibold text-earth-900 mb-3">Jeda</h1>
         <p className="text-sm leading-6 text-earth-600 mb-8">Ruang anonim untuk memahami pola stres, energi, dan progresmu dari hari ke hari.</p>
+
+        {hasStoredSession && (
+          <div className="mb-6 flex flex-col gap-3 border-l-4 border-lavender-400 bg-lavender-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm leading-5 text-lavender-900">Sesi sebelumnya masih tersimpan di perangkat ini.</p>
+            <button onClick={continueExistingSession} className="shrink-0 text-sm font-semibold text-lavender-900 underline underline-offset-4">Lanjutkan</button>
+          </div>
+        )}
 
         {/* Bagian Pengguna Baru */}
         <div className="mb-8 border-l-4 border-sage-400 bg-sage-50 p-5">

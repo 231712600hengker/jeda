@@ -20,6 +20,15 @@ export interface CheckinStressor {
   created_at?: string
 }
 
+export interface WeeklyReflection {
+  id?: string
+  user_id: string
+  week_start: string
+  reflection: string
+  created_at?: string
+  updated_at?: string
+}
+
 export interface ChartDataPoint {
   date: string
   displayDate: string
@@ -55,4 +64,3 @@ export interface AlertRecord {
   }
   acknowledged?: boolean
 }
-

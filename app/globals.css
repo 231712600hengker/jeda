@@ -2,8 +2,7 @@
 
 :root { --background: #fbf9f5; --foreground: #2b231c; }
 
-/* @theme removed; Tailwind-compatible theme variables are declared in :root instead. */
-:root {
+@theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);

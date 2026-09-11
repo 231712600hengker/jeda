@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useTransition } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import {
   ResponsiveContainer,
@@ -19,12 +19,27 @@ import {
 import { supabase } from '@/lib/supabase'
 import { getOrCreateUser } from '@/lib/user'
 import { Checkin, CheckinStressor, ChartDataPoint, StressorCount, AlertRecord } from '@/lib/types'
-import { generateDummyCheckins, STRESSOR_LABELS } from '@/lib/dummy-data'
+import { STRESSOR_LABELS } from '@/lib/dummy-data'
 
-// Tombol data simulasi hanya tampil kalau flag ini diaktifkan lewat env var.
-// JANGAN aktifkan di environment yang dipakai untuk pilot test sungguhan,
-// supaya partisipan tidak bisa tidak sengaja mengotori data asli mereka.
-const DEMO_DATA_ENABLED = process.env.NEXT_PUBLIC_ENABLE_DEMO_DATA === 'true'
+type Range = '7' | '30' | 'all'
+const DEMO_DATA_ENABLED = false
+
+function createDemoCheckins(): Checkin[] {
+  const pattern = [
+    [2, 2, 7, 6, 2, 2], [2, 1, 6, 5, 3, 3], [3, 2, 8, 7, 1, 2],
+    [1, 1, 5, 4, 4, 4], [2, 2, 6, 6, 3, 3], [1, 0, 4, 3, 4, 5], [0, 1, 3, 4, 5, 4],
+  ]
+  return pattern.map(([anxiety1, anxiety2, mental, physical, progress1, progress2], index) => {
+    const date = new Date()
+    date.setDate(date.getDate() - (pattern.length - 1 - index))
+    return {
+      id: `demo-${index}`, user_id: 'demo', checkin_date: date.toISOString().split('T')[0],
+      anxiety_1: anxiety1, anxiety_2: anxiety2, fatigue_mental: mental, fatigue_physical: physical,
+      sleep_quantity: index === 3 ? '4-6 Jam' : '6-8 Jam', sleep_quality: index === 3 ? 'Sering terbangun/Gelisah' : 'Cukup',
+      progress_1: progress1, progress_2: progress2,
+    }
+  })
+}
 
 export default function DashboardPage() {
   const [checkins, setCheckins] = useState<Checkin[]>([])
@@ -34,8 +49,12 @@ export default function DashboardPage() {
   const [anonCode, setAnonCode] = useState<string>('')
   const [userId, setUserId] = useState<string>('')
   const [loading, setLoading] = useState(true)
-  const [isGenerating, startGenerateTransition] = useTransition()
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [demoCheckins, setDemoCheckins] = useState<Checkin[] | null>(null)
+  const [selectedRange, setSelectedRange] = useState<Range>('30')
+  const [exporting, setExporting] = useState(false)
+  const [actionMessage, setActionMessage] = useState<string | null>(null)
+  const [isGenerating] = useState(false)
 
   async function loadData() {
     setLoading(true)
@@ -122,19 +141,18 @@ export default function DashboardPage() {
   }, [])
 
   function handleGenerateDummy() {
-    if (!userId) return
-    startGenerateTransition(async () => {
-      try {
-        await generateDummyCheckins(userId, 7)
-        await loadData()
-      } catch (err) {
-        alert('Gagal membuat data dummy: ' + (err as Error).message)
-      }
-    })
+    if (demoCheckins) {
+      setDemoCheckins(null)
+      setActionMessage('Kembali menampilkan data check-in kamu.')
+      return
+    }
+    setDemoCheckins(createDemoCheckins())
+    setActionMessage('Mode simulasi aktif. Data contoh ini hanya tampil di browser dan tidak disimpan.')
   }
 
   function exportCSV() {
-    if (checkins.length === 0) return
+    if (activeCheckins.length === 0) return
+    setExporting(true)
 
     const stressorsByCheckin: Record<string, string[]> = {}
     stressors.forEach((s) => {
@@ -156,7 +174,7 @@ export default function DashboardPage() {
       'sumber_stres',
     ]
 
-    const rows = checkins.map((c) => [
+    const rows = activeCheckins.map((c) => [
       c.checkin_date,
       c.anxiety_1,
       c.anxiety_2,
@@ -183,10 +201,14 @@ export default function DashboardPage() {
     link.click()
     document.body.removeChild(link)
     URL.revokeObjectURL(url)
+    setActionMessage(`CSV untuk ${activeCheckins.length} check-in sedang diunduh.`)
+    setExporting(false)
   }
 
+  const activeCheckins = demoCheckins ?? checkins
+
   // Format data untuk grafik
-  const chartData: ChartDataPoint[] = checkins.map((item) => {
+  const chartData: ChartDataPoint[] = activeCheckins.map((item) => {
     const parts = item.checkin_date.split('-')
     const displayDate = parts.length === 3 ? `${parts[2]}/${parts[1]}` : item.checkin_date
 
@@ -205,6 +227,8 @@ export default function DashboardPage() {
     }
   })
 
+  const filteredChartData = selectedRange === 'all' ? chartData : chartData.slice(-Number(selectedRange))
+
   // Hitung Stressor paling sering
   const stressorMap: Record<string, number> = {}
   stressors.forEach((s) => {
@@ -218,16 +242,18 @@ export default function DashboardPage() {
   })).sort((a, b) => b.count - a.count)
 
   // Metrik Ringkasan
-  const latestCheckin = checkins.length > 0 ? checkins[checkins.length - 1] : null
+  const latestCheckin = activeCheckins.length > 0 ? activeCheckins[activeCheckins.length - 1] : null
+  const today = new Date().toISOString().split('T')[0]
+  const needsDailyReminder = !loading && latestCheckin?.checkin_date !== today
   const latestAnxiety = latestCheckin ? latestCheckin.anxiety_1 + latestCheckin.anxiety_2 : null
   const avgMentalFatigue =
-    checkins.length > 0
-      ? (checkins.reduce((sum, c) => sum + c.fatigue_mental, 0) / checkins.length).toFixed(1)
+    activeCheckins.length > 0
+      ? (activeCheckins.reduce((sum, c) => sum + c.fatigue_mental, 0) / activeCheckins.length).toFixed(1)
       : '-'
   const avgProgress =
-    checkins.length > 0
+    activeCheckins.length > 0
       ? (
-          checkins.reduce((sum, c) => sum + (c.progress_1 + c.progress_2) / 2, 0) / checkins.length
+          activeCheckins.reduce((sum, c) => sum + (c.progress_1 + c.progress_2) / 2, 0) / activeCheckins.length
         ).toFixed(1)
       : '-'
 
@@ -269,6 +295,12 @@ export default function DashboardPage() {
 
           <div className="flex items-center gap-3 text-sm">
             <Link
+              href="/reflection"
+              className="border border-sand-300 px-3.5 py-2 font-semibold text-earth-700 transition hover:bg-sand-100"
+            >
+              Refleksi minggu ini
+            </Link>
+            <Link
               href="/checkin"
               className="bg-sage-700 hover:bg-sage-800 text-white font-medium px-3.5 py-2 shadow-sm transition"
             >
@@ -303,7 +335,7 @@ export default function DashboardPage() {
               }}
               className="border border-sand-300 text-earth-700 px-4 py-2 text-sm font-semibold hover:bg-sand-100 transition cursor-pointer"
             >
-              Keluar
+              Ganti kode / keluar
             </button>
           </div>
         </div>
@@ -317,21 +349,24 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={loadData}
               disabled={loading}
-              className="text-xs px-3 py-1.5 border border-neutral-300 rounded-lg hover:bg-neutral-100 bg-white transition disabled:opacity-50"
+              className="border border-sand-300 bg-white px-3 py-2 text-xs font-semibold text-earth-700 transition hover:bg-sand-100 disabled:cursor-not-allowed disabled:opacity-50"
             >
               🔄 Refresh
             </button>
             <button
               onClick={exportCSV}
-              disabled={checkins.length === 0}
-              className="text-xs px-3 py-1.5 border border-emerald-300 bg-emerald-50 text-emerald-700 rounded-lg hover:bg-emerald-100 transition disabled:opacity-50"
+              disabled={activeCheckins.length === 0 || exporting}
+              className="border border-sage-300 bg-sage-50 px-3 py-2 text-xs font-semibold text-sage-800 transition hover:bg-sage-100 disabled:cursor-not-allowed disabled:opacity-50"
               title="Unduh seluruh riwayat check-in sebagai CSV"
             >
               ⬇️ Ekspor CSV
+            </button>
+            <button onClick={handleGenerateDummy} disabled={loading} className="border border-lavender-300 bg-lavender-50 px-3 py-2 text-xs font-semibold text-lavender-800 transition hover:bg-lavender-100 disabled:cursor-not-allowed disabled:opacity-50" title="Tampilkan atau tutup contoh data 7 hari tanpa menyimpan apa pun">
+              {demoCheckins ? 'Kembali ke data saya' : 'Lihat data simulasi'}
             </button>
             {DEMO_DATA_ENABLED && (
               <button
@@ -345,6 +380,34 @@ export default function DashboardPage() {
             )}
           </div>
         </div>
+
+        {needsDailyReminder && (
+          <div className="flex flex-col gap-3 border-l-4 border-sage-400 bg-sage-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-sage-900">Belum ada check-in hari ini</p>
+              <p className="mt-1 text-sm text-sage-800">Satu menit cukup untuk membantu melihat ritme harimu.</p>
+            </div>
+            <Link href="/checkin" className="shrink-0 text-sm font-semibold text-sage-800 underline underline-offset-4">Catat sekarang</Link>
+          </div>
+        )}
+
+        {!loading && (
+          <div className="flex flex-col gap-3 border-y border-sand-200 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-earth-800">Tampilan data</p>
+              <p className="mt-1 text-xs text-earth-600">{demoCheckins ? 'Kamu sedang melihat data contoh yang hanya ada di browser ini.' : `${activeCheckins.length} check-in tersimpan di riwayatmu.`}</p>
+            </div>
+            <div className="inline-flex w-full border border-sand-300 bg-white sm:w-auto" aria-label="Rentang data">
+              {(['7', '30', 'all'] as Range[]).map((range) => (
+                <button key={range} onClick={() => setSelectedRange(range)} className={`flex-1 px-3 py-2 text-xs font-semibold transition sm:flex-none ${selectedRange === range ? 'bg-earth-800 text-white' : 'text-earth-600 hover:bg-sand-100'}`}>
+                  {range === 'all' ? 'Semua' : `${range} hari`}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {actionMessage && <div className="flex items-center justify-between border-l-4 border-sage-400 bg-sage-50 px-4 py-3 text-sm text-sage-900"><span>{actionMessage}</span><button onClick={() => setActionMessage(null)} className="ml-4 text-xs font-semibold underline underline-offset-4">Tutup</button></div>}
 
         {/* Active Alerts Banner */}
         {activeAlerts.length > 0 && (
@@ -394,7 +457,7 @@ export default function DashboardPage() {
         )}
 
         {/* Empty State */}
-        {!loading && checkins.length === 0 && (
+        {!loading && activeCheckins.length === 0 && (
           <div className="bg-white border border-neutral-200 rounded-2xl p-8 text-center max-w-lg mx-auto shadow-sm my-8">
             <div className="text-4xl mb-3">🌱</div>
             <h2 className="text-lg font-semibold mb-1">Belum Ada Riwayat Check-in</h2>
@@ -421,7 +484,7 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {!loading && checkins.length > 0 && (
+        {!loading && activeCheckins.length > 0 && (
           <>
             {/* Stat Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -460,7 +523,7 @@ export default function DashboardPage() {
               <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-sm">
                 <p className="text-xs text-neutral-500 font-medium uppercase">Total Riwayat</p>
                 <div className="mt-2 flex items-baseline gap-1">
-                  <span className="text-2xl font-bold">{checkins.length}</span>
+                  <span className="text-2xl font-bold">{activeCheckins.length}</span>
                   <span className="text-xs text-neutral-500">hari tercatat</span>
                 </div>
                 <p className="text-xs text-neutral-500 mt-2">
@@ -477,12 +540,12 @@ export default function DashboardPage() {
                   <p className="text-xs text-neutral-500">Skala 1 (Sangat Bugar) hingga 10 (Burnout / Sangat Lelah)</p>
                 </div>
                 <div className="text-xs text-neutral-400">
-                  {checkins.length} titik data
+                  {filteredChartData.length} titik data
                 </div>
               </div>
               <div className="w-full h-72">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <LineChart data={filteredChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                     <XAxis dataKey="displayDate" tick={{ fontSize: 12, fill: '#737373' }} />
                     <YAxis domain={[1, 10]} ticks={[1, 3, 5, 7, 10]} tick={{ fontSize: 12, fill: '#737373' }} />
@@ -529,7 +592,7 @@ export default function DashboardPage() {
               </div>
               <div className="w-full h-64">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <AreaChart data={filteredChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <defs>
                       <linearGradient id="anxietyGrad" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.4} />
@@ -569,7 +632,7 @@ export default function DashboardPage() {
               </div>
               <div className="w-full h-64">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <LineChart data={filteredChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                     <XAxis dataKey="displayDate" tick={{ fontSize: 12, fill: '#737373' }} />
                     <YAxis domain={[1, 5]} ticks={[1, 2, 3, 4, 5]} tick={{ fontSize: 12, fill: '#737373' }} />
