@@ -1,219 +1,52 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { saveAnonymousCode } from "@/lib/user";
-import { Brand } from "@/app/components/brand";
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { Brand } from '@/app/components/brand'
+import { saveAnonymousCode } from '@/lib/user'
 
-const CONSENT_KEY = "jeda_consent_given";
+const CONSENT_KEY = 'jeda_consent_given'
+
+function Icon({ children }: { children: string }) { return <span className="material-symbols-outlined" aria-hidden="true">{children}</span> }
 
 export default function LandingPage() {
-  const router = useRouter();
-  const [inputCode, setInputCode] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
-  const [showConsent, setShowConsent] = useState(false);
-  const [consentChecked, setConsentChecked] = useState(false);
-  const [newCode, setNewCode] = useState("");
-  const [hasStoredSession] = useState(() => typeof window !== "undefined" && Boolean(localStorage.getItem("jeda_user_id")));
+  const router = useRouter()
+  const [inputCode, setInputCode] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [errorMsg, setErrorMsg] = useState('')
+  const [showConsent, setShowConsent] = useState(false)
+  const [consentChecked, setConsentChecked] = useState(false)
+  const [newCode, setNewCode] = useState('')
+  const [tab, setTab] = useState<'new' | 'existing'>('new')
+  const [hasStoredSession] = useState(() => typeof window !== 'undefined' && Boolean(localStorage.getItem('jeda_anon_code')))
 
   async function createAnonymousUser() {
-    setLoading(true);
-    const response = await fetch('/api/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'create' }) });
-    const data = await response.json();
-    if (!response.ok) {
-      setErrorMsg("Gagal membuat kode anonim. Coba lagi.");
-      setLoading(false);
-      return;
-    }
-
-    // Simpan data ke browser
-    saveAnonymousCode(data.anonymousCode);
-
-    setNewCode(data.anonymousCode);
-    setLoading(false);
+    setLoading(true); setErrorMsg('')
+    try {
+      const response = await fetch('/api/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'create' }) })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error)
+      saveAnonymousCode(data.anonymousCode); setNewCode(data.anonymousCode)
+    } catch { setErrorMsg('Kode belum dapat dibuat. Coba lagi sebentar.') } finally { setLoading(false) }
   }
 
-  // Tombol "Buat Kode Anonim Baru" masuk sini dulu, bukan langsung createAnonymousUser
-  function handleStartClick() {
-    const alreadyConsented = localStorage.getItem(CONSENT_KEY);
-    if (alreadyConsented) {
-      createAnonymousUser();
-    } else {
-      setErrorMsg("");
-      setShowConsent(true);
-    }
-  }
-
-  function handleConfirmConsent() {
-    localStorage.setItem(CONSENT_KEY, new Date().toISOString());
-    setShowConsent(false);
-    createAnonymousUser();
-  }
-
-  function continueWithNewCode() {
-    setNewCode("");
-    router.push("/checkin");
-  }
-
-  function continueExistingSession() {
-    router.push("/dashboard");
-  }
+  function handleStartClick() { localStorage.getItem(CONSENT_KEY) ? createAnonymousUser() : setShowConsent(true) }
+  function handleConfirmConsent() { localStorage.setItem(CONSENT_KEY, new Date().toISOString()); setShowConsent(false); createAnonymousUser() }
 
   async function loginExistingCode() {
-    if (!inputCode) return;
-    setLoading(true);
-    setErrorMsg("");
-
-    const response = await fetch('/api/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'login', anonymousCode: inputCode }) });
-    const data = await response.json();
-    if (!response.ok) {
-      setErrorMsg("Kode tidak ditemukan. Silakan periksa kembali.");
-      setLoading(false);
-      return;
-    }
-
-    saveAnonymousCode(data.anonymousCode);
-    router.push("/dashboard");
+    if (!inputCode.trim()) return
+    setLoading(true); setErrorMsg('')
+    try {
+      const response = await fetch('/api/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'login', anonymousCode: inputCode }) })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error)
+      saveAnonymousCode(data.anonymousCode); router.push('/dashboard')
+    } catch { setErrorMsg('Kode tidak ditemukan. Periksa kembali kode yang disimpan.') } finally { setLoading(false) }
   }
 
-  if (newCode) {
-    return (
-      <div className="flex flex-1 items-center justify-center bg-sand-50 p-5 text-earth-900">
-        <section className="max-w-md w-full rounded-3xl border border-sand-200 bg-white p-7 shadow-ambient sm:p-9">
-          <Brand compact />
-          <p className="mt-5 text-sm font-semibold text-sage-700">Kode anonim berhasil dibuat</p>
-          <h1 className="mt-2 text-3xl font-semibold text-earth-900">Simpan kode ini dulu.</h1>
-          <p className="mt-3 text-sm leading-6 text-earth-600">Kode ini adalah satu-satunya cara untuk membuka riwayatmu dari perangkat lain.</p>
-          <div className="mt-7 border border-sage-300 bg-sage-50 px-5 py-4 text-center font-mono text-2xl font-bold tracking-wide text-sage-900">{newCode}</div>
-          <button onClick={continueWithNewCode} className="mt-7 w-full bg-sage-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-sage-800">Saya sudah menyimpan kode ini</button>
-          <button onClick={() => setNewCode("")} className="mt-3 w-full border border-sand-300 px-4 py-3 text-sm font-semibold text-earth-700 transition hover:bg-sand-50">Kembali</button>
-        </section>
-      </div>
-    );
-  }
+  if (newCode) return <main className="flex min-h-[calc(100vh-10rem)] flex-1 items-center justify-center overflow-hidden bg-sand-50 p-5"><section className="w-full max-w-lg rounded-3xl bg-white p-7 shadow-ambient sm:p-10"><Brand /><p className="mt-8 text-xs font-semibold uppercase tracking-[.16em] text-sage-700">Kunci rahasiamu siap</p><h1 className="mt-3 text-3xl font-semibold tracking-tight text-earth-900">Simpan kunci ini di tempat yang aman.</h1><p className="mt-3 leading-7 text-earth-600">Kunci ini diperlukan untuk membuka ruang refleksimu di perangkat lain.</p><div className="mt-7 rounded-2xl bg-sand-100 px-5 py-5 text-center font-mono text-xl font-bold tracking-wider text-sage-800 sm:text-2xl">{newCode}</div><button onClick={() => navigator.clipboard?.writeText(newCode)} className="mt-3 flex w-full items-center justify-center gap-2 rounded-full bg-sage-50 py-3 text-sm font-semibold text-sage-800"><Icon>content_copy</Icon>Salin kunci</button><button onClick={() => router.push('/checkin')} className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-sage-600 py-3.5 font-semibold text-white shadow-ambient transition hover:bg-sage-700">Mulai check-in pertama<Icon>arrow_forward</Icon></button></section></main>
 
-  return (
-    <div className="flex flex-1 items-center justify-center bg-sand-50 p-5 text-earth-900">
-      <div className="max-w-md w-full rounded-3xl border border-sand-200 bg-white p-7 shadow-ambient sm:p-9">
-        <Brand />
-        <p className="mt-6 text-sm font-semibold text-sage-700 mb-3">Untuk mahasiswa yang sedang menyelesaikan skripsi</p>
-        <p className="text-sm leading-6 text-earth-600 mb-8">Ruang anonim untuk memahami pola stres, energi, dan progresmu dari hari ke hari.</p>
-
-        {hasStoredSession && (
-          <div className="mb-6 flex flex-col gap-3 border-l-4 border-lavender-400 bg-lavender-50 p-4 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm leading-5 text-lavender-900">Sesi sebelumnya masih tersimpan di perangkat ini.</p>
-            <button onClick={continueExistingSession} className="shrink-0 text-sm font-semibold text-lavender-900 underline underline-offset-4">Lanjutkan</button>
-          </div>
-        )}
-
-        {/* Bagian Pengguna Baru */}
-        <div className="mb-8 border-l-4 border-sage-400 bg-sage-50 p-5">
-          <h2 className="text-xl font-semibold text-sage-900 mb-2">Mulai dari satu check-in</h2>
-          <p className="text-sm leading-6 text-sage-800 mb-4">Buat kode anonim untuk menyimpan catatan pribadimu. Jeda tidak meminta nama, NIM, atau email.</p>
-          <button
-            onClick={handleStartClick}
-            disabled={loading}
-            className="w-full bg-sage-700 text-white font-semibold py-3 px-4 hover:bg-sage-800 transition disabled:opacity-50"
-          >
-            {loading ? "Memproses..." : "Buat Kode Anonim Baru"}
-          </button>
-        </div>
-
-        <div className="relative flex py-2 items-center mb-6">
-          <div className="flex-grow border-t border-sand-200"></div>
-          <span className="flex-shrink-0 mx-4 text-earth-400 text-xs">ATAU</span>
-          <div className="flex-grow border-t border-sand-200"></div>
-        </div>
-
-        {/* Bagian Pengguna Lama */}
-        <div className="text-left">
-          <label className="block text-earth-700 text-sm font-semibold mb-2">
-            Punya kode anonim?
-          </label>
-          <input
-            type="text"
-            value={inputCode}
-            onChange={(e) => setInputCode(e.target.value)}
-            placeholder="Contoh: JEDA-A1B2C3"
-            className="w-full px-3 py-2.5 border border-sand-300 bg-sand-50 focus:outline-none focus:border-sage-500 uppercase text-earth-800"
-          />
-          {errorMsg && <p className="text-rose-700 text-sm mt-2">{errorMsg}</p>}
-          <button
-            onClick={loginExistingCode}
-            disabled={loading || !inputCode}
-            className="w-full mt-4 border border-earth-700 text-earth-800 font-semibold py-3 px-4 hover:bg-earth-50 transition disabled:opacity-50"
-          >
-            {loading ? "Memproses..." : "Masuk"}
-          </button>
-        </div>
-      </div>
-
-      {showConsent && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white shadow-xl rounded-3xl max-w-lg w-full p-6 max-h-[85vh] overflow-y-auto">
-            <h2 className="text-2xl font-semibold text-earth-800 mb-3">Persetujuan partisipasi</h2>
-            <div className="text-sm leading-6 text-earth-600 space-y-3 mb-4">
-              <p>
-                Jeda adalah alat pemantauan kesejahteraan mandiri yang dikembangkan sebagai
-                bagian dari penelitian akademik. Sebelum melanjutkan, mohon baca poin-poin
-                berikut:
-              </p>
-              <ul className="list-disc pl-5 space-y-1.5">
-                <li>
-                  <b>Tujuan:</b> Mencatat kondisi kecemasan, kelelahan, dan progres skripsi
-                  harian untuk membantu Anda memantau diri sendiri.
-                </li>
-                <li>
-                  <b>Anonimitas:</b> Tidak ada nama, email, atau NIM yang diminta. Identitas Anda
-                  hanya berupa kode acak yang Anda simpan sendiri.
-                </li>
-                <li>
-                  <b>Sukarela:</b> Partisipasi bersifat sukarela. Anda bisa berhenti mengisi
-                  kapan saja tanpa konsekuensi apa pun.
-                </li>
-                <li>
-                  <b>Bukan layanan darurat:</b> Notifikasi dalam aplikasi ini bersifat
-                  informatif, bukan pengganti konsultasi profesional. Jika Anda mengalami
-                  krisis, segera hubungi layanan konseling kampus atau layanan darurat.
-                </li>
-                <li>
-                  <b>Penggunaan data:</b> Data agregat dan anonim dapat digunakan untuk
-                  keperluan evaluasi/penelitian, tanpa dapat ditelusuri kembali ke identitas
-                  pribadi Anda.
-                </li>
-              </ul>
-            </div>
-            <label className="flex items-start gap-2 text-sm text-earth-700 mb-4 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={consentChecked}
-                onChange={(e) => setConsentChecked(e.target.checked)}
-                className="mt-1"
-              />
-              <span>
-                Saya memahami dan menyetujui poin-poin di atas, serta bersedia berpartisipasi
-                secara sukarela.
-              </span>
-            </label>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowConsent(false)}
-                className="flex-1 py-2.5 border border-sand-300 text-earth-700 hover:bg-sand-50 transition"
-              >
-                Batal
-              </button>
-              <button
-                onClick={handleConfirmConsent}
-                disabled={!consentChecked || loading}
-                className="flex-1 py-2.5 bg-sage-700 text-white font-semibold hover:bg-sage-800 transition disabled:opacity-50"
-              >
-                {loading ? "Memproses..." : "Saya Setuju & Lanjutkan"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+  return <main className="relative flex-1 overflow-hidden bg-sand-50"><div className="pointer-events-none absolute -top-32 left-1/2 -z-0 h-[34rem] w-[44rem] -translate-x-1/2 rounded-full bg-sage-200/40 blur-3xl" /><header className="relative z-10 mx-auto flex h-20 max-w-6xl items-center justify-between px-5"><Brand compact />{hasStoredSession && <button onClick={() => router.push('/dashboard')} className="rounded-full bg-sage-50 px-4 py-2 text-sm font-semibold text-sage-800">Lanjutkan ruangku</button>}</header><div className="relative z-10 mx-auto grid max-w-6xl gap-10 px-5 pb-16 pt-10 lg:grid-cols-12 lg:items-center lg:pt-16"><section className="lg:col-span-7"><span className="inline-flex items-center gap-2 rounded-full bg-sand-100 px-4 py-2 text-xs font-semibold uppercase tracking-[.13em] text-sage-700"><span className="h-2 w-2 rounded-full bg-sage-600" />Ruang teduh tanpa penghakiman</span><p className="mt-9 text-sm font-semibold uppercase tracking-[.18em] text-lavender-500">Perjalanan kembali ke diri</p><h1 className="mt-3 max-w-2xl text-4xl font-semibold leading-tight tracking-tight text-earth-900 sm:text-5xl">Beri dirimu ruang untuk <span className="text-sage-600">bernapas</span> dan merasa.</h1><p className="mt-5 max-w-xl text-lg leading-8 text-earth-600">Jeda adalah ruang anonim untuk mencatat stres, energi, tidur, dan progres skripsimu—pelan-pelan, tanpa tuntutan.</p><div className="mt-9 flex gap-4 rounded-3xl bg-sand-100 p-5"><div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-sage-200 text-sage-700"><Icon>air</Icon></div><div><p className="font-semibold text-earth-800">Tarik napas pelan-pelan.</p><p className="mt-1 text-sm leading-6 text-earth-600">Tak semua harus selesai hari ini. Satu check-in kecil sudah cukup.</p></div></div></section><section className="lg:col-span-5"><div className="rounded-3xl bg-white p-6 shadow-ambient sm:p-8"><div className="grid grid-cols-2 gap-1 rounded-full bg-sand-100 p-1"><button onClick={() => setTab('new')} className={`rounded-full px-3 py-2.5 text-sm font-semibold transition ${tab === 'new' ? 'bg-white text-sage-700 shadow-sm' : 'text-earth-600'}`}>Kode baru</button><button onClick={() => setTab('existing')} className={`rounded-full px-3 py-2.5 text-sm font-semibold transition ${tab === 'existing' ? 'bg-white text-sage-700 shadow-sm' : 'text-earth-600'}`}>Masuk dengan kode</button></div>{tab === 'new' ? <div className="mt-7"><div className="flex items-start justify-between gap-4"><div><h2 className="text-xl font-semibold text-earth-900">Kunci ketenanganmu</h2><p className="mt-1 text-sm leading-6 text-earth-600">Buat identitas tanpa nama, surel, atau kata sandi.</p></div><span className="rounded-full bg-sage-200 p-3 text-sage-800"><Icon>vpn_key</Icon></span></div><div className="mt-6 rounded-2xl bg-sand-100 p-4 text-sm leading-6 text-earth-600"><div className="flex items-center gap-2 font-semibold text-sage-800"><Icon>lock</Icon>Kunci hanya diketahui olehmu</div><p className="mt-2">Simpan kunci yang dibuat agar kamu dapat kembali ke catatanmu.</p></div><button onClick={handleStartClick} disabled={loading} className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-sage-600 py-3.5 font-semibold text-white shadow-ambient transition hover:bg-sage-700 disabled:opacity-50">{loading ? 'Menyiapkan kunci...' : 'Buat kunci anonim'}<Icon>arrow_forward</Icon></button></div> : <div className="mt-7"><h2 className="text-xl font-semibold text-earth-900">Selamat datang kembali</h2><p className="mt-1 text-sm leading-6 text-earth-600">Masukkan kunci yang pernah kamu simpan.</p><label className="mt-6 block text-xs font-semibold uppercase tracking-[.13em] text-earth-600">Kunci akses</label><div className="relative mt-2"><Icon>key</Icon><input value={inputCode} onChange={(event) => setInputCode(event.target.value)} onKeyDown={(event) => event.key === 'Enter' && loginExistingCode()} placeholder="JEDA-xxxx-xxxx" className="w-full rounded-2xl bg-sand-100 px-4 py-3.5 pl-11 font-mono uppercase text-earth-800 outline-none ring-sage-400 focus:ring-2" /></div>{errorMsg && <p className="mt-3 text-sm text-red-700">{errorMsg}</p>}<button onClick={loginExistingCode} disabled={loading || !inputCode.trim()} className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-sage-600 py-3.5 font-semibold text-white shadow-ambient disabled:opacity-50">{loading ? 'Membuka...' : 'Buka ruangku'}<Icon>lock_open</Icon></button></div>}<div className="mt-7 flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs text-earth-600"><span>✓ Tanpa email</span><span>✓ Tanpa kata sandi</span><span>✓ Tanpa iklan</span></div></div></section></div>{showConsent && <Consent checked={consentChecked} setChecked={setConsentChecked} onClose={() => setShowConsent(false)} onConfirm={handleConfirmConsent} loading={loading} />}</main>
 }
+
+function Consent({ checked, setChecked, onClose, onConfirm, loading }: { checked: boolean; setChecked: (checked: boolean) => void; onClose: () => void; onConfirm: () => void; loading: boolean }) { return <div className="fixed inset-0 z-50 flex items-center justify-center bg-earth-900/30 p-5 backdrop-blur-sm"><section className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-3xl bg-white p-7 shadow-2xl"><h2 className="text-2xl font-semibold text-earth-900">Persetujuan partisipasi</h2><p className="mt-3 text-sm leading-7 text-earth-600">Jeda membantu kamu mencatat kondisi harian secara anonim. Ini bukan layanan diagnosis atau darurat; hubungi orang tepercaya atau layanan profesional bila kamu merasa tidak aman.</p><label className="mt-6 flex gap-3 rounded-2xl bg-sand-100 p-4 text-sm leading-6 text-earth-700"><input type="checkbox" checked={checked} onChange={(event) => setChecked(event.target.checked)} className="mt-1 accent-sage-700" /><span>Saya memahami dan bersedia berpartisipasi secara sukarela.</span></label><div className="mt-6 flex gap-3"><button onClick={onClose} className="flex-1 rounded-full bg-sand-100 py-3 font-semibold text-earth-700">Batal</button><button onClick={onConfirm} disabled={!checked || loading} className="flex-1 rounded-full bg-sage-600 py-3 font-semibold text-white disabled:opacity-50">Saya setuju</button></div></section></div> }

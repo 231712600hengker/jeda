@@ -1,13 +1,15 @@
-import { apiError, requireAnonymousUser } from '@/lib/server/request-auth'
+import { apiError, requireSessionUser } from '@/lib/server/request-auth'
 import { supabaseAdmin } from '@/lib/server/supabase'
+import { enforceRateLimit, readJson, requestIp } from '@/lib/server/security'
 
 export async function POST(request: Request) {
   try {
-    const { anonymousCode } = await request.json()
-    const user = await requireAnonymousUser(anonymousCode)
+    await readJson<Record<string, never>>(request, 512)
+    const userId = requireSessionUser(request)
+    enforceRateLimit(`dashboard:${requestIp(request)}:${userId}`, 60, 60_000)
     const [{ data: checkins, error: checkinError }, { data: alerts, error: alertError }] = await Promise.all([
-      supabaseAdmin().from('checkins').select('*').eq('user_id', user.id).order('checkin_date', { ascending: true }),
-      supabaseAdmin().from('alerts').select('*').eq('user_id', user.id).eq('acknowledged', false).order('triggered_at', { ascending: false }),
+      supabaseAdmin().from('checkins').select('*').eq('user_id', userId).order('checkin_date', { ascending: true }).limit(365),
+      supabaseAdmin().from('alerts').select('*').eq('user_id', userId).eq('acknowledged', false).order('triggered_at', { ascending: false }).limit(100),
     ])
     if (checkinError || alertError) throw new Error('Data dashboard belum dapat dimuat.')
     const ids = (checkins ?? []).map((checkin) => checkin.id)

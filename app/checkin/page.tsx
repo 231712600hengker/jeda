@@ -75,18 +75,18 @@ export default function CheckinPage() {
 
   return <div className="flex-1 bg-sand-50 text-earth-900 pb-16">
     <header className="sticky top-0 z-10 border-b border-sand-200 bg-sand-50/95 backdrop-blur"><div className="mx-auto flex max-w-2xl items-center justify-between px-5 py-4"><Brand href="/dashboard" compact /><Link href="/dashboard" className="text-sm font-semibold text-sage-700 transition hover:text-sage-900">Ke dashboard</Link></div></header>
-    <main className="mx-auto max-w-xl px-5 py-10">
-      {!done && <Link href="/dashboard" className="mb-7 inline-block text-sm font-semibold text-earth-600 transition hover:text-sage-700">Kembali ke ringkasan</Link>}
+    <main className="mx-auto max-w-xl px-5 py-10"><div className="mb-7 rounded-2xl bg-sand-100 px-5 py-4"><p className="text-xs font-semibold uppercase tracking-[.14em] text-sage-700">Micro check-in harian</p><p className="mt-1 text-sm leading-6 text-earth-600">Dua menit untuk membaca keadaanmu tanpa perlu sempurna.</p></div>
+      {!done && <Link href="/dashboard" className="mb-7 inline-flex items-center gap-1 text-sm font-semibold text-earth-600 transition hover:text-sage-700"><span className="material-symbols-outlined text-base">arrow_back</span>Kembali ke ringkasan</Link>}
       {done ? <DoneView alertInfo={alertInfo} onReset={handleReset} /> : <section className="rounded-3xl border border-sand-200 bg-white px-6 py-8 shadow-ambient sm:px-10">
         <div className="flex items-center justify-between gap-4">
-          <p className="text-sm font-semibold text-sage-700">Pertanyaan {currentStep + 1} dari {STEPS.length}</p>
-          <p className="text-xs font-semibold text-earth-500">{progress}%</p>
+          <p className="rounded-full bg-sage-50 px-3 py-1 text-xs font-semibold text-sage-700">Langkah {currentStep + 1} dari {STEPS.length}</p>
+          <p className="text-xs font-semibold text-earth-500">{progress}% selesai</p>
         </div>
-        <div className="mt-3 h-1.5 bg-sand-100"><div className="h-full bg-sage-600 transition-all" style={{ width: `${progress}%` }} /></div>
+        <div className="mt-3 h-2 rounded-full bg-sand-100"><div className="h-full rounded-full bg-sage-600 transition-all" style={{ width: `${progress}%` }} /></div>
         <div className="mt-8 min-h-[320px]">{renderStep(STEPS[currentStep])}</div>
         <div className="mt-8 flex gap-3">
-          <button onClick={() => setCurrentStep((step) => Math.max(0, step - 1))} disabled={currentStep === 0 || submitting} className="flex-1 border border-sand-300 px-5 py-3 text-sm font-semibold text-earth-700 transition hover:bg-sand-100 disabled:cursor-not-allowed disabled:opacity-50">Kembali</button>
-          <button onClick={() => isLastStep ? handleSubmit() : setCurrentStep((step) => step + 1)} disabled={submitting} className="flex-1 bg-sage-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-sage-800 disabled:cursor-not-allowed disabled:opacity-60">{submitting ? 'Menyimpan...' : isLastStep ? 'Simpan catatan' : 'Lanjut'}</button>
+          <button onClick={() => setCurrentStep((step) => Math.max(0, step - 1))} disabled={currentStep === 0 || submitting} className="flex-1 rounded-full bg-sand-100 px-5 py-3 text-sm font-semibold text-earth-700 transition hover:bg-sand-200 disabled:cursor-not-allowed disabled:opacity-50">Kembali</button>
+          <button onClick={() => isLastStep ? handleSubmit() : setCurrentStep((step) => step + 1)} disabled={submitting} className="flex flex-1 items-center justify-center gap-2 rounded-full bg-sage-600 px-5 py-3 text-sm font-semibold text-white shadow-ambient transition hover:bg-sage-700 disabled:cursor-not-allowed disabled:opacity-60">{submitting ? 'Menyimpan...' : isLastStep ? 'Simpan & lepaskan' : 'Lanjut'}<span className="material-symbols-outlined text-base">arrow_forward</span></button>
         </div>
       </section>}
     </main>
@@ -113,7 +113,7 @@ export default function CheckinPage() {
       case 'progress_2':
         return <Question title="Skripsi hari ini" prompt="Seberapa jelas langkah berikutnya yang perlu dikerjakan?"><RangeField value={progress2} onChange={setProgress2} low="Belum jelas" high="Sangat jelas" max={5} /></Question>
       case 'stressors':
-        return <Question title="Pemicu hari ini" prompt="Apa yang paling membebani hari ini?"><div className="mt-5 grid gap-2">{STRESSOR_OPTIONS.map((option) => <label key={option.value} className={`flex cursor-pointer items-center gap-3 border px-3 py-3 text-sm transition ${stressors.includes(option.value) ? 'border-sage-400 bg-sage-50 text-sage-900' : 'border-sand-200 text-earth-700 hover:bg-sand-50'}`}><input type="checkbox" checked={stressors.includes(option.value)} onChange={() => toggleStressor(option.value)} className="h-4 w-4 accent-sage-700" />{option.label}</label>)}</div><p className="mt-4 text-xs leading-5 text-earth-500">Boleh kosong kalau tidak ada yang terasa dominan.</p></Question>
+        return <Question title="Pemicu hari ini" prompt="Apa yang menyita ruang kepalamu?"><div className="mt-5 flex flex-wrap gap-2">{STRESSOR_OPTIONS.map((option) => <button type="button" key={option.value} onClick={() => toggleStressor(option.value)} className={`rounded-full px-4 py-2.5 text-sm font-medium transition ${stressors.includes(option.value) ? 'bg-sage-200 text-sage-900' : 'bg-sand-100 text-earth-700 hover:bg-sand-200'}`}>{option.label}</button>)}</div><p className="mt-4 text-xs leading-5 text-earth-500">Boleh pilih lebih dari satu atau lewati.</p></Question>
     }
   }
 }

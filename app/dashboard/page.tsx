@@ -266,7 +266,7 @@ export default function DashboardPage() {
         <div className="max-w-5xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <Brand compact />
-            <span className="text-xs font-semibold px-2 py-0.5 rounded bg-sage-50 text-sage-800 border border-sage-200">
+            <span className="rounded-full bg-sage-50 px-3 py-1 text-xs font-semibold text-sage-800">
               Dashboard
             </span>
           </div>
@@ -274,13 +274,13 @@ export default function DashboardPage() {
           <div className="flex flex-wrap items-center gap-3 text-sm">
             <Link
               href="/reflection"
-              className="border border-sand-300 px-3.5 py-2 font-semibold text-earth-700 transition hover:bg-sand-100"
+              className="rounded-full bg-sand-100 px-4 py-2.5 font-semibold text-earth-700 transition hover:bg-sand-200"
             >
               Refleksi minggu ini
             </Link>
             <Link
               href="/checkin"
-              className="bg-sage-700 hover:bg-sage-800 text-white font-medium px-3.5 py-2 shadow-sm transition"
+              className="rounded-full bg-sage-600 px-4 py-2.5 font-medium text-white shadow-ambient transition hover:bg-sage-700"
             >
               + Check-in Hari Ini
             </Link>
@@ -294,14 +294,14 @@ export default function DashboardPage() {
         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-sand-200 pb-5">
           <div className="text-earth-600 text-sm">
             Kode Akses:{' '}
-            <span className="font-mono font-bold text-earth-800 bg-sand-100 px-2.5 py-1 border border-sand-200">
+            <span className="rounded-full bg-sand-100 px-3 py-1 font-mono font-bold text-earth-800">
               {anonCode || '-'}
             </span>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.push('/checkin')}
-              className="bg-sage-700 text-white px-4 py-2 text-sm font-semibold hover:bg-sage-800 transition cursor-pointer shadow-sm"
+              className="cursor-pointer rounded-full bg-sage-600 px-4 py-2.5 text-sm font-semibold text-white shadow-ambient transition hover:bg-sage-700"
             >
               + Isi Jurnal Hari Ini
             </button>
@@ -311,7 +311,7 @@ export default function DashboardPage() {
                 localStorage.removeItem('jeda_anon_code')
                 router.push('/')
               }}
-              className="border border-sand-300 text-earth-700 px-4 py-2 text-sm font-semibold hover:bg-sand-100 transition cursor-pointer"
+              className="cursor-pointer rounded-full bg-sand-100 px-4 py-2.5 text-sm font-semibold text-earth-700 transition hover:bg-sand-200"
             >
               Ganti kode / keluar
             </button>
