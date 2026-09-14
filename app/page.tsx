@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { saveAnonymousCode } from "@/lib/user";
+import { Brand } from "@/app/components/brand";
 
 const CONSENT_KEY = "jeda_consent_given";
 
@@ -80,7 +81,8 @@ export default function LandingPage() {
     return (
       <div className="flex flex-1 items-center justify-center bg-sand-50 p-5 text-earth-900">
         <section className="max-w-md w-full rounded-3xl border border-sand-200 bg-white p-7 shadow-ambient sm:p-9">
-          <p className="text-sm font-semibold text-sage-700">Kode anonim berhasil dibuat</p>
+          <Brand compact />
+          <p className="mt-5 text-sm font-semibold text-sage-700">Kode anonim berhasil dibuat</p>
           <h1 className="mt-2 text-3xl font-semibold text-earth-900">Simpan kode ini dulu.</h1>
           <p className="mt-3 text-sm leading-6 text-earth-600">Kode ini adalah satu-satunya cara untuk membuka riwayatmu dari perangkat lain.</p>
           <div className="mt-7 border border-sage-300 bg-sage-50 px-5 py-4 text-center font-mono text-2xl font-bold tracking-wide text-sage-900">{newCode}</div>
@@ -94,8 +96,8 @@ export default function LandingPage() {
   return (
     <div className="flex flex-1 items-center justify-center bg-sand-50 p-5 text-earth-900">
       <div className="max-w-md w-full rounded-3xl border border-sand-200 bg-white p-7 shadow-ambient sm:p-9">
-        <p className="text-sm font-semibold text-sage-700 mb-3">Untuk mahasiswa yang sedang menyelesaikan skripsi</p>
-        <h1 className="text-4xl font-semibold text-earth-900 mb-3">Jeda</h1>
+        <Brand />
+        <p className="mt-6 text-sm font-semibold text-sage-700 mb-3">Untuk mahasiswa yang sedang menyelesaikan skripsi</p>
         <p className="text-sm leading-6 text-earth-600 mb-8">Ruang anonim untuk memahami pola stres, energi, dan progresmu dari hari ke hari.</p>
 
         {hasStoredSession && (

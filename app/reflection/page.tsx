@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { Brand } from '@/app/components/brand'
 import { useRouter } from 'next/navigation'
 import { getAnonymousCode } from '@/lib/user'
 
@@ -72,7 +73,7 @@ export default function ReflectionPage() {
   }
 
   return <div className="flex-1 bg-sand-50 text-earth-900 pb-16">
-    <header className="sticky top-0 z-10 border-b border-sand-200 bg-sand-50/95 backdrop-blur"><div className="mx-auto flex max-w-2xl items-center justify-between px-5 py-4"><Link href="/dashboard" className="text-2xl font-semibold text-earth-800 hover:text-sage-700">Jeda</Link><Link href="/dashboard" className="text-sm font-semibold text-sage-700 hover:text-sage-900">Ke dashboard</Link></div></header>
+    <header className="sticky top-0 z-10 border-b border-sand-200 bg-sand-50/95 backdrop-blur"><div className="mx-auto flex max-w-2xl items-center justify-between px-5 py-4"><Brand href="/dashboard" compact /><Link href="/dashboard" className="text-sm font-semibold text-sage-700 hover:text-sage-900">Ke dashboard</Link></div></header>
     <main className="mx-auto max-w-xl px-5 py-10">
       <Link href="/dashboard" className="text-sm font-semibold text-earth-600 hover:text-sage-700">Kembali ke ringkasan</Link>
       <section className="mt-7 rounded-3xl border border-sand-200 bg-white px-6 py-8 shadow-ambient sm:px-10">

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { Brand } from '@/app/components/brand'
 import { useRouter } from 'next/navigation'
 import {
   ResponsiveContainer,
@@ -264,9 +265,7 @@ export default function DashboardPage() {
       <header className="bg-sand-50/95 border-b border-sand-200 sticky top-0 z-10 backdrop-blur">
         <div className="max-w-5xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-xl font-bold tracking-tight text-earth-800 hover:text-sage-700 transition">
-              Jeda 🍃
-            </Link>
+            <Brand compact />
             <span className="text-xs font-semibold px-2 py-0.5 rounded bg-sage-50 text-sage-800 border border-sage-200">
               Dashboard
             </span>
