@@ -386,9 +386,18 @@ export default function DashboardPage() {
               className="bg-lavender-50 border-l-4 border-lavender-500 p-4 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between sm:items-center gap-3"
               >
                 <div>
-                  <h3 className="text-lavender-900 font-bold flex items-center gap-2">
+                  <h3 className="text-lavender-900 font-bold flex items-center gap-2 flex-wrap">
                     <span>🚨</span>
                     <span>Peringatan: Skor Kritis Terdeteksi</span>
+                    <span
+                      className={
+                        alert.alert_type === 'kronis'
+                          ? 'rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-semibold text-purple-800'
+                          : 'rounded-full bg-orange-100 px-2.5 py-0.5 text-xs font-semibold text-orange-800'
+                      }
+                    >
+                      {alert.alert_type === 'kronis' ? 'Pola Kronis' : 'Lonjakan Akut'}
+                    </span>
                   </h3>
                   <p className="text-lavender-800 text-sm mt-0.5">
                     Sistem mendeteksi tingkat kecemasan/kelelahan yang tinggi pada check-in Anda. 
