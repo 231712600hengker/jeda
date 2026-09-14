@@ -1,18 +1,18 @@
 @import "tailwindcss";
 
-:root { --background: #fbf9f5; --foreground: #2b231c; }
+:root { --background: #fbf9f6; --foreground: #1b1c1a; }
 
 @theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-serif: Georgia, 'Times New Roman', serif;
-  --font-mono: var(--font-geist-mono);
-  --color-sand-50: #fbf9f5; --color-sand-100: #f4efe6; --color-sand-200: #e8ded0; --color-sand-300: #dbcab6; --color-sand-400: #cbb49b; --color-sand-500: #b59b7f; --color-sand-600: #9c8065; --color-sand-700: #7d6550; --color-sand-800: #5c4a3b; --color-sand-900: #3d3127;
-  --color-sage-50: #f3f6f3; --color-sage-100: #e4ece4; --color-sage-200: #c9d9ca; --color-sage-300: #a9c2aa; --color-sage-400: #88a78a; --color-sage-500: #6b8d6d; --color-sage-600: #557357; --color-sage-700: #445c46; --color-sage-800: #354737; --color-sage-900: #243226;
-  --color-earth-50: #f8f6f4; --color-earth-100: #ede7e1; --color-earth-200: #dbd0c4; --color-earth-300: #c5b5a4; --color-earth-400: #ab9783; --color-earth-500: #8f7964; --color-earth-600: #73604f; --color-earth-700: #5a4b3d; --color-earth-800: #42362c; --color-earth-900: #2b231c;
-  --color-lavender-50: #f8f6fa; --color-lavender-100: #eee8f6; --color-lavender-200: #ded3ed; --color-lavender-300: #c6b6dc; --color-lavender-400: #aa95c7; --color-lavender-500: #8d75af; --color-lavender-600: #745a96; --color-lavender-700: #5b4478; --color-lavender-800: #44325a; --color-lavender-900: #302240;
+  --font-sans: var(--font-plus-jakarta-sans);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --color-sand-50: #fbf9f6; --color-sand-100: #f5f3f0; --color-sand-200: #eae8e5; --color-sand-300: #e4e2df; --color-sand-400: #c1c8c2; --color-sand-500: #727974; --color-sand-600: #605e5a; --color-sand-700: #4a5568; --color-sand-800: #414844; --color-sand-900: #1b1c1a;
+  --color-sage-50: #e8efea; --color-sage-100: #e8efea; --color-sage-200: #c5ebd7; --color-sage-300: #aacfbc; --color-sage-400: #6b8e7d; --color-sage-500: #597c6b; --color-sage-600: #416353; --color-sage-700: #4a6b5b; --color-sage-800: #2c4d3f; --color-sage-900: #002115;
+  --color-earth-50: #f5f0eb; --color-earth-100: #eae2d8; --color-earth-200: #e6e2dd; --color-earth-300: #cac6c1; --color-earth-400: #a0aec0; --color-earth-500: #727974; --color-earth-600: #4a5568; --color-earth-700: #414844; --color-earth-800: #2d3748; --color-earth-900: #1b1c1a;
+  --color-lavender-50: #f4ddd4; --color-lavender-100: #ffdbcf; --color-lavender-200: #ffb59b; --color-lavender-300: #d98e73; --color-lavender-400: #a6634b; --color-lavender-500: #894c35; --color-lavender-600: #6f3722; --color-lavender-700: #6f3722; --color-lavender-800: #380d00; --color-lavender-900: #380d00;
+  --shadow-ambient: 0 10px 25px -5px rgba(107, 142, 125, .08), 0 8px 10px -6px rgba(107, 142, 125, .04);
 }
 
-body { background: var(--background); color: var(--foreground); font-family: var(--font-geist-sans), Arial, sans-serif; }
-button, input, select { font: inherit; }
+body { background: var(--background); color: var(--foreground); font-family: var(--font-plus-jakarta-sans), Arial, sans-serif; }
+button, input, select, textarea { font: inherit; }

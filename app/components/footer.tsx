@@ -5,7 +5,7 @@ export function Footer() {
     <footer className="border-t border-sand-200 bg-sand-50 text-earth-600">
       <div className="mx-auto flex max-w-5xl flex-col gap-5 px-5 py-8 text-sm sm:flex-row sm:items-start sm:justify-between">
         <div className="max-w-md">
-          <Link href="/" className="font-serif text-2xl font-semibold text-earth-800 transition hover:text-sage-700">
+          <Link href="/" className="text-2xl font-semibold text-earth-800 transition hover:text-sage-700">
             Jeda
           </Link>
           <p className="mt-2 leading-6">

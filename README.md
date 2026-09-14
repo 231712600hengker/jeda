@@ -1,5 +1,11 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Konfigurasi keamanan
+
+Operasi Supabase dilakukan melalui Route Handler di server. Tetapkan `NEXT_PUBLIC_SUPABASE_URL` dan `SUPABASE_SERVICE_ROLE_KEY` pada environment deployment; jangan gunakan atau mengekspos `NEXT_PUBLIC_SUPABASE_ANON_KEY` untuk akses data aplikasi. Jalankan `supabase/weekly_reflections.sql` di Supabase SQL Editor sebelum deploy untuk mencabut akses tabel dari `anon` dan `authenticated`.
+
+Catatan privasi: versi ini menyimpan check-in dan refleksi di server agar dashboard lintas perangkat dan alert dapat bekerja. Data tidak dienkripsi client-side/di IndexedDB, sehingga klaim enkripsi lokal atau “server tidak menyimpan catatan mentah” tidak berlaku untuk versi ini.
+
 ## Getting Started
 
 First, run the development server:

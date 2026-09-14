@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { saveAnonymousCode } from "@/lib/user";
 
 const CONSENT_KEY = "jeda_consent_given";
 
@@ -18,26 +18,18 @@ export default function LandingPage() {
 
   async function createAnonymousUser() {
     setLoading(true);
-    // Buat kode acak 6 karakter, misal: JEDA-A1B2C3
-    const generatedCode = "JEDA-" + Math.random().toString(36).substring(2, 8).toUpperCase();
-
-    const { data, error } = await supabase
-      .from("users")
-      .insert([{ anonymous_code: generatedCode }])
-      .select()
-      .single();
-
-    if (error) {
+    const response = await fetch('/api/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'create' }) });
+    const data = await response.json();
+    if (!response.ok) {
       setErrorMsg("Gagal membuat kode anonim. Coba lagi.");
       setLoading(false);
       return;
     }
 
     // Simpan data ke browser
-    localStorage.setItem("jeda_user_id", data.id);
-    localStorage.setItem("jeda_anon_code", data.anonymous_code);
+    saveAnonymousCode(data.anonymousCode);
 
-    setNewCode(data.anonymous_code);
+    setNewCode(data.anonymousCode);
     setLoading(false);
   }
 
@@ -72,29 +64,24 @@ export default function LandingPage() {
     setLoading(true);
     setErrorMsg("");
 
-    const { data, error } = await supabase
-      .from("users")
-      .select("id, anonymous_code")
-      .eq("anonymous_code", inputCode.trim().toUpperCase())
-      .single();
-
-    if (error || !data) {
+    const response = await fetch('/api/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'login', anonymousCode: inputCode }) });
+    const data = await response.json();
+    if (!response.ok) {
       setErrorMsg("Kode tidak ditemukan. Silakan periksa kembali.");
       setLoading(false);
       return;
     }
 
-    localStorage.setItem("jeda_user_id", data.id);
-    localStorage.setItem("jeda_anon_code", data.anonymous_code);
+    saveAnonymousCode(data.anonymousCode);
     router.push("/dashboard");
   }
 
   if (newCode) {
     return (
       <div className="flex flex-1 items-center justify-center bg-sand-50 p-5 text-earth-900">
-        <section className="max-w-md w-full border border-sand-200 bg-white p-7 shadow-sm sm:p-9">
+        <section className="max-w-md w-full rounded-3xl border border-sand-200 bg-white p-7 shadow-ambient sm:p-9">
           <p className="text-sm font-semibold text-sage-700">Kode anonim berhasil dibuat</p>
-          <h1 className="mt-2 font-serif text-3xl font-semibold text-earth-900">Simpan kode ini dulu.</h1>
+          <h1 className="mt-2 text-3xl font-semibold text-earth-900">Simpan kode ini dulu.</h1>
           <p className="mt-3 text-sm leading-6 text-earth-600">Kode ini adalah satu-satunya cara untuk membuka riwayatmu dari perangkat lain.</p>
           <div className="mt-7 border border-sage-300 bg-sage-50 px-5 py-4 text-center font-mono text-2xl font-bold tracking-wide text-sage-900">{newCode}</div>
           <button onClick={continueWithNewCode} className="mt-7 w-full bg-sage-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-sage-800">Saya sudah menyimpan kode ini</button>
@@ -106,9 +93,9 @@ export default function LandingPage() {
 
   return (
     <div className="flex flex-1 items-center justify-center bg-sand-50 p-5 text-earth-900">
-      <div className="max-w-md w-full border border-sand-200 bg-white p-7 shadow-sm sm:p-9">
+      <div className="max-w-md w-full rounded-3xl border border-sand-200 bg-white p-7 shadow-ambient sm:p-9">
         <p className="text-sm font-semibold text-sage-700 mb-3">Untuk mahasiswa yang sedang menyelesaikan skripsi</p>
-        <h1 className="font-serif text-4xl font-semibold text-earth-900 mb-3">Jeda</h1>
+        <h1 className="text-4xl font-semibold text-earth-900 mb-3">Jeda</h1>
         <p className="text-sm leading-6 text-earth-600 mb-8">Ruang anonim untuk memahami pola stres, energi, dan progresmu dari hari ke hari.</p>
 
         {hasStoredSession && (
@@ -120,7 +107,7 @@ export default function LandingPage() {
 
         {/* Bagian Pengguna Baru */}
         <div className="mb-8 border-l-4 border-sage-400 bg-sage-50 p-5">
-          <h2 className="font-serif text-xl font-semibold text-sage-900 mb-2">Mulai dari satu check-in</h2>
+          <h2 className="text-xl font-semibold text-sage-900 mb-2">Mulai dari satu check-in</h2>
           <p className="text-sm leading-6 text-sage-800 mb-4">Buat kode anonim untuk menyimpan catatan pribadimu. Jeda tidak meminta nama, NIM, atau email.</p>
           <button
             onClick={handleStartClick}
@@ -162,8 +149,8 @@ export default function LandingPage() {
 
       {showConsent && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white shadow-xl max-w-lg w-full p-6 max-h-[85vh] overflow-y-auto">
-            <h2 className="font-serif text-2xl font-semibold text-earth-800 mb-3">Persetujuan partisipasi</h2>
+          <div className="bg-white shadow-xl rounded-3xl max-w-lg w-full p-6 max-h-[85vh] overflow-y-auto">
+            <h2 className="text-2xl font-semibold text-earth-800 mb-3">Persetujuan partisipasi</h2>
             <div className="text-sm leading-6 text-earth-600 space-y-3 mb-4">
               <p>
                 Jeda adalah alat pemantauan kesejahteraan mandiri yang dikembangkan sebagai

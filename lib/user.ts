@@ -1,22 +1,10 @@
-import { supabase } from './supabase'
+export function getAnonymousCode(): string {
+  if (typeof window === 'undefined') return ''
+  return localStorage.getItem('jeda_anon_code') ?? ''
+}
 
-export async function getOrCreateUser(): Promise<string> {
-  const existingId = localStorage.getItem('jeda_user_id')
-  if (existingId) return existingId
-
-  const anonymousCode = 'JEDA-' + Math.random().toString(36).substring(2, 8).toUpperCase()
-
-  const { data, error } = await supabase
-    .from('users')
-    .insert({ anonymous_code: anonymousCode })
-    .select()
-    .single()
-
-  if (error || !data) {
-    throw new Error('Gagal membuat user: ' + error?.message)
-  }
-
-  localStorage.setItem('jeda_user_id', data.id)
-  localStorage.setItem('jeda_anon_code', data.anonymous_code)
-  return data.id
+export function saveAnonymousCode(anonymousCode: string) {
+  localStorage.setItem('jeda_anon_code', anonymousCode)
+  // Key lama dipertahankan untuk UX/routing saja; bukan bukti otorisasi.
+  localStorage.setItem('jeda_user_id', 'anonymous-session')
 }

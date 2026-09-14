@@ -17,29 +17,12 @@ import {
   AreaChart,
   Area,
 } from 'recharts'
-import { supabase } from '@/lib/supabase'
-import { getOrCreateUser } from '@/lib/user'
+import { getAnonymousCode } from '@/lib/user'
+import { createDemoCheckins } from '@/lib/dummy-data'
 import { Checkin, CheckinStressor, ChartDataPoint, AlertRecord } from '@/lib/types'
 import { SLEEP_QUALITY_OPTIONS, STRESSOR_LABELS } from '@/lib/constants'
 
 type Range = '7' | '30' | 'all'
-
-function createDemoCheckins(): Checkin[] {
-  const pattern = [
-    [2, 2, 7, 6, 2, 2], [2, 1, 6, 5, 3, 3], [3, 2, 8, 7, 1, 2],
-    [1, 1, 5, 4, 4, 4], [2, 2, 6, 6, 3, 3], [1, 0, 4, 3, 4, 5], [0, 1, 3, 4, 5, 4],
-  ]
-  return pattern.map(([anxiety1, anxiety2, mental, physical, progress1, progress2], index) => {
-    const date = new Date()
-    date.setDate(date.getDate() - (pattern.length - 1 - index))
-    return {
-      id: `demo-${index}`, user_id: 'demo', checkin_date: date.toISOString().split('T')[0],
-      anxiety_1: anxiety1, anxiety_2: anxiety2, fatigue_mental: mental, fatigue_physical: physical,
-      sleep_quantity: index === 3 ? '4-6 Jam' : '6-8 Jam', sleep_quality: index === 3 ? SLEEP_QUALITY_OPTIONS[0] : SLEEP_QUALITY_OPTIONS[1],
-      progress_1: progress1, progress_2: progress2,
-    }
-  })
-}
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -59,54 +42,17 @@ export default function DashboardPage() {
     setLoading(true)
     setErrorMsg(null)
     try {
-      const uid = await getOrCreateUser()
-
-      const { data: cData, error: cErr } = await supabase
-        .from('checkins')
-        .select('*')
-        .eq('user_id', uid)
-        .order('checkin_date', { ascending: true })
-
-      if (cErr) throw cErr
-
-      const fetchedCheckins = cData || []
+      const response = await fetch('/api/dashboard', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ anonymousCode: getAnonymousCode() }) })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error)
+      const fetchedCheckins = data.checkins as Checkin[]
       setCheckins(fetchedCheckins)
-
-      if (fetchedCheckins.length > 0) {
-        const ids = fetchedCheckins.map((c) => c.id)
-        const { data: sData, error: sErr } = await supabase
-          .from('checkin_stressors')
-          .select('*')
-          .in('checkin_id', ids)
-
-        if (!sErr && sData) {
-          setStressors(sData)
-        }
-      } else {
-        setStressors([])
-      }
-
-      // 2. Query Data Alerts yang belum direspons (acknowledged: false)
-      const { data: alertsData, error: alertsError } = await supabase
-        .from('alerts')
-        .select('*')
-        .eq('user_id', uid)
-        .eq('acknowledged', false)
-        .order('triggered_at', { ascending: false })
-
-      if (!alertsError && alertsData) {
-        setActiveAlerts(alertsData)
-      }
-
-      // 3. Query Data Stressors dari Supabase
-      const { data: stressorsInfo, error: stressorsError } = await supabase
-        .from('checkin_stressors')
-        .select('category, checkins!inner(user_id)')
-        .eq('checkins.user_id', uid)
-
-      if (!stressorsError && stressorsInfo) {
+      const fetchedStressors = data.stressors as CheckinStressor[]
+      setStressors(fetchedStressors)
+      setActiveAlerts(data.alerts as AlertRecord[])
+      if (fetchedStressors) {
         const counts: Record<string, number> = {}
-        stressorsInfo.forEach((item: { category: string }) => {
+        fetchedStressors.forEach((item) => {
           counts[item.category] = (counts[item.category] || 0) + 1
         })
 
@@ -129,8 +75,7 @@ export default function DashboardPage() {
 
   // 3. Amankan Rute (Route Protection)
   useEffect(() => {
-    const storedUserId = localStorage.getItem('jeda_user_id')
-    if (!storedUserId) {
+    if (!getAnonymousCode()) {
       router.push('/')
       return
     }
@@ -306,12 +251,8 @@ export default function DashboardPage() {
 
   // 3. Buat Fungsi untuk Menutup Notifikasi (Acknowledge)
   async function handleAcknowledge(alertId: string) {
-    const { error } = await supabase
-      .from('alerts')
-      .update({ acknowledged: true })
-      .eq('id', alertId)
-
-    if (!error) {
+    const response = await fetch('/api/alerts/acknowledge', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ anonymousCode: getAnonymousCode(), alertId }) })
+    if (response.ok) {
       // Hapus dari tampilan layar tanpa perlu refresh halaman
       setActiveAlerts((prev) => prev.filter((alert) => alert.id !== alertId))
     }
@@ -381,7 +322,7 @@ export default function DashboardPage() {
         {/* Banner / Title & Actions */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="font-serif text-3xl font-semibold tracking-tight">Pola yang kamu catat</h1>
+            <h1 className="text-3xl font-semibold tracking-tight">Pola yang kamu catat</h1>
             <p className="text-earth-600 text-sm mt-2">
               Lihat kecenderungan hari-hari yang terasa ringan maupun berat, tanpa perlu menghakimi diri sendiri.
             </p>
@@ -508,7 +449,7 @@ export default function DashboardPage() {
             <section className="grid gap-4 border border-sand-200 bg-white p-5 shadow-sm md:grid-cols-[1fr_auto] md:items-center">
               <div>
                 <p className="text-sm font-semibold text-sage-700">{maintenanceInsight.label}</p>
-                <h2 className="mt-2 font-serif text-2xl font-semibold text-earth-900">{maintenanceInsight.title}</h2>
+                <h2 className="mt-2 text-2xl font-semibold text-earth-900">{maintenanceInsight.title}</h2>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-earth-600">{maintenanceInsight.description}</p>
               </div>
               <Link href={maintenanceInsight.href} className="bg-sage-700 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-sage-800">

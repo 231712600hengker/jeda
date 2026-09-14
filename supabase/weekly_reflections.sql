@@ -14,17 +14,8 @@ create table if not exists public.weekly_reflections (
 create index if not exists weekly_reflections_user_week_idx
   on public.weekly_reflections (user_id, week_start desc);
 
--- Pastikan role anon/authenticated bisa membaca, menulis, dan memperbarui tabel.
--- Jika proyek Anda sudah punya kebijakan RLS untuk public.users, pakai kebijakan yang sama
--- dan jangan menambah kebijakan baru secara publik.
-grant usage on schema public to anon, authenticated;
-grant select, insert, update, delete on public.weekly_reflections to anon, authenticated;
-
--- Jeda memakai kode anonim buatan aplikasi, bukan Supabase Auth. Karena anon key
--- tidak membawa auth.uid(), policy "milik sendiri" tidak bisa divalidasi oleh RLS.
--- Untuk setup riset/prototipe ini, samakan dengan akses tabel Jeda lain: anon dan
--- authenticated boleh membaca/menulis. Jika aplikasi dipakai publik, pindahkan
--- operasi tulis ke server action/API route dengan service role dan validasi kode.
+-- Semua akses data pribadi hanya lewat Route Handler Next.js menggunakan
+-- SUPABASE_SERVICE_ROLE_KEY. Jangan pernah mengekspos key tersebut ke browser.
 alter table public.weekly_reflections enable row level security;
 
 drop policy if exists "weekly_reflections_anon_select" on public.weekly_reflections;
@@ -32,23 +23,7 @@ drop policy if exists "weekly_reflections_anon_insert" on public.weekly_reflecti
 drop policy if exists "weekly_reflections_anon_update" on public.weekly_reflections;
 drop policy if exists "weekly_reflections_anon_delete" on public.weekly_reflections;
 
-create policy "weekly_reflections_anon_select"
-  on public.weekly_reflections for select
-  to anon, authenticated
-  using (true);
-
-create policy "weekly_reflections_anon_insert"
-  on public.weekly_reflections for insert
-  to anon, authenticated
-  with check (true);
-
-create policy "weekly_reflections_anon_update"
-  on public.weekly_reflections for update
-  to anon, authenticated
-  using (true)
-  with check (true);
-
-create policy "weekly_reflections_anon_delete"
-  on public.weekly_reflections for delete
-  to anon, authenticated
-  using (true);
+revoke all on public.users, public.checkins, public.checkin_stressors, public.alerts, public.weekly_reflections from anon, authenticated;
+revoke usage on schema public from anon, authenticated;
+grant usage on schema public to service_role;
+grant select, insert, update, delete on public.users, public.checkins, public.checkin_stressors, public.alerts, public.weekly_reflections to service_role;
