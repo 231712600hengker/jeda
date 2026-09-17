@@ -4,9 +4,9 @@ import { enforceRateLimit, readJson, requestIp } from '@/lib/server/security'
 import { SLEEP_QUALITY_OPTIONS, SLEEP_QUANTITY_OPTIONS, STRESSOR_OPTIONS } from '@/lib/constants'
 
 type CheckinRequest = { checkin_date?: unknown; anxiety_1?: unknown; anxiety_2?: unknown; fatigue_mental?: unknown; fatigue_physical?: unknown; sleep_quantity?: unknown; sleep_quality?: unknown; progress_1?: unknown; progress_2?: unknown; stressors?: unknown }
-const stressorValues = new Set(STRESSOR_OPTIONS.map((option) => option.value))
-const sleepQuantities = new Set(SLEEP_QUANTITY_OPTIONS)
-const sleepQualities = new Set(SLEEP_QUALITY_OPTIONS)
+const stressorValues = new Set<string>(STRESSOR_OPTIONS.map((option) => option.value))
+const sleepQuantities = new Set<string>(SLEEP_QUANTITY_OPTIONS)
+const sleepQualities = new Set<string>(SLEEP_QUALITY_OPTIONS)
 const isIntIn = (value: unknown, min: number, max: number) => typeof value === 'number' && Number.isInteger(value) && value >= min && value <= max
 function isIsoDate(value: unknown) {
   if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false
