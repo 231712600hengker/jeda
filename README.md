@@ -103,6 +103,8 @@ File `.env.example` berisi variabel berikut:
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
+ANONYMOUS_CODE_HMAC_SECRET=
+SESSION_SECRET=
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
@@ -110,6 +112,10 @@ Catatan penting:
 - `NEXT_PUBLIC_SUPABASE_URL` dipakai untuk client dan server
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` hanya untuk client-side yang memang aman dipakai publik
 - `SUPABASE_SERVICE_ROLE_KEY` hanya boleh dipakai di server-side, tidak boleh dikirim ke browser
+- `ANONYMOUS_CODE_HMAC_SECRET` dibutuhkan untuk hashing kode anonim
+- `SESSION_SECRET` dibutuhkan untuk menandatangani cookie sesi
+
+Untuk deployment ke Vercel atau platform hosting lain, isi variabel yang sama di environment settings. Jangan gunakan nilai yang sama untuk semua project dan pastikan panjang secret minimal 32 karakter.
 
 ## Database / Supabase
 
