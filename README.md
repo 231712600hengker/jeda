@@ -1,42 +1,165 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Jeda
 
-## Konfigurasi keamanan
+Jeda adalah aplikasi web yang membantu pengguna memantau kondisi diri secara ringan, anonim, dan tanpa menghakimi. Aplikasi ini dibuat untuk mendukung mahasiswa dan peneliti yang sedang menjalani proses berat seperti skripsi, tugas akhir, atau pekerjaan akademik yang memakan energi mental.
 
-Operasi Supabase dilakukan melalui Route Handler di server. Tetapkan `NEXT_PUBLIC_SUPABASE_URL` dan `SUPABASE_SERVICE_ROLE_KEY` pada environment deployment; jangan gunakan atau mengekspos `NEXT_PUBLIC_SUPABASE_ANON_KEY` untuk akses data aplikasi. Jalankan `supabase/weekly_reflections.sql` di Supabase SQL Editor sebelum deploy untuk mencabut akses tabel dari `anon` dan `authenticated`.
+Tujuan utamanya bukan untuk memberi skor atau diagnosis, melainkan membantu pengguna melihat pola stres, kelelahan, tidur, dan progres harian dalam bentuk yang sederhana dan mudah dipahami.
 
-Catatan privasi: versi ini menyimpan check-in dan refleksi di server agar dashboard lintas perangkat dan alert dapat bekerja. Data tidak dienkripsi client-side/di IndexedDB, sehingga klaim enkripsi lokal atau “server tidak menyimpan catatan mentah” tidak berlaku untuk versi ini.
+## Fitur utama
 
-## Getting Started
+- Check-in harian singkat tentang kecemasan, kelelahan, tidur, dan progres skripsi
+- Pemilihan pemicu stres yang umum dialami dalam proses akademik
+- Dashboard ringkas untuk melihat tren dan pola dalam rentang waktu tertentu
+- Peringatan ringan ketika ada pola yang perlu diperhatikan
+- Refleksi mingguan untuk menilai perjalanan kerja secara lebih manusiawi
+- Export data ke CSV untuk kebutuhan personal atau evaluasi diri
 
-First, run the development server:
+## Stack teknologi
+
+- Next.js 16
+- React 19
+- TypeScript
+- Supabase
+- Tailwind CSS
+- Recharts
+
+## Struktur folder
+
+```text
+jeda/
+├── app/
+│   ├── api/
+│   │   ├── alerts/
+│   │   ├── checkin/
+│   │   ├── dashboard/
+│   │   ├── reflection/
+│   │   └── session/
+│   ├── checkin/
+│   ├── dashboard/
+│   ├── reflection/
+│   ├── components/
+│   ├── globals.css
+│   ├── layout.tsx
+│   └── page.tsx
+├── lib/
+│   ├── constants.ts
+│   ├── dummy-data.ts
+│   ├── types.ts
+│   ├── user.ts
+│   └── server/
+├── public/
+├── supabase/
+│   └── weekly_reflections.sql
+├── .env.example
+├── .gitignore
+├── AGENTS.md
+├── CLAUDE.md
+├── eslint.config.mjs
+├── next-env.d.ts
+├── next.config.ts
+├── package.json
+├── postcss.config.mjs
+├── PROJECT_GOALS.md
+├── README.md
+├── tsconfig.json
+└── docs/
+    └── SECURITY.md
+```
+
+## Persyaratan
+
+- Node.js 20+
+- npm
+- Akun Supabase
+
+## Setup lokal
+
+1. Clone repo
+2. Install dependency:
+
+```bash
+npm install
+```
+
+3. Buat file environment lokal berdasarkan contoh:
+
+```bash
+copy .env.example .env.local
+```
+
+4. Isi nilai variabel environment sesuai project Anda.
+5. Jalankan aplikasi:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Buka http://localhost:3000 untuk melihat aplikasi.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Variabel environment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+File `.env.example` berisi variabel berikut:
 
-## Learn More
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
 
-To learn more about Next.js, take a look at the following resources:
+Catatan penting:
+- `NEXT_PUBLIC_SUPABASE_URL` dipakai untuk client dan server
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` hanya untuk client-side yang memang aman dipakai publik
+- `SUPABASE_SERVICE_ROLE_KEY` hanya boleh dipakai di server-side, tidak boleh dikirim ke browser
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Database / Supabase
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Sebelum deploy, jalankan SQL migration di Supabase:
 
-## Deploy on Vercel
+```sql
+supabase/weekly_reflections.sql
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Pastikan aturan akses tabel dibatasi dengan benar agar data tidak terlalu terbuka untuk `anon` atau `authenticated` yang tidak dibutuhkan.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Keamanan dan privasi
+
+Proyek ini menyimpan catatan user di server agar dashboard lintas perangkat dan alert dapat berjalan. Karena itu:
+
+- jangan mengekspos `SUPABASE_SERVICE_ROLE_KEY` ke frontend
+- jangan menggunakan key anon untuk operasi sensitif di server
+- gunakan Route Handler di Next.js untuk akses protected data
+- jangan mengklaim bahwa data aman secara lokal atau terenkripsi penuh jika memang tidak ada mekanisme tersebut di implementasi
+
+Informasi detail ada di [docs/SECURITY.md](docs/SECURITY.md).
+
+## Script yang tersedia
+
+```bash
+npm run dev
+npm run build
+npm run start
+npm run lint
+```
+
+## Status proyek
+
+Proyek ini masih dalam tahap MVP / pengembangan awal. Fokus saat ini adalah:
+
+- pengalaman check-in harian yang ringan
+- dashboard pola diri yang mudah dibaca
+- keamanan data dan flow autentikasi anonim
+- kesiapan fitur refleksi dan percepatan pengembangan berikutnya
+
+## Referensi tambahan
+
+- [PROJECT_GOALS.md](PROJECT_GOALS.md)
+- [docs/SECURITY.md](docs/SECURITY.md)
+
+## Catatan pengembang
+
+Repository ini sudah cukup rapi secara dasar, namun untuk scaling ke depan disarankan:
+
+- memisahkan dokumentasi ke folder `docs/`
+- menambahkan `.env.example` dan panduan setup
+- menjaga agar komponen / halaman tidak terlalu padat logic
+- menambah test untuk route handler dan operasi data penting
