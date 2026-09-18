@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     if (action === 'login') {
       enforceRateLimit(`session:login:${requestIp(request)}`, 10, 10 * 60_000)
       const user = await requireAnonymousUser(anonymousCode)
-      const response = NextResponse.json({ ok: true })
+      const response = NextResponse.json({ ok: true, anonymousCode: anonymousCode?.trim() ?? '' })
       response.cookies.set(createSession(user.id)); return response
     }
     return apiError(new Error('Aksi sesi tidak dikenal.'))
