@@ -20,20 +20,26 @@ function getSecretKey(): Uint8Array {
   return new TextEncoder().encode(JWT_SECRET);
 }
 
-// ─── CREATE SESSION ───────────────────────────────────────
+// ─── CREATE & SIGN SESSION ─────────────────────────────────
+
+/**
+ * Buat signed JWT string dari UserSession.
+ */
+export async function signSessionToken(session: UserSession): Promise<string> {
+  const secretKey = getSecretKey();
+  return new SignJWT(session as unknown as JWTPayload)
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('90d')
+    .sign(secretKey);
+}
 
 /**
  * Buat JWT dan simpan ke httpOnly cookie.
  * Dipanggil setelah login berhasil.
  */
 export async function createSession(session: UserSession): Promise<string> {
-  const secretKey = getSecretKey();
-
-  const token = await new SignJWT(session as unknown as JWTPayload)
-    .setProtectedHeader({ alg: 'HS256' })
-    .setIssuedAt()
-    .setExpirationTime('90d')
-    .sign(secretKey);
+  const token = await signSessionToken(session);
 
   // Set cookie (hanya di server — Next.js 15 menggunakan await cookies())
   const cookieStore = await cookies();
@@ -80,7 +86,7 @@ export async function getSessionFromRequest(req: NextRequest): Promise<UserSessi
 
 // ─── VERIFY TOKEN ─────────────────────────────────────────
 
-async function verifyToken(token: string): Promise<UserSession | null> {
+export async function verifyToken(token: string): Promise<UserSession | null> {
   try {
     const { payload } = await jwtVerify(token, getSecretKey());
     return payload as unknown as UserSession;
