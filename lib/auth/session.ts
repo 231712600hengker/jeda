@@ -12,12 +12,26 @@ import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
 import type { UserSession } from '@/types/jeda';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'jeda-v2-default-fallback-secret-min-32-chars-long';
+const JWT_SECRET = process.env.JWT_SECRET?.trim();
 const COOKIE_NAME = 'jeda_session';
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 90; // 90 hari
 
 function getSecretKey(): Uint8Array {
-  return new TextEncoder().encode(JWT_SECRET);
+  const isProduction = process.env.NODE_ENV === 'production';
+  const secret = JWT_SECRET || (!isProduction ? 'jeda-dev-secret-key-for-local-tests-32b' : undefined);
+
+  if (!secret || secret.length < 32) {
+    if (isProduction) {
+      throw new Error(
+        'Missing or weak JWT_SECRET. Set JWT_SECRET to a random string with at least 32 characters in your deployment environment.'
+      );
+    }
+
+    console.warn('Missing JWT_SECRET in non-production mode; using a local fallback secret for tests/dev only.');
+    return new TextEncoder().encode('jeda-dev-secret-key-for-local-tests-32b');
+  }
+
+  return new TextEncoder().encode(secret);
 }
 
 // ─── CREATE & SIGN SESSION ─────────────────────────────────
