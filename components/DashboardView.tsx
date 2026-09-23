@@ -236,7 +236,7 @@ export default function DashboardView({
           <div className="flex items-center gap-2 text-xs font-semibold text-[#6b8e7d] uppercase tracking-wider">
             <span>Dasbor Refleksi Diri</span>
             <span aria-hidden="true">·</span>
-            <span>Jeda v2</span>
+            <span>Ruang Tenang</span>
           </div>
           <h2 className="text-2xl font-bold text-[#2d3748] tracking-tight font-serif">
             Pemantauan Ritme &amp; Progres Skripsi
@@ -575,7 +575,7 @@ export default function DashboardView({
       {checkins.length > 0 && (
         <div className="flex items-center justify-between border-b border-[#e4e2df] pb-3">
           <div className="text-sm font-bold text-[#2d3748] font-serif">
-            Kurva Pola Harian ({chartData.length} Titik Data)
+            Grafik Perjalanan Refleksi ({chartData.length} Titik Data)
           </div>
           <div className="flex items-center gap-1 bg-[#f5f0eb] p-1 rounded-full border border-[#e4e2df]">
             {(['7', '14', '30'] as const).map((days) => (
@@ -602,9 +602,9 @@ export default function DashboardView({
           <div className="bg-white border border-[#e4e2df] rounded-3xl p-6 shadow-[0_10px_25px_-5px_rgba(107,142,125,0.06)] flex flex-col">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-sm font-bold text-[#2d3748] font-serif">1. Dinamika Kecemasan</h3>
+                <h3 className="text-sm font-bold text-[#2d3748] font-serif">1. Naik Turun Rasa Cemas</h3>
                 <p className="text-xs text-[#a0aec0]">
-                  Adaptasi GAD-2 (0 - 6). Ambang lonjakan akut pada nilai 5.
+                  Skala kecemasan (0 - 6). Garis terracotta menandakan perlu perhatian khusus.
                 </p>
               </div>
               <div className="flex items-center gap-2 text-[10px] text-[#a0aec0]">
@@ -633,7 +633,7 @@ export default function DashboardView({
                     y={5}
                     stroke="#d98e73"
                     strokeDasharray="4 4"
-                    label={{ value: 'Ambang Akut (5)', fill: '#d98e73', fontSize: 10, position: 'top' }}
+                    label={{ value: 'Perlu Perhatian (5)', fill: '#d98e73', fontSize: 10, position: 'top' }}
                   />
                   <Line
                     type="monotone"
@@ -654,7 +654,7 @@ export default function DashboardView({
               <div>
                 <h3 className="text-sm font-bold text-[#2d3748] font-serif">2. Tingkat Kelelahan Mental &amp; Fisik</h3>
                 <p className="text-xs text-[#a0aec0]">
-                  Chalder Fatigue Scale (1 - 10). Ambang kelelahan kronis pada nilai 6.
+                  Rata-rata energi pikiran &amp; fisik (1 - 10). Garis waspada menandakan butuh istirahat.
                 </p>
               </div>
               <div className="flex items-center gap-2 text-[10px] text-[#a0aec0]">
@@ -689,7 +689,7 @@ export default function DashboardView({
                     y={6}
                     stroke="#a6634b"
                     strokeDasharray="4 4"
-                    label={{ value: 'Ambang Kronis (6)', fill: '#a6634b', fontSize: 10, position: 'top' }}
+                    label={{ value: 'Batas Waspada (6)', fill: '#a6634b', fontSize: 10, position: 'top' }}
                   />
                   <Area
                     type="monotone"
@@ -707,9 +707,9 @@ export default function DashboardView({
           <div className="bg-white border border-[#e4e2df] rounded-3xl p-6 shadow-[0_10px_25px_-5px_rgba(107,142,125,0.06)] flex flex-col">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-sm font-bold text-[#2d3748] font-serif">3. Progres &amp; Efikasi Skripsi</h3>
+                <h3 className="text-sm font-bold text-[#2d3748] font-serif">3. Kemajuan &amp; Keyakinan Diri</h3>
                 <p className="text-xs text-[#a0aec0]">
-                  Skala Likert (1 - 5). Ambang stagnasi pengerjaan pada nilai ≤ 2.
+                  Kepuasan langkah &amp; efikasi (1 - 5). Garis abu menandakan perlunya evaluasi target.
                 </p>
               </div>
               <div className="flex items-center gap-2 text-[10px] text-[#a0aec0]">
@@ -738,7 +738,7 @@ export default function DashboardView({
                     y={2}
                     stroke="#a0aec0"
                     strokeDasharray="4 4"
-                    label={{ value: 'Ambang Mandek (2)', fill: '#a0aec0', fontSize: 10, position: 'top' }}
+                    label={{ value: 'Perlu Jeda / Bantuan (2)', fill: '#a0aec0', fontSize: 10, position: 'top' }}
                   />
                   <Line
                     type="monotone"
@@ -757,9 +757,9 @@ export default function DashboardView({
           <div className="bg-white border border-[#e4e2df] rounded-3xl p-6 shadow-[0_10px_25px_-5px_rgba(107,142,125,0.06)] flex flex-col">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-sm font-bold text-[#2d3748] font-serif">4. Distribusi Sumber Stres</h3>
+                <h3 className="text-sm font-bold text-[#2d3748] font-serif">4. Faktor yang Sering Menguras Energi</h3>
                 <p className="text-xs text-[#a0aec0]">
-                  Frekuensi kemunculan faktor pemicu stres dalam periode {dayFilter} hari.
+                  Frekuensi hal yang menjadi tantangan dalam {dayFilter} hari terakhir.
                 </p>
               </div>
             </div>

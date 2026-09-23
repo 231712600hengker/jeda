@@ -54,15 +54,15 @@ export default function LandingHero({ onStartNew, onLogin, onOpenGuide }: Landin
 
       {/* Main Title & Hero Copy */}
       <h1 className="text-3xl sm:text-5xl font-bold text-[#2d3748] tracking-tight leading-tight sm:leading-tight mb-5 max-w-2xl font-serif">
-        Rehat Sejenak, Sadari Ritme &amp; Progres Skripsimu Secara{' '}
+        Rehat Sejenak, Sadari Ritme &amp; Langkah Skripsimu Secara{' '}
         <span className="text-[#4a6b5b] underline decoration-[#c5ebd7] decoration-wavy decoration-2 underline-offset-8">
           Anonim
         </span>
       </h1>
 
       <p className="text-base sm:text-lg text-[#4a5568] max-w-xl mb-10 leading-relaxed font-sans">
-        Jeda hadir sebagai ruang hening yang aman dan bebas penilaian. Luangkan 2 menit setiap hari
-        untuk merekam kecemasan, kelelahan, dan kemajuan tugas akhir Anda sebelum menjadi kelelahan kronis.
+        Jeda adalah ruang hening yang aman dan bebas penghakiman. Luangkan 2 menit setiap hari
+        untuk menyapa diri, mengenali rasa lelah, dan merawat semangat skripsimu dengan penuh kasih.
       </p>
 
       {/* Error Banner */}
@@ -81,7 +81,7 @@ export default function LandingHero({ onStartNew, onLogin, onOpenGuide }: Landin
             onClick={handleStartNewClick}
             className="w-full sm:w-auto flex-1 px-8 py-3.5 rounded-full font-semibold text-sm text-white bg-[#6b8e7d] hover:bg-[#4a6b5b] shadow-[0_10px_25px_-5px_rgba(107,142,125,0.3)] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 hover:scale-[1.015] active:scale-[0.98]"
           >
-            <span>{isLoading ? 'Menyiapkan Ruang...' : 'Mulai Cek-in (Anonim)'}</span>
+            <span>{isLoading ? 'Menyiapkan Ruang...' : 'Mulai Ruang Refleksi'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
 
@@ -137,7 +137,7 @@ export default function LandingHero({ onStartNew, onLogin, onOpenGuide }: Landin
             </button>
           </div>
           <p className="text-xs text-[#a0aec0] mt-3.5 text-center leading-relaxed">
-            Kode unik tersimpan aman di cloud — dapat diakses kembali dari ponsel maupun laptop Anda.
+            Kode unik Anda tersimpan aman — dapat diakses kapan pun dari ponsel maupun laptop.
           </p>
         </form>
       )}
@@ -150,7 +150,7 @@ export default function LandingHero({ onStartNew, onLogin, onOpenGuide }: Landin
           </div>
           <h3 className="text-base font-semibold text-[#2d3748] mb-1.5 font-serif">1 Kali Refleksi Tiap Hari</h3>
           <p className="text-xs sm:text-sm text-[#4a5568] leading-relaxed">
-            9 instrumen tervalidasi yang dirancang ringkas &lt; 2 menit. Melatih kebiasaan sadar (*mindfulness*) tanpa membebani rutinitas harianmu.
+            Pertanyaan sederhana dan ringkas (&lt; 2 menit). Mengajakmu menyapa diri sejenak di tengah padatnya hari tanpa rasa terbebani.
           </p>
         </div>
 
@@ -158,9 +158,9 @@ export default function LandingHero({ onStartNew, onLogin, onOpenGuide }: Landin
           <div className="w-10 h-10 rounded-2xl bg-[#f5f0eb] border border-[#eae2d8] flex items-center justify-center text-[#d98e73] mb-4">
             <LineChart className="w-5 h-5 text-[#d98e73]" />
           </div>
-          <h3 className="text-base font-semibold text-[#2d3748] mb-1.5 font-serif">Visualisasi Tren &amp; Pola</h3>
+          <h3 className="text-base font-semibold text-[#2d3748] mb-1.5 font-serif">Mengenali Ritme &amp; Pola</h3>
           <p className="text-xs sm:text-sm text-[#4a5568] leading-relaxed">
-            Membantu mengenali keterkaitan antara kualitas tidur, rasa cemas, dan kemajuan pengerjaan skripsi dalam grafik yang menenangkan mata.
+            Membantumu melihat keterkaitan antara tidur, rasa cemas, dan kemajuan skripsi melalui grafik yang menenangkan mata.
           </p>
         </div>
 
@@ -168,9 +168,9 @@ export default function LandingHero({ onStartNew, onLogin, onOpenGuide }: Landin
           <div className="w-10 h-10 rounded-2xl bg-[#f4ddd4] border border-[#f4ddd4] flex items-center justify-center text-[#a6634b] mb-4">
             <HeartHandshake className="w-5 h-5 text-[#a6634b]" />
           </div>
-          <h3 className="text-base font-semibold text-[#2d3748] mb-1.5 font-serif">Deteksi &amp; Pendampingan</h3>
+          <h3 className="text-base font-semibold text-[#2d3748] mb-1.5 font-serif">Pengingat Lembut Saat Lelah</h3>
           <p className="text-xs sm:text-sm text-[#4a5568] leading-relaxed">
-            Mengenali tanda kelelahan berkepanjangan (5 hari stagnan) dan langsung menyuguhkan panduan pernapasan serta relaksasi grounding.
+            Menemani saat kamu merasa buntu dan menyediakan panduan pernapasan serta relaksasi grounding kapan pun kamu butuh jeda.
           </p>
         </div>
       </div>
@@ -181,7 +181,7 @@ export default function LandingHero({ onStartNew, onLogin, onOpenGuide }: Landin
           onClick={onOpenGuide}
           className="text-xs sm:text-sm text-[#6b8e7d] hover:text-[#4a6b5b] font-medium underline underline-offset-4 transition-colors cursor-pointer"
         >
-          Pelajari metodologi ilmiah &amp; etika riset Jeda →
+          Pelajari panduan dan cara kerja Jeda →
         </button>
       </div>
     </div>

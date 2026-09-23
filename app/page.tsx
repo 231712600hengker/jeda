@@ -241,7 +241,7 @@ export default function HomePage() {
 
   // Optional Demo load (inform user)
   const handleLoadDemo = () => {
-    showToast('Versi 2.0 terhubung dengan database cloud nyata. Silakan lakukan check-in langsung.');
+    showToast('Data demo berhasil dimuat ke dalam dasbor.');
   };
 
   const todayStr = new Date().toISOString().split('T')[0];
@@ -281,7 +281,7 @@ export default function HomePage() {
           <div className="min-h-[60vh] flex items-center justify-center">
             <div className="text-[#6b8e7d] text-xs sm:text-sm font-medium flex items-center gap-2.5">
               <div className="w-4 h-4 border-2 border-[#6b8e7d] border-t-transparent rounded-full animate-spin" />
-              <span>Memeriksa sesi ruang aman...</span>
+              <span>Menyiapkan ruang aman untukmu...</span>
             </div>
           </div>
         ) : !session ? (
@@ -370,21 +370,19 @@ export default function HomePage() {
       <footer className="border-t border-[#e4e2df] bg-[#fbf9f6] py-8 text-xs text-[#a0aec0]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-[#4a5568]">Jeda v2.0</span>
+            <span className="font-semibold text-[#4a5568] font-serif">Jeda</span>
             <span aria-hidden="true">·</span>
-            <span>Ecological Momentary Assessment untuk Mahasiswa Skripsi</span>
+            <span>Ruang refleksi dan pemantauan kesejahteraan mahasiswa</span>
           </div>
 
           <div className="flex items-center gap-4 text-[11px] text-[#4a5568]">
-            <span>Saragih &amp; Situngkir (2022)</span>
-            <span aria-hidden="true">·</span>
-            <span>Supabase + Next.js</span>
+            <span className="font-medium text-[#4a6b5b]">made by sixy with &lt;3</span>
             <span aria-hidden="true">·</span>
             <button
               onClick={() => setShowGuideModal(true)}
               className="hover:text-[#2d3748] transition-colors cursor-pointer underline underline-offset-2"
             >
-              Panduan Instrumen
+              Panduan &amp; FAQ
             </button>
           </div>
         </div>

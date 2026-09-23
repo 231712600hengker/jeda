@@ -65,11 +65,11 @@ export default function CheckInForm({
   const [note, setNote] = useState<string>(existingTodayCheckin?.note ?? '');
 
   const steps = [
-    { id: 0, title: 'Kecemasan Saat Ini', icon: Flame, desc: 'Adaptasi GAD-2 Momentary (0-3)' },
-    { id: 1, title: 'Kelelahan Mental & Fisik', icon: Battery, desc: 'Chalder Fatigue Scale (1-10)' },
-    { id: 2, title: 'Tidur Semalam', icon: Moon, desc: 'Durasi & Kualitas Istirahat' },
-    { id: 3, title: 'Progres & Efikasi Skripsi', icon: TrendingUp, desc: 'Persepsi Kemajuan Hari Ini' },
-    { id: 4, title: 'Sumber Stres Hari Ini', icon: Tags, desc: 'Pemetaan Hambatan Terbesar' },
+    { id: 0, title: 'Kecemasan Saat Ini', icon: Flame, desc: 'Mengenali apa yang sedang dirasakan pikiranmu' },
+    { id: 1, title: 'Kelelahan Mental & Fisik', icon: Battery, desc: 'Mengecek tingkat energi pikiran dan tubuhmu' },
+    { id: 2, title: 'Tidur Semalam', icon: Moon, desc: 'Kecukupan dan kualitas istirahatmu' },
+    { id: 3, title: 'Progres & Semangat Hari Ini', icon: TrendingUp, desc: 'Langkah kecil dan rasa percaya dirimu' },
+    { id: 4, title: 'Hal yang Mengganjal', icon: Tags, desc: 'Hal yang paling menguras energimu hari ini' },
   ];
 
   const handleToggleStressor = (cat: StressorCategory) => {
@@ -271,19 +271,19 @@ export default function CheckInForm({
         {currentStep === 0 && (
           <div className="space-y-6 animate-fade-in">
             <div className="p-4 bg-[#fbf9f6] border border-[#e4e2df] rounded-2xl text-xs text-[#4a5568] leading-relaxed">
-              💡 <em>Refleksikan apa yang kamu rasakan secara spontan hari ini. Tidak ada jawaban yang salah.</em>
+              💡 <em>Jawablah secara spontan sesuai apa yang kamu rasakan hari ini. Tidak ada jawaban yang salah.</em>
             </div>
 
             {/* Q1 */}
             <div className="space-y-3">
               <label className="block text-sm font-medium text-[#2d3748] leading-snug">
-                1. Merasa gugup, cemas, atau gelisah saat memikirkan skripsi?
+                1. Seberapa sering rasa gugup, cemas, atau gelisah hadir saat memikirkan skripsi?
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {[
                   { val: 0, label: 'Tidak sama sekali' },
-                  { val: 1, label: 'Beberapa saat' },
-                  { val: 2, label: 'Lebih dari separuh hari' },
+                  { val: 1, label: 'Hanya sesekali' },
+                  { val: 2, label: 'Cukup sering' },
                   { val: 3, label: 'Hampir sepanjang hari' },
                 ].map((item) => (
                   <button
@@ -305,14 +305,14 @@ export default function CheckInForm({
             {/* Q2 */}
             <div className="space-y-3 pt-2">
               <label className="block text-sm font-medium text-[#2d3748] leading-snug">
-                2. Tidak mampu menghentikan atau mengendalikan rasa khawatir?
+                2. Seberapa sulit menghentikan atau mengendalikan rasa khawatir yang muncul?
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {[
-                  { val: 0, label: 'Tidak sama sekali' },
-                  { val: 1, label: 'Beberapa saat' },
-                  { val: 2, label: 'Lebih dari separuh hari' },
-                  { val: 3, label: 'Hampir sepanjang hari' },
+                  { val: 0, label: 'Tidak sulit sama sekali' },
+                  { val: 1, label: 'Kadang terasa sulit' },
+                  { val: 2, label: 'Cukup sulit dikendalikan' },
+                  { val: 3, label: 'Sangat sulit ditenangkan' },
                 ].map((item) => (
                   <button
                     key={item.val}
@@ -339,7 +339,7 @@ export default function CheckInForm({
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <label className="text-sm font-medium text-[#2d3748]">
-                  3. Tingkat Kelelahan Mental (Pikiran / Otak):
+                  3. Seberapa lelah pikiranmu saat ini?
                 </label>
                 <span className="font-mono text-sm font-bold px-3 py-0.5 rounded-full bg-[#e8efea] text-[#4a6b5b]">
                   {fatigueMental} / 10
@@ -354,9 +354,9 @@ export default function CheckInForm({
                 className="w-full h-2.5 bg-[#eae2d8] rounded-full appearance-none cursor-pointer accent-[#6b8e7d]"
               />
               <div className="flex justify-between text-[11px] text-[#a0aec0]">
-                <span>1 — Segar Bugar</span>
+                <span>1 — Segar &amp; Jernih</span>
                 <span>5 — Cukup Lelah</span>
-                <span>10 — Otak Buntu / Habis Daya</span>
+                <span>10 — Buntu / Jenuh Total</span>
               </div>
             </div>
 
@@ -364,7 +364,7 @@ export default function CheckInForm({
             <div className="space-y-3 pt-3">
               <div className="flex items-center justify-between">
                 <label className="text-sm font-medium text-[#2d3748]">
-                  4. Tingkat Kelelahan Fisik (Tubuh / Energi):
+                  4. Seberapa lelah tubuh dan fisikmu?
                 </label>
                 <span className="font-mono text-sm font-bold px-3 py-0.5 rounded-full bg-[#f4ddd4] text-[#a6634b]">
                   {fatiguePhysical} / 10
@@ -380,8 +380,8 @@ export default function CheckInForm({
               />
               <div className="flex justify-between text-[11px] text-[#a0aec0]">
                 <span>1 — Sangat Berenergi</span>
-                <span>5 — Pegal Normal</span>
-                <span>10 — Sangat Letih / Terkuras</span>
+                <span>5 — Sedikit Pegal</span>
+                <span>10 — Sangat Letih &amp; Terkuras</span>
               </div>
             </div>
           </div>
@@ -393,7 +393,7 @@ export default function CheckInForm({
             {/* Sleep Quantity */}
             <div className="space-y-3">
               <label className="block text-sm font-medium text-[#2d3748]">
-                5. Berapa perkiraan durasi tidur Anda semalam?
+                5. Berapa perkiraan durasi tidurmu semalam?
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
                 {(['< 5 jam', '5-6 jam', '6-7 jam', '7-8 jam', '> 8 jam'] as SleepQuantity[]).map(
@@ -418,13 +418,13 @@ export default function CheckInForm({
             {/* Sleep Quality */}
             <div className="space-y-3 pt-3">
               <label className="block text-sm font-medium text-[#2d3748]">
-                6. Bagaimana kualitas tidur semalam saat bangun?
+                6. Bagaimana kualitas tidur semalam saat bangun pagi tadi?
               </label>
               <div className="grid grid-cols-3 gap-3">
                 {[
-                  { val: 'buruk' as SleepQuality, label: 'Buruk', desc: 'Sering terbangun / tidak nyenyak' },
-                  { val: 'cukup' as SleepQuality, label: 'Cukup', desc: 'Biasa saja, cukup istirahat' },
-                  { val: 'baik' as SleepQuality, label: 'Baik', desc: 'Nyenyak dan terasa pulih' },
+                  { val: 'buruk' as SleepQuality, label: 'Kurang Segar', desc: 'Sering terbangun / tidak nyenyak' },
+                  { val: 'cukup' as SleepQuality, label: 'Cukup Baik', desc: 'Biasa saja, cukup istirahat' },
+                  { val: 'baik' as SleepQuality, label: 'Sangat Nyenyak', desc: 'Bangun dengan tubuh pulih' },
                 ].map((item) => (
                   <button
                     key={item.val}
@@ -454,7 +454,7 @@ export default function CheckInForm({
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <label className="text-sm font-medium text-[#2d3748]">
-                  7. Kepuasan atas progres pengerjaan skripsi hari ini:
+                  7. Bagaimana perasaanmu tentang progres skripsi hari ini?
                 </label>
                 <span className="font-mono text-sm font-bold px-3 py-0.5 rounded-full bg-[#e8efea] text-[#4a6b5b]">
                   {progress} / 5
@@ -462,11 +462,11 @@ export default function CheckInForm({
               </div>
               <div className="grid grid-cols-5 gap-2">
                 {[
-                  { val: 1, label: 'Sangat Sedikit / Nihil' },
+                  { val: 1, label: 'Belum Ada Progres' },
                   { val: 2, label: 'Kurang Puas' },
-                  { val: 3, label: 'Ada Kemajuan' },
-                  { val: 4, label: 'Memuaskan' },
-                  { val: 5, label: 'Sangat Signifikan' },
+                  { val: 3, label: 'Ada Sedikit Kemajuan' },
+                  { val: 4, label: 'Cukup Memuaskan' },
+                  { val: 5, label: 'Sangat Produktif' },
                 ].map((item) => (
                   <button
                     key={item.val}
@@ -491,7 +491,7 @@ export default function CheckInForm({
             <div className="space-y-3 pt-3">
               <div className="flex items-center justify-between">
                 <label className="text-sm font-medium text-[#2d3748]">
-                  8. Keyakinan mampu menyelesaikan target esok hari:
+                  8. Keyakinanmu untuk melangkah dan melanjutkan esok hari:
                 </label>
                 <span className="font-mono text-sm font-bold px-3 py-0.5 rounded-full bg-[#f4ddd4] text-[#a6634b]">
                   {selfEfficacy} / 5
@@ -499,10 +499,10 @@ export default function CheckInForm({
               </div>
               <div className="grid grid-cols-5 gap-2">
                 {[
-                  { val: 1, label: 'Sangat Pesimis' },
-                  { val: 2, label: 'Ragu-ragu' },
+                  { val: 1, label: 'Masih Ragu' },
+                  { val: 2, label: 'Sedikit Cemas' },
                   { val: 3, label: 'Cukup Yakin' },
-                  { val: 4, label: 'Yakin' },
+                  { val: 4, label: 'Yakin & Siap' },
                   { val: 5, label: 'Sangat Percaya Diri' },
                 ].map((item) => (
                   <button
@@ -531,34 +531,34 @@ export default function CheckInForm({
           <div className="space-y-6 animate-fade-in">
             <div className="space-y-3">
               <label className="block text-sm font-medium text-[#2d3748]">
-                9. Sumber hambatan atau stres terbesar hari ini (pilih semua yang relevan):
+                9. Hal yang paling menguras energimu hari ini (bisa pilih lebih dari satu):
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {[
                   {
                     cat: 'technical' as StressorCategory,
-                    title: 'Beban Teknis & Kognitif',
-                    desc: 'Analisis data rumit, coding bug, penulisan bab sulit.',
+                    title: 'Tantangan Teknis & Analisis',
+                    desc: 'Analisis data rumit, coding bug, atau kesulitan merangkai kata.',
                   },
                   {
                     cat: 'guidance_bureaucracy' as StressorCategory,
-                    title: 'Bimbingan & Birokrasi Dosen',
-                    desc: 'Dosen sulit ditemui, revisi tiada henti, administrasi.',
+                    title: 'Bimbingan & Komunikasi Dosen',
+                    desc: 'Menunggu revisi, jadwal bimbingan, atau arahan dosen yang membingungkan.',
                   },
                   {
                     cat: 'time_management' as StressorCategory,
-                    title: 'Manajemen Waktu & Prokrastinasi',
-                    desc: 'Deadline menumpuk, menunda-nunda, sulit fokus.',
+                    title: 'Fokus & Manajemen Waktu',
+                    desc: 'Menunda-nunda, sulit berkonsentrasi, atau deadline yang terasa dekat.',
                   },
                   {
                     cat: 'infrastructure' as StressorCategory,
-                    title: 'Lingkungan & Fasilitas',
-                    desc: 'Koneksi internet lambat, ruang belajar kurang kondusif.',
+                    title: 'Suasana & Lingkungan Belajar',
+                    desc: 'Koneksi internet bermasalah atau ruangan kurang nyaman untuk fokus.',
                   },
                   {
                     cat: 'personal' as StressorCategory,
-                    title: 'Personal & Ekspektasi',
-                    desc: 'Keluarga, finansial, membandingkan diri dengan teman.',
+                    title: 'Pikiran Pribadi & Ekspektasi',
+                    desc: 'Ekspektasi keluarga, keuangan, atau membandingkan diri dengan teman.',
                   },
                 ].map((item) => {
                   const isSelected = stressors.includes(item.cat);
@@ -600,7 +600,7 @@ export default function CheckInForm({
               <textarea
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
-                placeholder="Bagikan apa saja yang berkecamuk di pikiranmu hari ini..."
+                placeholder="Tuliskan apa pun yang ingin kamu luapkan hari ini... Tidak ada yang menilai, ini ruang amanmu."
                 rows={2}
                 className="w-full px-4 py-3 bg-[#fbf9f6] border border-[#e4e2df] rounded-2xl text-xs text-[#2d3748] placeholder:text-[#a0aec0] focus:outline-none focus:border-[#6b8e7d] focus:ring-2 focus:ring-[#6b8e7d]/10 resize-none"
               />

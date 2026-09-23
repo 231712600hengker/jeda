@@ -20,27 +20,27 @@ export default function GuideFaqModal({ isOpen, onClose }: GuideFaqModalProps) {
   const faqs = [
     {
       q: 'Apakah aplikasi Jeda aman dan anonim?',
-      a: 'Ya, data Anda sepenuhnya anonim. Anda masuk hanya menggunakan kode akses unik (tanpa nama, email, nomor induk mahasiswa, atau kata sandi). Data Anda disimpan terenkripsi di server PostgreSQL (Supabase) dan tidak pernah dibagikan ke pihak ketiga atau dosen pembimbing.',
+      a: 'Ya, ruang ini sepenuhnya anonim. Kamu masuk hanya menggunakan kode akses unik (tanpa nama, email, NIM, ataupun kata sandi). Datamu tersimpan aman dan terenkripsi, serta tidak pernah dibagikan kepada siapa pun termasuk dosen pembimbing.',
     },
     {
       q: 'Mengapa check-in dibatasi 1 kali per hari?',
-      a: 'Instrumen refleksi Jeda (kualitas tidur, kepuasan progres hari ini, efikasi esok hari) mengukur siklus harian secara utuh. Pembatasan 1 kali sehari mencegah kejenuhan mengisi survei (survey fatigue) dan menjaga keakuratan algoritma deteksi pola 5 hari berturut-turut. Jika ada yang ingin direvisi, Anda bisa menggunakan tombol "Perbarui Catatan / Jawaban Hari Ini".',
+      a: 'Refleksi Jeda (kualitas tidur semalam, perasaan tentang progres hari ini, dan kesiapan esok hari) dirancang untuk menangkap satu ritme harian yang utuh. Pembatasan ini menjaga agar kamu tidak lelah mengisi pertanyaan berulang kali. Jika ada kondisi yang berubah di malam hari, kamu cukup menekan tombol "Perbarui Catatan / Jawaban Hari Ini".',
     },
     {
       q: 'Bagaimana jika saya merasa cemas di siang hari?',
-      a: 'Anda tidak perlu mengisi 9 pertanyaan check-in hanya untuk mencari ketenangan. Cukup tekan tombol "Butuh Jeda?" di navigasi atas atau tombol "Latihan Relaksasi" di dasbor untuk langsung membuka panduan napas 4-7-8 atau teknik grounding 5-4-3-2-1 kapan saja.',
+      a: 'Kamu tidak perlu mengisi 9 pertanyaan check-in hanya untuk mencari ketenangan. Cukup tekan tombol "Butuh Jeda?" di navigasi atas atau tombol "Latihan Relaksasi" di dasbor untuk langsung membuka panduan napas 4-7-8 atau teknik grounding 5-4-3-2-1 kapan pun kamu butuhkan.',
     },
     {
-      q: 'Apa arti dari peringatan (Alert Akut & Kronis) yang muncul?',
-      a: 'Peringatan bukanlah vonis ataupun nilai buruk. Peringatan adalah cermin reflektif agar Anda menyadari saat beban mental melonjak tajam (Akut) atau saat kelelahan berkepanjangan disertai hambatan progres (Kronis / indikasi awal burnout), sehingga Anda bisa mengambil jeda sebelum terlambat.',
+      q: 'Apa maksud pengingat atau alert yang muncul?',
+      a: 'Pengingat bukanlah vonis ataupun penilaian buruk. Ini adalah cermin lembut yang mengingatkanmu saat rasa cemas sedang tinggi atau saat tubuh dan pikiranmu sudah terlalu lelah, agar kamu bisa beristirahat sejenak sebelum kelelahan berlanjut.',
     },
     {
-      q: 'Dapatkah saya menggunakan akun saya di perangkat lain?',
-      a: 'Sangat bisa! Jeda v2.0 menyimpan data di database cloud server. Cukup simpan atau catat kode unik Anda, lalu pilih tombol "Punya Kode Akses" dari HP, tablet, maupun laptop lain.',
+      q: 'Dapatkah saya membuka akun ini di perangkat lain?',
+      a: 'Sangat bisa! Datamu tersimpan aman di cloud. Cukup simpan atau catat kode akses unikmu, lalu pilih tombol "Punya Kode Akses" dari HP, tablet, maupun laptop lain kapan saja.',
     },
     {
       q: 'Bisakah saya menghapus data saya?',
-      a: 'Tentu. Kedaulatan data sepenuhnya di tangan Anda. Di menu Pengaturan (ikon gir), pilih "Hapus Akun & Data Saya". Seluruh riwayat check-in, catatan, dan alert Anda akan terhapus permanen dari server.',
+      a: 'Tentu saja. Kendali data sepenuhnya milikmu. Di menu Pengaturan (ikon gir), pilih "Hapus Akun & Data Saya". Seluruh catatan dan riwayat refleksimu akan dihapus permanen dari sistem.',
     },
   ];
 
@@ -55,9 +55,9 @@ export default function GuideFaqModal({ isOpen, onClose }: GuideFaqModalProps) {
             </div>
             <div>
               <h2 className="text-xl font-bold text-[#2d3748] tracking-tight font-serif">
-                Panduan Penggunaan &amp; FAQ
+                Panduan &amp; Tanya Jawab
               </h2>
-              <p className="text-xs text-[#a0aec0]">Prinsip EMA &amp; Cara Membaca Dasbor Jeda</p>
+              <p className="text-xs text-[#a0aec0]">Mengenal Cara Kerja dan Manfaat Ruang Jeda</p>
             </div>
           </div>
           <button

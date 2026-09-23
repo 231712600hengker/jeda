@@ -4,6 +4,8 @@ import React from 'react';
 import type { UserSession } from '@/types/jeda';
 import { LayoutDashboard, ClipboardCheck, History, BookOpen, Settings, LogOut, Sparkles, Wind } from 'lucide-react';
 
+import Image from 'next/image';
+
 interface NavbarProps {
   session: UserSession | null;
   activeTab: 'dashboard' | 'checkin' | 'history';
@@ -32,18 +34,23 @@ export default function Navbar({
       <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
         {/* Logo & Brand Identity */}
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-2xl bg-[#6b8e7d] flex items-center justify-center font-bold text-white shadow-[0_4px_12px_rgba(107,142,125,0.25)]">
-            <span className="font-serif text-lg tracking-tight">J</span>
+          <div className="relative h-9 w-9 rounded-2xl overflow-hidden shadow-[0_4px_12px_rgba(107,142,125,0.2)] bg-[#6b8e7d] flex items-center justify-center">
+            <Image
+              src="/jeda-logo.png"
+              alt="Jeda Logo"
+              width={36}
+              height={36}
+              className="object-cover w-full h-full"
+              priority
+            />
           </div>
           <div>
-            <div className="text-base font-semibold tracking-tight text-[#2d3748] flex items-center gap-2">
+            <div className="text-base font-semibold tracking-tight text-[#2d3748] flex items-center gap-1.5 font-serif">
               <span>Jeda</span>
-              <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-[#e8efea] text-[#4a6b5b] border border-[#c5ebd7]">
-                v2.0
-              </span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#6b8e7d] inline-block mb-0.5" />
             </div>
             <div className="text-[11px] text-[#4a5568] hidden sm:block">
-              Ruang Tenang · Pemantauan Skripsi Mahasiswa
+              Ruang Tenang · Teman Perjalanan Skripsimu
             </div>
           </div>
         </div>
