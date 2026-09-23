@@ -1,48 +1,68 @@
-# Jeda v2.0 — Ecological Momentary Assessment (EMA) untuk Mahasiswa Skripsi
+# 🌿 Jeda — Ruang Refleksi & Pemantauan Kesejahteraan Mahasiswa
 
-Aplikasi web pemantauan stres, kelelahan, kualitas tidur, dan progres pengerjaan skripsi berbasis **Next.js 15 (App Router), TypeScript, Tailwind CSS, dan Supabase (PostgreSQL)**.
-
-> **Referensi Ilmiah:**  
-> Saragih, S. F., & Situngkir, T. T. (2022). Penerapan Aplikasi Web Ecological Momentary Assessment (EMA) "Jeda" untuk Deteksi Dini Pola Stres dan Pencegahan Burnout pada Mahasiswa Tingkat Akhir. *GIAT: Teknologi untuk Masyarakat*, 1(1).
+**Jeda** adalah aplikasi web refleksi diri yang tenang, aman, dan sepenuhnya anonim, dirancang khusus untuk menemani mahasiswa (terutama yang sedang menempuh tugas akhir/skripsi) dalam menyadari ritme emosi, tingkat kelelahan, kualitas tidur, dan kemajuan karya mereka tanpa rasa terhakimi.
 
 ---
 
-## 📚 Dokumentasi Formal
+## ✨ Fitur Utama
 
-Untuk detail teknis mendalam, silakan baca dokumentasi berikut:
-* 🏗️ [**Arsitektur & Desain Sistem**](docs/ARCHITECTURE.md) — Diagram sistem, privacy model, algoritma pemicu alert, dan ERD database.
-* 📡 [**Spesifikasi REST API**](docs/API_SPECIFICATION.md) — Dokumentasi kontrak seluruh endpoint, format payload JSON, dan kode status HTTP.
+- 🍃 **1 Kali Refleksi Harian (Daily Check-in)**  
+  Pertanyaan ringkas yang dirancang selesai dalam waktu kurang dari 2 menit. Setelah selesai, tab check-in bertransformasi menjadi ruang afirmasi hangat dengan opsi *"Perbarui Catatan / Jawaban Hari Ini"* jika ada perubahan kondisi di malam hari.
 
----
+- 🌬️ **Fitur "Butuh Jeda" (Tersedia Kapan Saja)**  
+  Akses instan ke latihan ketenangan tanpa harus mengisi check-in:
+  - **Latihan Pernapasan 4-7-8**: Panduan visual lingkaran animasi dengan ritme Tarik Napas (4d), Tahan (7d), dan Hembuskan (8d).
+  - **Teknik Grounding 5-4-3-2-1**: Panduan bertahap untuk menstabilkan fokus sensorik saat pikiran terasa penuh.
 
-## 🚀 Perbedaan Kritis v2.0 vs Versi Lama
+- 📊 **Dasbor Ritme & Visualisasi Pola**  
+  Empat grafik visual interaktif untuk memahami hubungan antara:
+  1. *Naik Turun Rasa Cemas*
+  2. *Tingkat Kelelahan Mental & Fisik*
+  3. *Kemajuan & Keyakinan Diri*
+  4. *Faktor yang Sering Menguras Energi (Tantangan Teknis, Bimbingan Dosen, Waktu, Suasana, Personal)*
 
-| Fitur | Versi Lama (jeda-omega) | Versi Baru (v2.0) |
-|---|---|---|
-| **Database** | Hanya `localStorage` di browser | **Supabase (PostgreSQL)** dengan schema relasional penuh |
-| **Akses Lintas Perangkat** | ❌ Tidak bisa (data hilang jika ganti HP/laptop) | ✅ **Bisa** — login kode akses dari perangkat mana pun |
-| **API Endpoints** | Route terpisah tanpa koneksi nyata | ✅ Seluruh 10 endpoint REST API terhubung penuh |
-| **Sesi Pengguna** | State memori browser | **JWT session dalam httpOnly Cookie** aman |
-| **Keamanan & Privasi** | Tanpa RLS | **Row-Level Security (RLS)** & tanpa pengumpulan PII |
-| **Error Handling** | Unhandled crash | **Next.js Error Boundaries & Custom 404** |
-| **Testing** | Skrip ad-hoc | **Automated Suite (`npm test`) dengan 18 unit tests** |
+- 🕯️ **Pengingat Lembut (Caring Alerts)**  
+  Mendeteksi lonjakan stres atau kelelahan berkepanjangan dan memberikan saran pemulihan yang menenangkan.
 
----
-
-## 📋 Prasyarat & Persiapan Database (Supabase)
-
-1. Buat akun gratis di [supabase.com](https://supabase.com) dan buat **Project Baru**.
-2. Masuk ke menu **SQL Editor** di dashboard Supabase Anda.
-3. Jalankan query dari berkas [`supabase/migrations/001_initial_schema.sql`](supabase/migrations/001_initial_schema.sql) untuk membuat tabel:
-   - `users` (kode akses anonim & persetujuan)
-   - `checkins` (9 item instrumen EMA + catatan)
-   - `checkin_stressors` (kategori sumber stres)
-   - `alerts` (riwayat peringatan akut & kronis)
-4. Jalankan query dari berkas [`supabase/migrations/002_rls.sql`](supabase/migrations/002_rls.sql) untuk mengaktifkan Row-Level Security.
+- 🔒 **100% Anonim & Berdaulat**  
+  Tanpa nama, tanpa email, dan tanpa NIM. Pengguna masuk menggunakan **Kode Akses Unik** yang dapat digunakan di HP, tablet, maupun laptop. Seluruh riwayat dapat diunduh (format CSV) atau dihapus permanen kapan saja.
 
 ---
 
-## ⚙️ Konfigurasi Environment Variables
+## 🎨 Konsep Desain: *"Serene Hearth"*
+
+Aplikasi ini mengusung estetika visual **Serene Hearth** untuk memberikan kenyamanan psikologis:
+- **Warna Utama**: *Sage Green* (`#6b8e7d`) — menghadirkan ketenangan, rasa aman, dan keseimbangan.
+- **Warna Aksen**: *Warm Terracotta* (`#d98e73`) — kehangatan manusiawi dan energi positif.
+- **Latar Kanvas**: *Soft Cream* (`#fbf9f6`) — lembut di mata dan tidak menyilaukan.
+- **Tipografi**: *Plus Jakarta Sans* — ramah, elegan, dan nyaman dibaca.
+
+---
+
+## 🛠️ Teknologi yang Digunakan
+
+- **Frontend / Framework**: [Next.js 15](https://nextjs.org/) (App Router), [React 19](https://react.dev/), [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Visualisasi Data**: [Recharts](https://recharts.org/)
+- **Ikon**: [Lucide React](https://lucide.dev/)
+- **Database & Cloud Storage**: [Supabase](https://supabase.com/) (PostgreSQL dengan Row-Level Security)
+- **Autentikasi & Sesi**: Custom JWT Session via secure `httpOnly` Cookie
+- **Validasi Data**: [Zod](https://zod.dev/)
+- **Testing**: Node Test Runner & `tsx`
+
+---
+
+## 🚀 Memulai di Komputer Lokal
+
+### 1. Kloning Repositori & Pasang Dependensi
+
+```bash
+git clone https://github.com/231712600hengker/jeda.git
+cd jeda
+npm install
+```
+
+### 2. Konfigurasi Environment Variables
 
 Salin berkas `.env.example` menjadi `.env.local`:
 
@@ -50,66 +70,73 @@ Salin berkas `.env.example` menjadi `.env.local`:
 cp .env.example .env.local
 ```
 
-Isi variabel berikut (dapat diperoleh dari **Project Settings → API** di Supabase):
+Lengkapi kredensial Supabase dan JWT secret:
 
 ```env
-# URL Project Supabase
 NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
-
-# Anon Public Key
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-
-# Service Role Secret Key (Server-only, jangan diekspos ke client)
 SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-
-# JWT Secret untuk session cookie (minimal 32 karakter acak)
-JWT_SECRET=rahasia-kunci-jwt-jeda-minimal-32-karakter-acak
+JWT_SECRET=kunci-rahasia-jwt-anda-minimal-32-karakter-acak
 ```
 
----
+### 3. Migrasi Database (Supabase)
 
-## 💻 Menjalankan di Lokal
+Jalankan query SQL berikut di **SQL Editor** pada dashboard Supabase Anda secara berurutan:
+1. `supabase/migrations/001_initial_schema.sql` — Membuat tabel `users`, `checkins`, `checkin_stressors`, dan `alerts`.
+2. `supabase/migrations/002_rls.sql` — Mengaktifkan Row-Level Security (RLS).
+3. `supabase/migrations/003_daily_checkin_constraint.sql` — Menambahkan constraint unik 1 check-in per hari.
+
+### 4. Menjalankan Server Pengembangan
 
 ```bash
-# 1. Install dependensi
-npm install
-
-# 2. Jalankan automated test suite
+# Menjalankan unit test otomatis
 npm test
 
-# 3. Jalankan server pengembangan
+# Menjalankan server lokal
 npm run dev
-
-# 4. Buka di browser
-http://localhost:3000
 ```
+
+Buka [http://localhost:3000](http://localhost:3000) di browser Anda.
 
 ---
 
-## 🧪 Pengujian Otomatis (Testing)
+## 🧪 Pengujian Otomatis
 
-Proyek ini dilengkapi dengan 18 unit test otomatis untuk memverifikasi logika deteksi alert, validasi Zod, dan keamanan sesi:
+Proyek ini dilengkapi dengan 18 unit tests yang menguji logika deteksi stres, enkripsi sesi JWT, dan integritas validasi Zod:
 
 ```bash
 npm test
 ```
 
-Cakupan pengujian:
-1. **Deteksi Alert Akut:** Gabungan kecemasan $\ge 5$ atau kelelahan $\ge 8$.
-2. **Deteksi Alert Kronis:** Rata-rata progres 5 hari $\le 2$ dan kelelahan $\ge 6$.
-3. **Mekanisme Peredaman:** Pencegahan duplikasi alert kronis dalam 3 hari.
-4. **Validasi Skema:** Integritas 9 item input EMA dan kode partisipan.
-5. **Keamanan Sesi:** Enkripsi JWT HS256, proteksi manipulasi payload.
+---
+
+## 📁 Struktur Direktori
+
+```
+jeda/
+├── app/                  # Next.js App Router (Halaman & API Routes)
+│   ├── api/              # REST API (auth, checkins, alerts, export, user)
+│   ├── globals.css       # Token warna Serene Hearth & animasi
+│   ├── layout.tsx        # Root layout dengan font Plus Jakarta Sans
+│   └── page.tsx          # Halaman utama & manajemen alur state
+├── components/           # Komponen UI
+│   ├── AlertModal.tsx    # Modal pengingat & pendampingan
+│   ├── CheckInForm.tsx   # Form refleksi 5 langkah & completion sanctuary
+│   ├── DashboardView.tsx # Grafik Recharts & pelacak streak ritme
+│   ├── GuideFaqModal.tsx # Panduan penggunaan & tanya jawab
+│   ├── HistoryTable.tsx  # Tabel riwayat & ekspor data
+│   ├── LandingHero.tsx   # Halaman selamat datang & login kode akses
+│   ├── Navbar.tsx        # Navigasi atas, logo Jeda, & tombol "Butuh Jeda?"
+│   ├── RelaxationModal.tsx # Latihan napas 4-7-8 & grounding 5-4-3-2-1
+│   └── SettingsModal.tsx # Pengaturan akun, ekspor data, & hapus akun
+├── hooks/                # Custom React hooks (useSession)
+├── lib/                  # Logika deteksi, validasi Zod, auth JWT, & Supabase client
+├── public/               # Aset statis & logo Jeda
+└── types/                # Definisi tipe TypeScript
+```
 
 ---
 
-## 🚢 Deploy ke Vercel
-
-1. Push repository ke GitHub:
-   ```bash
-   git remote add origin https://github.com/231712600hengker/jeda.git
-   git push -u origin main
-   ```
-2. Impor project ke [Vercel](https://vercel.com).
-3. Masukkan Environment Variables (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `JWT_SECRET`) di menu Vercel Settings.
-4. Klik **Deploy**!
+<div align="center">
+  <sub>made by sixy with ❤️</sub>
+</div>
