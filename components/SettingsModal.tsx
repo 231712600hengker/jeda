@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import type { UserSession } from '@/types/jeda';
-import { X, Copy, Check, Download, LogOut, Trash2, Shield, Calendar, BarChart2 } from 'lucide-react';
+import { X, Copy, Check, Download, LogOut, Trash2, BarChart2 } from 'lucide-react';
 import { formatDateID } from '@/lib/utils';
 
 interface SettingsModalProps {
@@ -50,143 +50,138 @@ export default function SettingsModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl text-slate-100 animate-fade-in my-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#2d3748]/40 backdrop-blur-sm p-4 overflow-y-auto animate-fade-in">
+      <div className="bg-white border border-[#e4e2df] rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-[0_20px_35px_-10px_rgba(45,55,72,0.12),0_1px_3px_0_rgba(107,142,125,0.06)] text-[#2d3748] my-8">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-5">
-          <div className="flex items-center gap-2">
-            <h2 className="text-base font-bold text-white tracking-tight">Pengaturan Akun</h2>
-          </div>
+        <div className="flex items-center justify-between border-b border-[#e4e2df] pb-3.5 mb-5">
+          <h2 className="text-xl font-bold text-[#2d3748] tracking-tight font-serif">Pengaturan Akun</h2>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-full text-[#a0aec0] hover:text-[#2d3748] hover:bg-[#f5f0eb] transition-colors cursor-pointer"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="space-y-5 text-xs">
+        <div className="space-y-5 text-xs text-[#4a5568]">
           {/* Section 1: Access Code */}
           <div className="space-y-1.5">
-            <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+            <label className="text-[11px] font-semibold text-[#a0aec0] uppercase tracking-wider">
               Kode Akses Anonim Anda
             </label>
-            <div className="flex items-center justify-between p-3 rounded-xl bg-slate-950 border border-slate-800">
-              <span className="font-mono text-base font-bold text-emerald-400 tracking-wider">
+            <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#fbf9f6] border border-[#e4e2df]">
+              <span className="font-mono text-base font-bold text-[#2d3748] tracking-widest">
                 {session.accessCode}
               </span>
               <button
                 type="button"
                 onClick={handleCopy}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#e4e2df] hover:bg-[#f5f0eb] text-[#4a5568] hover:text-[#2d3748] text-xs font-semibold shadow-sm transition-colors cursor-pointer active:scale-95"
               >
                 {copied ? (
                   <>
-                    <Check className="w-3.5 h-3.5 text-emerald-400" />
-                    <span className="text-emerald-400 font-semibold">Tersalin</span>
+                    <Check className="w-3.5 h-3.5 text-[#6b8e7d]" />
+                    <span className="text-[#4a6b5b]">Tersalin</span>
                   </>
                 ) : (
                   <>
-                    <Copy className="w-3.5 h-3.5 text-slate-400" />
+                    <Copy className="w-3.5 h-3.5 text-[#6b8e7d]" />
                     <span>Salin</span>
                   </>
                 )}
               </button>
             </div>
-            <p className="text-[10px] text-slate-500">
-              Gunakan kode ini untuk masuk kembali ke akun Anda dari browser atau perangkat lain.
+            <p className="text-[11px] text-[#a0aec0]">
+              Gunakan kode ini untuk masuk kembali ke akun Anda dari ponsel maupun laptop lain.
             </p>
           </div>
 
           {/* Section 2: Statistics */}
-          <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
-            <div className="text-[11px] font-semibold text-slate-300 flex items-center gap-1.5 mb-1">
-              <BarChart2 className="w-3.5 h-3.5 text-emerald-400" />
+          <div className="p-4 rounded-2xl bg-[#fbf9f6] border border-[#e4e2df] space-y-2.5">
+            <div className="text-xs font-semibold text-[#2d3748] flex items-center gap-1.5 mb-1 font-serif">
+              <BarChart2 className="w-4 h-4 text-[#6b8e7d]" />
               <span>Statistik Penggunaan</span>
             </div>
-            <div className="flex justify-between text-slate-400">
+            <div className="flex justify-between text-[#4a5568]">
               <span>Total Check-in Tercatat:</span>
-              <span className="font-mono font-semibold text-white">{totalCheckins} kali</span>
+              <span className="font-mono font-bold text-[#2d3748]">{totalCheckins} kali</span>
             </div>
             {firstCheckinDate && (
-              <div className="flex justify-between text-slate-400">
+              <div className="flex justify-between text-[#4a5568]">
                 <span>Check-in Pertama:</span>
-                <span className="text-slate-200">{formatDateID(firstCheckinDate)}</span>
+                <span className="text-[#2d3748] font-medium">{formatDateID(firstCheckinDate)}</span>
               </div>
             )}
             {lastCheckinDate && (
-              <div className="flex justify-between text-slate-400">
+              <div className="flex justify-between text-[#4a5568]">
                 <span>Check-in Terakhir:</span>
-                <span className="text-slate-200">{formatDateID(lastCheckinDate)}</span>
+                <span className="text-[#2d3748] font-medium">{formatDateID(lastCheckinDate)}</span>
               </div>
             )}
           </div>
 
           {/* Section 3: Export Data */}
           <div className="space-y-1.5">
-            <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-              Ekspor &amp; Dokumentasi
+            <label className="text-[11px] font-semibold text-[#a0aec0] uppercase tracking-wider">
+              Ekspor &amp; Portabilitas Data
             </label>
             <button
               type="button"
-              onClick={() => {
-                onExportCSV();
-              }}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium transition-colors"
+              onClick={onExportCSV}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-full bg-[#f5f0eb] hover:bg-[#eae2d8] border border-[#e4e2df] text-[#4a5568] hover:text-[#2d3748] font-semibold text-xs transition-colors cursor-pointer"
             >
-              <Download className="w-3.5 h-3.5 text-slate-400" />
+              <Download className="w-3.5 h-3.5 text-[#6b8e7d]" />
               <span>Unduh Riwayat Lengkap (Format CSV)</span>
             </button>
-            <p className="text-[10px] text-slate-500">
+            <p className="text-[11px] text-[#a0aec0]">
               Format CSV dapat dibuka di Excel atau Google Sheets dan dibawa saat sesi konseling.
             </p>
           </div>
 
           {/* Section 4: Logout */}
-          <div className="pt-2 border-t border-slate-800">
+          <div className="pt-2 border-t border-[#e4e2df]">
             <button
               type="button"
               onClick={onLogout}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white font-medium transition-colors"
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-full bg-[#fbf9f6] hover:bg-[#f5f0eb] border border-[#e4e2df] text-[#4a5568] hover:text-[#2d3748] font-semibold text-xs transition-colors cursor-pointer"
             >
-              <LogOut className="w-3.5 h-3.5 text-slate-400" />
+              <LogOut className="w-3.5 h-3.5 text-[#a0aec0]" />
               <span>Keluar dari Sesi Ini</span>
             </button>
           </div>
 
           {/* Section 5: Delete Account */}
-          <div className="pt-2 border-t border-slate-800/80">
+          <div className="pt-2 border-t border-[#e4e2df]">
             {!showDeleteConfirm ? (
               <button
                 type="button"
                 onClick={() => setShowDeleteConfirm(true)}
-                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-rose-400 hover:text-rose-300 hover:bg-rose-950/20 text-xs transition-colors"
+                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-full text-[#d98e73] hover:text-[#a6634b] hover:bg-[#f4ddd4]/40 text-xs font-medium transition-colors cursor-pointer"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 <span>Hapus Akun &amp; Seluruh Data Saya</span>
               </button>
             ) : (
-              <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-800/80 space-y-2.5 animate-fade-in">
-                <div className="text-rose-200 font-semibold text-xs">
+              <div className="p-4 rounded-2xl bg-[#f4ddd4]/60 border border-[#d98e73] space-y-2.5 animate-fade-in">
+                <div className="text-[#a6634b] font-bold text-xs">
                   Konfirmasi Penghapusan Permanen
                 </div>
-                <p className="text-[11px] text-rose-300/80 leading-snug">
-                  Tindakan ini tidak dapat dibatalkan. Seluruh riwayat check-in, alert, dan kode akses
-                  Anda akan dihapus seketika dari server Supabase.
+                <p className="text-[11px] text-[#a6634b]/90 leading-relaxed">
+                  Tindakan ini tidak dapat dibatalkan. Seluruh riwayat check-in, alert, dan kode akses Anda akan dihapus seketika dari server.
                 </p>
                 <div className="flex items-center gap-2 pt-1">
                   <button
                     type="button"
                     disabled={isDeleting}
                     onClick={handleDelete}
-                    className="flex-1 py-1.5 px-3 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-semibold text-xs shadow transition-colors disabled:opacity-50"
+                    className="flex-1 py-2 px-3 rounded-full bg-[#d98e73] hover:bg-[#a6634b] text-white font-semibold text-xs shadow transition-colors disabled:opacity-50 cursor-pointer"
                   >
                     {isDeleting ? 'Menghapus...' : 'Ya, Hapus Semuanya'}
                   </button>
                   <button
                     type="button"
                     onClick={() => setShowDeleteConfirm(false)}
-                    className="py-1.5 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs transition-colors"
+                    className="py-2 px-4 rounded-full bg-white border border-[#e4e2df] text-[#4a5568] text-xs font-semibold transition-colors cursor-pointer"
                   >
                     Batal
                   </button>
@@ -199,4 +194,3 @@ export default function SettingsModal({
     </div>
   );
 }
-

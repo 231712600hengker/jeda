@@ -104,7 +104,16 @@ export interface ApiLoginResponse {
 
 export interface ApiCheckinPostResponse {
   checkinId: string;
+  checkinDate?: string;
+  isUpdate?: boolean;
   alerts: AlertRecord[];
+  detection?: DetectionResult;
+}
+
+export interface ApiCheckinGetResponse {
+  checkins: CheckinItem[];
+  hasCheckedInToday: boolean;
+  todayCheckin: CheckinItem | null;
 }
 
 export interface ApiDashboardSummary {

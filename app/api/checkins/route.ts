@@ -1,28 +1,11 @@
-// POST /api/checkins — Simpan check-in baru + jalankan deteksi alert
-// GET  /api/checkins — Ambil riwayat check-in user
+// POST /api/checkins — Simpan atau perbarui check-in harian (1x per hari) + jalankan deteksi alert
+// GET  /api/checkins — Ambil riwayat check-in user & status check-in hari ini
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { getSessionFromRequest } from '@/lib/auth/session';
 import { evaluateCheckinAlerts } from '@/lib/detection';
+import { CheckinSchema } from '@/lib/validations';
 import type { CheckinItem, AlertRecord } from '@/types/jeda';
-
-// ─── VALIDATION SCHEMA ────────────────────────────────────
-
-const CheckinSchema = z.object({
-  anxietyQ1: z.number().int().min(0).max(3),
-  anxietyQ2: z.number().int().min(0).max(3),
-  fatigueMental: z.number().int().min(1).max(10),
-  fatiguePhysical: z.number().int().min(1).max(10),
-  sleepQuantity: z.enum(['< 5 jam', '5-6 jam', '6-7 jam', '7-8 jam', '> 8 jam']),
-  sleepQuality: z.enum(['buruk', 'cukup', 'baik']),
-  progress: z.number().int().min(1).max(5),
-  selfEfficacy: z.number().int().min(1).max(5),
-  stressors: z.array(
-    z.enum(['technical', 'guidance_bureaucracy', 'time_management', 'infrastructure', 'personal'])
-  ),
-  note: z.string().max(500).optional(),
-});
 
 // ─── POST /api/checkins ───────────────────────────────────
 
@@ -52,31 +35,73 @@ export async function POST(req: NextRequest) {
     const checkinTime = now.toISOString();
     const checkinDate = checkinTime.split('T')[0];
 
-    // ─── Simpan check-in ke Supabase ─────────────────────
-    const { data: checkinRow, error: checkinError } = await supabaseAdmin
+    // ─── Periksa apakah sudah ada check-in hari ini (Aturan 1x per hari) ───
+    const { data: existingCheckin } = await supabaseAdmin
       .from('checkins')
-      .insert({
-        user_id: session.userId,
-        checkin_date: checkinDate,
-        checkin_time: checkinTime,
-        anxiety_q1: data.anxietyQ1,
-        anxiety_q2: data.anxietyQ2,
-        fatigue_mental: data.fatigueMental,
-        fatigue_physical: data.fatiguePhysical,
-        sleep_quantity: data.sleepQuantity,
-        sleep_quality: data.sleepQuality,
-        progress: data.progress,
-        self_efficacy: data.selfEfficacy,
-        note: data.note ?? null,
-      })
       .select('id')
-      .single();
+      .eq('user_id', session.userId)
+      .eq('checkin_date', checkinDate)
+      .maybeSingle();
 
-    if (checkinError || !checkinRow) {
-      throw checkinError ?? new Error('Gagal menyimpan check-in');
+    let checkinId: string;
+    const isUpdate = !!existingCheckin;
+
+    if (existingCheckin) {
+      // Perbarui (Upsert/Update) check-in hari ini jika sudah pernah diisi
+      const { data: updatedRow, error: updateError } = await supabaseAdmin
+        .from('checkins')
+        .update({
+          checkin_time: checkinTime,
+          anxiety_q1: data.anxietyQ1,
+          anxiety_q2: data.anxietyQ2,
+          fatigue_mental: data.fatigueMental,
+          fatigue_physical: data.fatiguePhysical,
+          sleep_quantity: data.sleepQuantity,
+          sleep_quality: data.sleepQuality,
+          progress: data.progress,
+          self_efficacy: data.selfEfficacy,
+          note: data.note ?? null,
+          updated_at: checkinTime,
+        })
+        .eq('id', existingCheckin.id)
+        .select('id')
+        .single();
+
+      if (updateError || !updatedRow) {
+        throw updateError ?? new Error('Gagal memperbarui check-in hari ini');
+      }
+
+      checkinId = updatedRow.id;
+
+      // Hapus stressors lama untuk check-in ini sebelum insert yang baru
+      await supabaseAdmin.from('checkin_stressors').delete().eq('checkin_id', checkinId);
+    } else {
+      // Simpan check-in baru untuk hari ini
+      const { data: checkinRow, error: checkinError } = await supabaseAdmin
+        .from('checkins')
+        .insert({
+          user_id: session.userId,
+          checkin_date: checkinDate,
+          checkin_time: checkinTime,
+          anxiety_q1: data.anxietyQ1,
+          anxiety_q2: data.anxietyQ2,
+          fatigue_mental: data.fatigueMental,
+          fatigue_physical: data.fatiguePhysical,
+          sleep_quantity: data.sleepQuantity,
+          sleep_quality: data.sleepQuality,
+          progress: data.progress,
+          self_efficacy: data.selfEfficacy,
+          note: data.note ?? null,
+        })
+        .select('id')
+        .single();
+
+      if (checkinError || !checkinRow) {
+        throw checkinError ?? new Error('Gagal menyimpan check-in');
+      }
+
+      checkinId = checkinRow.id;
     }
-
-    const checkinId = checkinRow.id;
 
     // ─── Simpan stressors ─────────────────────────────────
     if (data.stressors.length > 0) {
@@ -96,13 +121,13 @@ export async function POST(req: NextRequest) {
       .update({ last_checkin_at: checkinTime })
       .eq('id', session.userId);
 
-    // ─── Ambil 4 check-in terakhir untuk deteksi kronis ──
+    // ─── Ambil 4 check-in hari sebelumnya untuk deteksi kronis (5 hari unik) ──
     const { data: pastRows } = await supabaseAdmin
       .from('checkins')
       .select('anxiety_q1, anxiety_q2, fatigue_mental, fatigue_physical, progress, self_efficacy, checkin_time')
       .eq('user_id', session.userId)
       .neq('id', checkinId)
-      .order('checkin_time', { ascending: false })
+      .order('checkin_date', { ascending: false })
       .limit(4);
 
     const pastCheckins = (pastRows ?? []).map((r) => ({
@@ -204,7 +229,16 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ checkinId, alerts: generatedAlerts }, { status: 201 });
+    return NextResponse.json(
+      {
+        checkinId,
+        checkinDate,
+        isUpdate,
+        alerts: generatedAlerts,
+        detection,
+      },
+      { status: isUpdate ? 200 : 201 }
+    );
   } catch (err) {
     console.error('[POST /api/checkins]', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -225,6 +259,7 @@ export async function GET(req: NextRequest) {
     const limitDate = new Date();
     limitDate.setDate(limitDate.getDate() - days);
     const limitDateStr = limitDate.toISOString().split('T')[0];
+    const todayStr = new Date().toISOString().split('T')[0];
 
     // Ambil checkins dengan stressors (join manual)
     const { data: checkinRows, error } = await supabaseAdmin
@@ -262,10 +297,16 @@ export async function GET(req: NextRequest) {
       createdAt: r.created_at,
     }));
 
-    return NextResponse.json({ checkins });
+    const todayCheckin = checkins.find((c) => c.checkinDate === todayStr) || null;
+    const hasCheckedInToday = !!todayCheckin;
+
+    return NextResponse.json({
+      checkins,
+      hasCheckedInToday,
+      todayCheckin,
+    });
   } catch (err) {
     console.error('[GET /api/checkins]', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-

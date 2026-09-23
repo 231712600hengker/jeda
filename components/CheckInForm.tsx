@@ -9,17 +9,18 @@ import {
   DetectionResult,
 } from '@/types/jeda';
 import {
-  Sparkles,
   CheckCircle2,
   Clock,
   ChevronRight,
   ChevronLeft,
-  ArrowRight,
   Flame,
   Battery,
   Moon,
   TrendingUp,
   Tags,
+  Edit3,
+  Heart,
+  Wind,
 } from 'lucide-react';
 
 interface CheckInFormProps {
@@ -27,6 +28,7 @@ interface CheckInFormProps {
   onSave: (checkinData: Omit<CheckinItem, 'id' | 'createdAt'>) => Promise<DetectionResult>;
   onCancel: () => void;
   existingTodayCheckin?: CheckinItem | null;
+  onOpenRelaxation?: () => void;
 }
 
 export default function CheckInForm({
@@ -34,7 +36,12 @@ export default function CheckInForm({
   onSave,
   onCancel,
   existingTodayCheckin,
+  onOpenRelaxation,
 }: CheckInFormProps) {
+  // Mode edit jika user ingin mengubah entri hari ini
+  const [isEditing, setIsEditing] = useState(false);
+  const hasExistingCheckin = !!existingTodayCheckin;
+
   // Step state (0: Kecemasan, 1: Kelelahan, 2: Tidur, 3: Progres, 4: Sumber Stres)
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -99,269 +106,340 @@ export default function CheckInForm({
 
     try {
       await onSave(checkinPayload);
+      setIsEditing(false);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const getAnxietyLabel = (val: number) => {
-    switch (val) {
-      case 0:
-        return 'Tidak sama sekali (0)';
-      case 1:
-        return 'Ringan / Sedikit (1)';
-      case 2:
-        return 'Sedang / Cukup mengganggu (2)';
-      case 3:
-        return 'Berat / Sangat terasa (3)';
-      default:
-        return `${val}`;
-    }
-  };
-
-  return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
-      {/* Container */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl text-slate-100">
-        {/* Top Header */}
-        <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-emerald-400">
-              <Clock className="w-3.5 h-3.5" />
-              <span>EMA Check-in &lt; 2 Menit</span>
-            </div>
-            <h2 className="text-xl font-bold text-white tracking-tight mt-1">
-              Catatan Kondisi Hari Ini
-            </h2>
+  // ─── 1. TAMPILAN JIKA SUDAH CHECK-IN HARI INI (Serene Hearth Sanctuary) ───
+  if (hasExistingCheckin && !isEditing) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-8 sm:py-12 animate-fade-in">
+        <div className="bg-white border border-[#e4e2df] rounded-3xl p-6 sm:p-10 shadow-[0_10px_25px_-5px_rgba(107,142,125,0.08),0_8px_10px_-6px_rgba(107,142,125,0.04)] text-center">
+          {/* Calming Warm Icon */}
+          <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-[#e8efea] border border-[#c5ebd7] flex items-center justify-center text-[#4a6b5b] shadow-inner">
+            <Heart className="w-8 h-8 fill-[#6b8e7d]/20 text-[#4a6b5b]" />
           </div>
-          <div className="text-right">
-            <span className="text-xs text-slate-400">Langkah</span>
-            <div className="font-mono text-sm font-semibold text-emerald-400">
-              {currentStep + 1} / {steps.length}
-            </div>
-          </div>
-        </div>
 
-        {/* Step Progress Bar */}
-        <div className="grid grid-cols-5 gap-1.5 mb-8">
-          {steps.map((st, i) => (
+          <span className="inline-block px-4 py-1.5 rounded-full text-xs font-semibold bg-[#e8efea] text-[#4a6b5b] border border-[#c5ebd7] mb-3">
+            Refleksi Hari Ini Selesai
+          </span>
+
+          <h2 className="text-2xl sm:text-3xl font-bold text-[#2d3748] mb-3 font-serif">
+            Terima Kasih Sudah Hadir untuk Dirimu
+          </h2>
+
+          <p className="text-base sm:text-lg text-[#4a5568] max-w-lg mx-auto mb-8 leading-relaxed font-sans">
+            &ldquo;Terima kasih sudah meluangkan waktu untuk dirimu hari ini. Istirahatlah, kamu sudah berjuang dengan baik hari ini.&rdquo;
+          </p>
+
+          {/* Today's Summary Card */}
+          <div className="bg-[#fbf9f6] border border-[#e4e2df] rounded-2xl p-5 mb-8 text-left space-y-3">
+            <div className="text-xs font-semibold text-[#4a5568] uppercase tracking-wider flex items-center justify-between border-b border-[#e4e2df] pb-2">
+              <span>Ringkasan Refleksi Hari Ini</span>
+              <span className="font-mono text-[#6b8e7d]">{existingTodayCheckin.checkinDate}</span>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center pt-1">
+              <div className="p-3 bg-white rounded-xl border border-[#e4e2df]">
+                <div className="text-[11px] text-[#a0aec0]">Cemas (0-6)</div>
+                <div className="text-lg font-bold text-[#2d3748] mt-0.5">
+                  {existingTodayCheckin.anxietyQ1 + existingTodayCheckin.anxietyQ2}/6
+                </div>
+              </div>
+              <div className="p-3 bg-white rounded-xl border border-[#e4e2df]">
+                <div className="text-[11px] text-[#a0aec0]">Lelah (1-10)</div>
+                <div className="text-lg font-bold text-[#2d3748] mt-0.5">
+                  {((existingTodayCheckin.fatigueMental + existingTodayCheckin.fatiguePhysical) / 2).toFixed(1)}
+                </div>
+              </div>
+              <div className="p-3 bg-white rounded-xl border border-[#e4e2df]">
+                <div className="text-[11px] text-[#a0aec0]">Tidur Semalam</div>
+                <div className="text-xs font-semibold text-[#2d3748] mt-1.5">
+                  {existingTodayCheckin.sleepQuantity}
+                </div>
+              </div>
+              <div className="p-3 bg-white rounded-xl border border-[#e4e2df]">
+                <div className="text-[11px] text-[#a0aec0]">Progres Skripsi</div>
+                <div className="text-lg font-bold text-[#6b8e7d] mt-0.5">
+                  {existingTodayCheckin.progress}/5
+                </div>
+              </div>
+            </div>
+
+            {existingTodayCheckin.note && (
+              <div className="text-xs text-[#4a5568] bg-white p-3 rounded-xl border border-[#e4e2df] italic">
+                &ldquo;{existingTodayCheckin.note}&rdquo;
+              </div>
+            )}
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <button
-              key={st.id}
-              onClick={() => setCurrentStep(i)}
-              className="h-1.5 rounded-full transition-all cursor-pointer"
-              style={{
-                backgroundColor:
-                  i <= currentStep ? '#10B981' : 'rgba(51, 65, 85, 0.4)',
-              }}
-              title={st.title}
-            />
-          ))}
+              onClick={() => setIsEditing(true)}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-xs sm:text-sm font-semibold text-[#4a5568] bg-[#f5f0eb] hover:bg-[#eae2d8] border border-[#e4e2df] transition-all cursor-pointer active:scale-[0.98]"
+            >
+              <Edit3 className="w-4 h-4 text-[#6b8e7d]" />
+              <span>Perbarui Catatan / Jawaban Hari Ini</span>
+            </button>
+
+            {onOpenRelaxation && (
+              <button
+                onClick={onOpenRelaxation}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-xs sm:text-sm font-semibold text-white bg-[#6b8e7d] hover:bg-[#4a6b5b] shadow-[0_4px_16px_rgba(107,142,125,0.25)] transition-all cursor-pointer active:scale-[0.98]"
+              >
+                <Wind className="w-4 h-4" />
+                <span>Butuh Jeda Sekarang (Latihan Napas &amp; Grounding)</span>
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── 2. TAMPILAN FORM PENGISIAN 9 ITEM (Serene Hearth Form) ───
+  return (
+    <div className="max-w-2xl mx-auto px-4 py-8 animate-fade-in">
+      {/* Banner mode edit jika memperbarui */}
+      {isEditing && (
+        <div className="mb-4 p-3.5 bg-[#e8efea] border border-[#c5ebd7] rounded-2xl flex items-center justify-between text-xs text-[#4a6b5b]">
+          <div className="flex items-center gap-2">
+            <Edit3 className="w-4 h-4 text-[#6b8e7d]" />
+            <span>Sedang memperbarui catatan refleksi hari ini.</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsEditing(false)}
+            className="text-xs font-semibold text-[#2c4d3f] underline hover:no-underline cursor-pointer"
+          >
+            Batal Ubah
+          </button>
+        </div>
+      )}
+
+      {/* Main Form Container */}
+      <div className="bg-white border border-[#e4e2df] rounded-3xl p-6 sm:p-8 shadow-[0_10px_25px_-5px_rgba(107,142,125,0.08),0_8px_10px_-6px_rgba(107,142,125,0.04)]">
+        {/* Step Progress Indicators */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#6b8e7d] font-sans">
+              Langkah {currentStep + 1} dari {steps.length}
+            </span>
+            <span className="text-xs text-[#a0aec0] flex items-center gap-1 font-mono">
+              <Clock className="w-3.5 h-3.5" /> &lt; 2 menit
+            </span>
+          </div>
+
+          <div className="grid grid-cols-5 gap-2">
+            {steps.map((s, idx) => (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => setCurrentStep(idx)}
+                className={`h-2 rounded-full transition-all cursor-pointer ${
+                  idx === currentStep
+                    ? 'bg-[#6b8e7d]'
+                    : idx < currentStep
+                    ? 'bg-[#c5ebd7]'
+                    : 'bg-[#eae2d8]'
+                }`}
+                title={s.title}
+              />
+            ))}
+          </div>
         </div>
 
-        {/* Step 0: Kecemasan (GAD-2 Adaptation) */}
+        {/* Step Header */}
+        <div className="flex items-start gap-4 mb-6 pb-4 border-b border-[#e4e2df]">
+          <div className="w-12 h-12 rounded-2xl bg-[#e8efea] border border-[#c5ebd7] flex items-center justify-center text-[#4a6b5b] shrink-0">
+            {React.createElement(steps[currentStep].icon, { className: 'w-6 h-6' })}
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-[#2d3748] font-serif">
+              {steps[currentStep].title}
+            </h2>
+            <p className="text-xs sm:text-sm text-[#4a5568] mt-0.5">
+              {steps[currentStep].desc}
+            </p>
+          </div>
+        </div>
+
+        {/* ─── STEP 0: KECEMASAN (GAD-2) ─── */}
         {currentStep === 0 && (
           <div className="space-y-6 animate-fade-in">
-            <div className="bg-slate-950/50 p-3.5 rounded-xl border border-slate-800/80 text-xs text-slate-300">
-              💡 <strong>Prinsip Momentary Assessment:</strong> Jawab berdasarkan apa yang Anda rasakan{' '}
-              <em>pada saat ini</em> (bukan rata-rata minggu lalu).
+            <div className="p-4 bg-[#fbf9f6] border border-[#e4e2df] rounded-2xl text-xs text-[#4a5568] leading-relaxed">
+              💡 <em>Refleksikan apa yang kamu rasakan secara spontan hari ini. Tidak ada jawaban yang salah.</em>
             </div>
 
             {/* Q1 */}
             <div className="space-y-3">
-              <label className="block text-sm font-medium text-slate-200">
-                1. Merasa gugup, cemas, atau gelisah saat ini:
+              <label className="block text-sm font-medium text-[#2d3748] leading-snug">
+                1. Merasa gugup, cemas, atau gelisah saat memikirkan skripsi?
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {[0, 1, 2, 3].map((val) => (
+                {[
+                  { val: 0, label: 'Tidak sama sekali' },
+                  { val: 1, label: 'Beberapa saat' },
+                  { val: 2, label: 'Lebih dari separuh hari' },
+                  { val: 3, label: 'Hampir sepanjang hari' },
+                ].map((item) => (
                   <button
-                    key={val}
+                    key={item.val}
                     type="button"
-                    onClick={() => setAnxietyQ1(val)}
-                    className={`p-3 rounded-xl border text-xs font-medium text-left transition-all ${
-                      anxietyQ1 === val
-                        ? 'bg-emerald-500/20 border-emerald-500 text-white ring-1 ring-emerald-500'
-                        : 'bg-slate-950/60 border-slate-800 text-slate-300 hover:border-slate-700 hover:bg-slate-800/50'
+                    onClick={() => setAnxietyQ1(item.val)}
+                    className={`p-3 rounded-2xl text-left border transition-all cursor-pointer ${
+                      anxietyQ1 === item.val
+                        ? 'bg-[#6b8e7d] border-[#4a6b5b] text-white shadow-md'
+                        : 'bg-[#fbf9f6] border-[#e4e2df] text-[#4a5568] hover:bg-[#f5f0eb]'
                     }`}
                   >
-                    <div className="font-mono text-sm font-bold text-emerald-400 mb-1">{val}</div>
-                    <div className="text-[11px] leading-snug">
-                      {val === 0 && 'Tidak sama sekali'}
-                      {val === 1 && 'Ringan'}
-                      {val === 2 && 'Sedang'}
-                      {val === 3 && 'Berat'}
-                    </div>
+                    <div className="text-xs font-semibold">{item.val} — {item.label}</div>
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Q2 */}
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-slate-200">
-                2. Merasa tidak mampu menghentikan atau mengendalikan rasa khawatir saat ini:
+            <div className="space-y-3 pt-2">
+              <label className="block text-sm font-medium text-[#2d3748] leading-snug">
+                2. Tidak mampu menghentikan atau mengendalikan rasa khawatir?
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {[0, 1, 2, 3].map((val) => (
+                {[
+                  { val: 0, label: 'Tidak sama sekali' },
+                  { val: 1, label: 'Beberapa saat' },
+                  { val: 2, label: 'Lebih dari separuh hari' },
+                  { val: 3, label: 'Hampir sepanjang hari' },
+                ].map((item) => (
                   <button
-                    key={val}
+                    key={item.val}
                     type="button"
-                    onClick={() => setAnxietyQ2(val)}
-                    className={`p-3 rounded-xl border text-xs font-medium text-left transition-all ${
-                      anxietyQ2 === val
-                        ? 'bg-emerald-500/20 border-emerald-500 text-white ring-1 ring-emerald-500'
-                        : 'bg-slate-950/60 border-slate-800 text-slate-300 hover:border-slate-700 hover:bg-slate-800/50'
+                    onClick={() => setAnxietyQ2(item.val)}
+                    className={`p-3 rounded-2xl text-left border transition-all cursor-pointer ${
+                      anxietyQ2 === item.val
+                        ? 'bg-[#6b8e7d] border-[#4a6b5b] text-white shadow-md'
+                        : 'bg-[#fbf9f6] border-[#e4e2df] text-[#4a5568] hover:bg-[#f5f0eb]'
                     }`}
                   >
-                    <div className="font-mono text-sm font-bold text-emerald-400 mb-1">{val}</div>
-                    <div className="text-[11px] leading-snug">
-                      {val === 0 && 'Tidak sama sekali'}
-                      {val === 1 && 'Ringan'}
-                      {val === 2 && 'Sedang'}
-                      {val === 3 && 'Berat'}
-                    </div>
+                    <div className="text-xs font-semibold">{item.val} — {item.label}</div>
                   </button>
                 ))}
               </div>
             </div>
-
-            <div className="pt-2 flex items-center justify-between text-xs text-slate-400">
-              <span>Skor Kecemasan Gabungan:</span>
-              <span className="font-mono font-bold text-slate-200 tabular-nums">
-                {anxietyQ1 + anxietyQ2} / 6
-                {anxietyQ1 + anxietyQ2 >= 5 && (
-                  <span className="text-amber-400 ml-2">⚠️ Mendekati ambang lonjakan akut</span>
-                )}
-              </span>
-            </div>
           </div>
         )}
 
-        {/* Step 1: Kelelahan Mental & Fisik (Chalder Fatigue Scale) */}
+        {/* ─── STEP 1: KELELAHAN (Chalder Fatigue Scale) ─── */}
         {currentStep === 1 && (
           <div className="space-y-6 animate-fade-in">
-            <div className="bg-slate-950/50 p-3.5 rounded-xl border border-slate-800/80 text-xs text-slate-300">
-              💡 Nilai dari skala <strong>1 (sangat segar/bertenaga)</strong> sampai{' '}
-              <strong>10 (sangat lelah luar biasa/terkuras)</strong>.
-            </div>
-
-            {/* Q3: Mental Fatigue */}
+            {/* Mental Fatigue Slider */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-slate-200">
-                  3. Tingkat kelelahan kognitif / mental hari ini:
+                <label className="text-sm font-medium text-[#2d3748]">
+                  3. Tingkat Kelelahan Mental (Pikiran / Otak):
                 </label>
-                <span className="font-mono text-base font-bold text-emerald-400 tabular-nums">
+                <span className="font-mono text-sm font-bold px-3 py-0.5 rounded-full bg-[#e8efea] text-[#4a6b5b]">
                   {fatigueMental} / 10
                 </span>
               </div>
               <input
                 type="range"
-                min="1"
-                max="10"
-                step="1"
+                min={1}
+                max={10}
                 value={fatigueMental}
                 onChange={(e) => setFatigueMental(Number(e.target.value))}
-                className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                className="w-full h-2.5 bg-[#eae2d8] rounded-full appearance-none cursor-pointer accent-[#6b8e7d]"
               />
-              <div className="flex justify-between text-[11px] text-slate-500">
-                <span>1 - Pikiran jernih & segar</span>
-                <span>5 - Cukup lelah</span>
-                <span>10 - Otak buntu & terkuras</span>
+              <div className="flex justify-between text-[11px] text-[#a0aec0]">
+                <span>1 — Segar Bugar</span>
+                <span>5 — Cukup Lelah</span>
+                <span>10 — Otak Buntu / Habis Daya</span>
               </div>
             </div>
 
-            {/* Q4: Physical Fatigue */}
-            <div className="space-y-3">
+            {/* Physical Fatigue Slider */}
+            <div className="space-y-3 pt-3">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-slate-200">
-                  4. Tingkat kelelahan fisik tubuh hari ini:
+                <label className="text-sm font-medium text-[#2d3748]">
+                  4. Tingkat Kelelahan Fisik (Tubuh / Energi):
                 </label>
-                <span className="font-mono text-base font-bold text-emerald-400 tabular-nums">
+                <span className="font-mono text-sm font-bold px-3 py-0.5 rounded-full bg-[#f4ddd4] text-[#a6634b]">
                   {fatiguePhysical} / 10
                 </span>
               </div>
               <input
                 type="range"
-                min="1"
-                max="10"
-                step="1"
+                min={1}
+                max={10}
                 value={fatiguePhysical}
                 onChange={(e) => setFatiguePhysical(Number(e.target.value))}
-                className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                className="w-full h-2.5 bg-[#eae2d8] rounded-full appearance-none cursor-pointer accent-[#d98e73]"
               />
-              <div className="flex justify-between text-[11px] text-slate-500">
-                <span>1 - Bugar & berenergi</span>
-                <span>5 - Agak letih</span>
-                <span>10 - Sangat lelah fisik</span>
+              <div className="flex justify-between text-[11px] text-[#a0aec0]">
+                <span>1 — Sangat Berenergi</span>
+                <span>5 — Pegal Normal</span>
+                <span>10 — Sangat Letih / Terkuras</span>
               </div>
-            </div>
-
-            <div className="pt-2 flex items-center justify-between text-xs text-slate-400 border-t border-slate-800/80">
-              <span>Rata-rata Kelelahan:</span>
-              <span className="font-mono font-bold text-slate-200 tabular-nums">
-                {((fatigueMental + fatiguePhysical) / 2).toFixed(1)} / 10
-              </span>
             </div>
           </div>
         )}
 
-        {/* Step 2: Tidur Semalam (PSQI Adaptasi) */}
+        {/* ─── STEP 2: TIDUR SEMALAM ─── */}
         {currentStep === 2 && (
           <div className="space-y-6 animate-fade-in">
-            <div className="bg-slate-950/50 p-3.5 rounded-xl border border-slate-800/80 text-xs text-slate-300">
-              💡 Gangguan tidur seringkali menjadi indikator awal yang menyertai akumulasi stres skripsi.
-            </div>
-
-            {/* Q5: Kuantitas Tidur */}
+            {/* Sleep Quantity */}
             <div className="space-y-3">
-              <label className="block text-sm font-medium text-slate-200">
-                5. Berapa durasi tidur Anda semalam?
+              <label className="block text-sm font-medium text-[#2d3748]">
+                5. Berapa perkiraan durasi tidur Anda semalam?
               </label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
                 {(['< 5 jam', '5-6 jam', '6-7 jam', '7-8 jam', '> 8 jam'] as SleepQuantity[]).map(
-                  (val) => (
+                  (qty) => (
                     <button
-                      key={val}
+                      key={qty}
                       type="button"
-                      onClick={() => setSleepQuantity(val)}
-                      className={`p-3 rounded-xl border text-xs font-medium text-center transition-all ${
-                        sleepQuantity === val
-                          ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300 ring-1 ring-emerald-500'
-                          : 'bg-slate-950/60 border-slate-800 text-slate-300 hover:border-slate-700 hover:bg-slate-800/50'
+                      onClick={() => setSleepQuantity(qty)}
+                      className={`p-3 rounded-2xl text-center border text-xs font-semibold transition-all cursor-pointer ${
+                        sleepQuantity === qty
+                          ? 'bg-[#6b8e7d] border-[#4a6b5b] text-white shadow-md'
+                          : 'bg-[#fbf9f6] border-[#e4e2df] text-[#4a5568] hover:bg-[#f5f0eb]'
                       }`}
                     >
-                      {val}
+                      {qty}
                     </button>
                   )
                 )}
               </div>
             </div>
 
-            {/* Q6: Kualitas Tidur */}
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-slate-200">
-                6. Bagaimana kualitas tidur Anda semalam?
+            {/* Sleep Quality */}
+            <div className="space-y-3 pt-3">
+              <label className="block text-sm font-medium text-[#2d3748]">
+                6. Bagaimana kualitas tidur semalam saat bangun?
               </label>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 gap-3">
                 {[
-                  { id: 'buruk', label: 'Buruk', desc: 'Sering terbangun / gelisah' },
-                  { id: 'cukup', label: 'Cukup', desc: 'Tidur lumayan nyenyak' },
-                  { id: 'baik', label: 'Baik', desc: 'Nyenyak & bangun segar' },
+                  { val: 'buruk' as SleepQuality, label: 'Buruk', desc: 'Sering terbangun / tidak nyenyak' },
+                  { val: 'cukup' as SleepQuality, label: 'Cukup', desc: 'Biasa saja, cukup istirahat' },
+                  { val: 'baik' as SleepQuality, label: 'Baik', desc: 'Nyenyak dan terasa pulih' },
                 ].map((item) => (
                   <button
-                    key={item.id}
+                    key={item.val}
                     type="button"
-                    onClick={() => setSleepQuality(item.id as SleepQuality)}
-                    className={`p-3 rounded-xl border text-xs text-left transition-all ${
-                      sleepQuality === item.id
-                        ? 'bg-emerald-500/20 border-emerald-500 text-white ring-1 ring-emerald-500'
-                        : 'bg-slate-950/60 border-slate-800 text-slate-300 hover:border-slate-700 hover:bg-slate-800/50'
+                    onClick={() => setSleepQuality(item.val)}
+                    className={`p-3.5 rounded-2xl text-center border transition-all cursor-pointer ${
+                      sleepQuality === item.val
+                        ? 'bg-[#6b8e7d] border-[#4a6b5b] text-white shadow-md'
+                        : 'bg-[#fbf9f6] border-[#e4e2df] text-[#4a5568] hover:bg-[#f5f0eb]'
                     }`}
                   >
-                    <div className="font-semibold text-emerald-400 capitalize mb-0.5">
-                      {item.label}
+                    <div className="text-sm font-bold capitalize">{item.label}</div>
+                    <div className={`text-[11px] mt-1 ${sleepQuality === item.val ? 'text-white/80' : 'text-[#a0aec0]'}`}>
+                      {item.desc}
                     </div>
-                    <div className="text-[10px] text-slate-400">{item.desc}</div>
                   </button>
                 ))}
               </div>
@@ -369,145 +447,144 @@ export default function CheckInForm({
           </div>
         )}
 
-        {/* Step 3: Progres & Efikasi Skripsi (Custom konteks skripsi) */}
+        {/* ─── STEP 3: PROGRES & EFIKASI SKRIPSI ─── */}
         {currentStep === 3 && (
           <div className="space-y-6 animate-fade-in">
-            <div className="bg-slate-950/50 p-3.5 rounded-xl border border-slate-800/80 text-xs text-slate-300">
-              💡 Digunakan untuk mendeteksi pola stagnasi berkelanjutan sebelum memicu kelelahan kronis.
-            </div>
-
-            {/* Q7: Progres */}
+            {/* Progress Likert */}
             <div className="space-y-3">
-              <label className="block text-sm font-medium text-slate-200">
-                7. Progres pengerjaan skripsi yang Anda rasakan hari ini:
-              </label>
-              <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-[#2d3748]">
+                  7. Kepuasan atas progres pengerjaan skripsi hari ini:
+                </label>
+                <span className="font-mono text-sm font-bold px-3 py-0.5 rounded-full bg-[#e8efea] text-[#4a6b5b]">
+                  {progress} / 5
+                </span>
+              </div>
+              <div className="grid grid-cols-5 gap-2">
                 {[
-                  { val: 1, label: 'Sangat Mandek', short: 'Buntu' },
-                  { val: 2, label: 'Sedikit Progres', short: 'Lambat' },
-                  { val: 3, label: 'Cukup Progres', short: 'Sedang' },
-                  { val: 4, label: 'Lancar / Baik', short: 'Lancar' },
-                  { val: 5, label: 'Sangat Produktif', short: 'Optimal' },
+                  { val: 1, label: 'Sangat Sedikit / Nihil' },
+                  { val: 2, label: 'Kurang Puas' },
+                  { val: 3, label: 'Ada Kemajuan' },
+                  { val: 4, label: 'Memuaskan' },
+                  { val: 5, label: 'Sangat Signifikan' },
                 ].map((item) => (
                   <button
                     key={item.val}
                     type="button"
                     onClick={() => setProgress(item.val)}
-                    className={`p-2.5 rounded-xl border text-center transition-all ${
+                    className={`p-2.5 rounded-2xl text-center border transition-all cursor-pointer ${
                       progress === item.val
-                        ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300 ring-1 ring-emerald-500'
-                        : 'bg-slate-950/60 border-slate-800 text-slate-300 hover:border-slate-700 hover:bg-slate-800/50'
+                        ? 'bg-[#6b8e7d] border-[#4a6b5b] text-white shadow-md'
+                        : 'bg-[#fbf9f6] border-[#e4e2df] text-[#4a5568] hover:bg-[#f5f0eb]'
                     }`}
                   >
-                    <div className="font-mono text-base font-bold text-white mb-0.5">{item.val}</div>
-                    <div className="text-[10px] leading-tight text-slate-400">{item.short}</div>
+                    <div className="text-sm font-bold">{item.val}</div>
+                    <div className={`text-[10px] mt-0.5 line-clamp-2 ${progress === item.val ? 'text-white/80' : 'text-[#a0aec0]'}`}>
+                      {item.label}
+                    </div>
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Q8: Efikasi Diri */}
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-slate-200">
-                8. Keyakinan diri bahwa skripsi dapat diselesaikan sesuai target:
-              </label>
-              <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
+            {/* Self-Efficacy Likert */}
+            <div className="space-y-3 pt-3">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-[#2d3748]">
+                  8. Keyakinan mampu menyelesaikan target esok hari:
+                </label>
+                <span className="font-mono text-sm font-bold px-3 py-0.5 rounded-full bg-[#f4ddd4] text-[#a6634b]">
+                  {selfEfficacy} / 5
+                </span>
+              </div>
+              <div className="grid grid-cols-5 gap-2">
                 {[
-                  { val: 1, label: 'Sangat Ragu', short: 'Pesimis' },
-                  { val: 2, label: 'Kurang Yakin', short: 'Ragu' },
-                  { val: 3, label: 'Netral', short: 'Cukup' },
-                  { val: 4, label: 'Yakin', short: 'Optimis' },
-                  { val: 5, label: 'Sangat Yakin', short: 'Mantap' },
+                  { val: 1, label: 'Sangat Pesimis' },
+                  { val: 2, label: 'Ragu-ragu' },
+                  { val: 3, label: 'Cukup Yakin' },
+                  { val: 4, label: 'Yakin' },
+                  { val: 5, label: 'Sangat Percaya Diri' },
                 ].map((item) => (
                   <button
                     key={item.val}
                     type="button"
                     onClick={() => setSelfEfficacy(item.val)}
-                    className={`p-2.5 rounded-xl border text-center transition-all ${
+                    className={`p-2.5 rounded-2xl text-center border transition-all cursor-pointer ${
                       selfEfficacy === item.val
-                        ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300 ring-1 ring-emerald-500'
-                        : 'bg-slate-950/60 border-slate-800 text-slate-300 hover:border-slate-700 hover:bg-slate-800/50'
+                        ? 'bg-[#d98e73] border-[#a6634b] text-white shadow-md'
+                        : 'bg-[#fbf9f6] border-[#e4e2df] text-[#4a5568] hover:bg-[#f5f0eb]'
                     }`}
                   >
-                    <div className="font-mono text-base font-bold text-white mb-0.5">{item.val}</div>
-                    <div className="text-[10px] leading-tight text-slate-400">{item.short}</div>
+                    <div className="text-sm font-bold">{item.val}</div>
+                    <div className={`text-[10px] mt-0.5 line-clamp-2 ${selfEfficacy === item.val ? 'text-white/80' : 'text-[#a0aec0]'}`}>
+                      {item.label}
+                    </div>
                   </button>
                 ))}
               </div>
             </div>
-
-            <div className="pt-2 flex items-center justify-between text-xs text-slate-400 border-t border-slate-800/80">
-              <span>Rata-rata Progres & Efikasi:</span>
-              <span className="font-mono font-bold text-slate-200 tabular-nums">
-                {((progress + selfEfficacy) / 2).toFixed(1)} / 5
-              </span>
-            </div>
           </div>
         )}
 
-        {/* Step 4: Sumber Stres Hari Ini (Multi-Choice) */}
+        {/* ─── STEP 4: SUMBER STRES (Multi-choice) ─── */}
         {currentStep === 4 && (
           <div className="space-y-6 animate-fade-in">
-            <div>
-              <label className="block text-sm font-medium text-slate-200 mb-1">
-                9. Sumber stres yang Anda rasakan hari ini:
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-[#2d3748]">
+                9. Sumber hambatan atau stres terbesar hari ini (pilih semua yang relevan):
               </label>
-              <p className="text-xs text-slate-400 mb-3">
-                Dapat dipilih lebih dari satu kategori yang relevan:
-              </p>
-
-              <div className="space-y-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {[
                   {
-                    id: 'technical' as StressorCategory,
-                    title: 'Beban teknis/kognitif',
-                    desc: 'Riset, metodologi, pengolahan/analisis data, menulis bab skripsi',
+                    cat: 'technical' as StressorCategory,
+                    title: 'Beban Teknis & Kognitif',
+                    desc: 'Analisis data rumit, coding bug, penulisan bab sulit.',
                   },
                   {
-                    id: 'guidance_bureaucracy' as StressorCategory,
-                    title: 'Bimbingan & birokrasi',
-                    desc: 'Proses bimbingan, revisi dosen, administrasi kampus / fakultas',
+                    cat: 'guidance_bureaucracy' as StressorCategory,
+                    title: 'Bimbingan & Birokrasi Dosen',
+                    desc: 'Dosen sulit ditemui, revisi tiada henti, administrasi.',
                   },
                   {
-                    id: 'time_management' as StressorCategory,
-                    title: 'Manajemen waktu',
-                    desc: 'Deadline mendesak, kebingungan prioritas, prokrastinasi',
+                    cat: 'time_management' as StressorCategory,
+                    title: 'Manajemen Waktu & Prokrastinasi',
+                    desc: 'Deadline menumpuk, menunda-nunda, sulit fokus.',
                   },
                   {
-                    id: 'infrastructure' as StressorCategory,
-                    title: 'Infrastruktur & lingkungan',
-                    desc: 'Tempat kerja, koneksi internet, akses jurnal/buku referensi, lab',
+                    cat: 'infrastructure' as StressorCategory,
+                    title: 'Lingkungan & Fasilitas',
+                    desc: 'Koneksi internet lambat, ruang belajar kurang kondusif.',
                   },
                   {
-                    id: 'personal' as StressorCategory,
-                    title: 'Personal & kesehatan',
-                    desc: 'Hubungan keluarga/teman, kesehatan fisik, masalah personal',
+                    cat: 'personal' as StressorCategory,
+                    title: 'Personal & Ekspektasi',
+                    desc: 'Keluarga, finansial, membandingkan diri dengan teman.',
                   },
                 ].map((item) => {
-                  const isSelected = stressors.includes(item.id);
+                  const isSelected = stressors.includes(item.cat);
                   return (
                     <button
-                      key={item.id}
+                      key={item.cat}
                       type="button"
-                      onClick={() => handleToggleStressor(item.id)}
-                      className={`w-full p-3.5 rounded-xl border text-left flex items-start gap-3 transition-all ${
+                      onClick={() => handleToggleStressor(item.cat)}
+                      className={`p-3.5 rounded-2xl text-left border flex items-start gap-3 transition-all cursor-pointer ${
                         isSelected
-                          ? 'bg-emerald-500/15 border-emerald-500/60 text-slate-100 ring-1 ring-emerald-500/50'
-                          : 'bg-slate-950/60 border-slate-800 text-slate-300 hover:border-slate-700 hover:bg-slate-800/40'
+                          ? 'bg-[#e8efea] border-[#6b8e7d] text-[#2c4d3f] shadow-sm'
+                          : 'bg-[#fbf9f6] border-[#e4e2df] text-[#4a5568] hover:bg-[#f5f0eb]'
                       }`}
                     >
                       <div
-                        className={`w-4 h-4 rounded mt-0.5 flex items-center justify-center shrink-0 border ${
+                        className={`w-5 h-5 rounded-full mt-0.5 flex items-center justify-center shrink-0 border transition-all ${
                           isSelected
-                            ? 'bg-emerald-500 border-emerald-500 text-slate-950'
-                            : 'border-slate-700 bg-slate-900'
+                            ? 'bg-[#6b8e7d] border-[#6b8e7d] text-white'
+                            : 'border-[#a0aec0] bg-white'
                         }`}
                       >
                         {isSelected && <CheckCircle2 className="w-3.5 h-3.5" />}
                       </div>
                       <div>
-                        <div className="text-xs font-semibold text-white">{item.title}</div>
-                        <div className="text-[11px] text-slate-400 mt-0.5">{item.desc}</div>
+                        <div className="text-xs font-semibold text-[#2d3748]">{item.title}</div>
+                        <div className="text-[11px] text-[#4a5568] mt-0.5 leading-snug">{item.desc}</div>
                       </div>
                     </button>
                   );
@@ -517,36 +594,36 @@ export default function CheckInForm({
 
             {/* Optional reflection note */}
             <div className="space-y-2 pt-2">
-              <label className="block text-xs font-medium text-slate-300">
-                Catatan refleksi singkat hari ini (opsional):
+              <label className="block text-xs font-medium text-[#2d3748]">
+                Catatan refleksi bebas hari ini (opsional):
               </label>
               <textarea
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
-                placeholder="Contoh: Bab 4 baru selesai babak analisis regresi, dosen belum balas email revisi..."
+                placeholder="Bagikan apa saja yang berkecamuk di pikiranmu hari ini..."
                 rows={2}
-                className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 resize-none"
+                className="w-full px-4 py-3 bg-[#fbf9f6] border border-[#e4e2df] rounded-2xl text-xs text-[#2d3748] placeholder:text-[#a0aec0] focus:outline-none focus:border-[#6b8e7d] focus:ring-2 focus:ring-[#6b8e7d]/10 resize-none"
               />
             </div>
           </div>
         )}
 
         {/* Footer Navigation Buttons */}
-        <div className="flex items-center justify-between border-t border-slate-800 pt-6 mt-8">
+        <div className="flex items-center justify-between border-t border-[#e4e2df] pt-6 mt-8">
           {currentStep > 0 ? (
             <button
               type="button"
               onClick={() => setCurrentStep((prev) => prev - 1)}
-              className="px-4 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-750 border border-slate-700 flex items-center gap-1.5 transition-colors"
+              className="px-5 py-2.5 rounded-full text-xs font-semibold text-[#4a5568] hover:text-[#2d3748] bg-[#f5f0eb] hover:bg-[#eae2d8] border border-[#e4e2df] flex items-center gap-1.5 transition-all cursor-pointer"
             >
-              <ChevronLeft className="w-3.5 h-3.5" />
+              <ChevronLeft className="w-4 h-4" />
               <span>Kembali</span>
             </button>
           ) : (
             <button
               type="button"
               onClick={onCancel}
-              className="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white transition-colors"
+              className="px-5 py-2.5 rounded-full text-xs font-semibold text-[#a0aec0] hover:text-[#4a5568] transition-colors cursor-pointer"
             >
               Batal
             </button>
@@ -556,20 +633,26 @@ export default function CheckInForm({
             <button
               type="button"
               onClick={() => setCurrentStep((prev) => prev + 1)}
-              className="px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-950 bg-emerald-500 hover:bg-emerald-400 shadow-lg shadow-emerald-500/20 flex items-center gap-1.5 transition-all cursor-pointer"
+              className="px-6 py-2.5 rounded-full text-xs font-semibold text-white bg-[#6b8e7d] hover:bg-[#4a6b5b] shadow-[0_4px_14px_rgba(107,142,125,0.25)] flex items-center gap-1.5 transition-all cursor-pointer hover:scale-[1.015] active:scale-[0.98]"
             >
               <span>Selanjutnya</span>
-              <ChevronRight className="w-3.5 h-3.5" />
+              <ChevronRight className="w-4 h-4" />
             </button>
           ) : (
             <button
               type="button"
               disabled={isSubmitting}
               onClick={handleSubmit}
-              className="px-6 py-2.5 rounded-xl text-xs font-semibold text-slate-950 bg-emerald-500 hover:bg-emerald-400 shadow-lg shadow-emerald-500/20 flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+              className="px-7 py-2.5 rounded-full text-xs font-semibold text-white bg-[#6b8e7d] hover:bg-[#4a6b5b] shadow-[0_6px_20px_rgba(107,142,125,0.3)] flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50 hover:scale-[1.015] active:scale-[0.98]"
             >
               <CheckCircle2 className="w-4 h-4" />
-              <span>{isSubmitting ? 'Mengevaluasi & Menyimpan...' : 'Simpan Check-in Hari Ini'}</span>
+              <span>
+                {isSubmitting
+                  ? 'Menyimpan...'
+                  : isEditing
+                  ? 'Perbarui Refleksi Hari Ini'
+                  : 'Selesaikan Refleksi Hari Ini'}
+              </span>
             </button>
           )}
         </div>

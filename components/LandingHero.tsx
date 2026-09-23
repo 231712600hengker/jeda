@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Sparkles, ArrowRight, ShieldCheck, Clock, LineChart, KeyRound, LogIn, ChevronLeft } from 'lucide-react';
+import { Sparkles, ArrowRight, ShieldCheck, Clock, LineChart, KeyRound, LogIn, ChevronLeft, HeartHandshake } from 'lucide-react';
 
 interface LandingHeroProps {
   onStartNew: () => Promise<void>;
@@ -45,44 +45,43 @@ export default function LandingHero({ onStartNew, onLogin, onOpenGuide }: Landin
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12 sm:py-16 flex flex-col items-center justify-center text-center">
-      {/* Top Badge */}
-      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-6 animate-fade-in">
-        <Sparkles className="w-3.5 h-3.5" />
-        <span>Ecological Momentary Assessment (EMA)</span>
+    <div className="max-w-4xl mx-auto px-4 py-12 sm:py-20 flex flex-col items-center justify-center text-center">
+      {/* Top Badge: Serene Hearth Style */}
+      <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#e8efea] border border-[#c5ebd7] text-[#4a6b5b] text-xs font-semibold uppercase tracking-wider mb-6 animate-fade-in shadow-sm">
+        <Sparkles className="w-3.5 h-3.5 text-[#6b8e7d]" />
+        <span>Ruang Refleksi Mahasiswa Skripsi</span>
       </div>
 
       {/* Main Title & Hero Copy */}
-      <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight sm:leading-tight mb-4 max-w-2xl">
-        Pantau Ritme Stres &amp; Progres Skripsimu Secara{' '}
-        <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">
+      <h1 className="text-3xl sm:text-5xl font-bold text-[#2d3748] tracking-tight leading-tight sm:leading-tight mb-5 max-w-2xl font-serif">
+        Rehat Sejenak, Sadari Ritme &amp; Progres Skripsimu Secara{' '}
+        <span className="text-[#4a6b5b] underline decoration-[#c5ebd7] decoration-wavy decoration-2 underline-offset-8">
           Anonim
         </span>
       </h1>
 
-      <p className="text-sm sm:text-base text-slate-400 max-w-xl mb-8 leading-relaxed">
-        Jeda membantu mahasiswa tingkat akhir merekam kondisi kecemasan, kelelahan, kualitas tidur,
-        dan kemajuan tugas akhir setiap hari tanpa recall bias, mendeteksi pola kelelahan kronis
-        sebelum memicu burnout.
+      <p className="text-base sm:text-lg text-[#4a5568] max-w-xl mb-10 leading-relaxed font-sans">
+        Jeda hadir sebagai ruang hening yang aman dan bebas penilaian. Luangkan 2 menit setiap hari
+        untuk merekam kecemasan, kelelahan, dan kemajuan tugas akhir Anda sebelum menjadi kelelahan kronis.
       </p>
 
       {/* Error Banner */}
       {errorMessage && (
-        <div className="w-full max-w-sm mb-6 p-3 rounded-xl bg-rose-950/60 border border-rose-800 text-rose-300 text-xs font-medium animate-fade-in">
+        <div className="w-full max-w-md mb-6 p-4 rounded-2xl bg-[#f4ddd4]/80 border border-[#d98e73] text-[#a6634b] text-xs font-medium animate-fade-in text-left">
           {errorMessage}
         </div>
       )}
 
       {/* Actions Section */}
       {mode === 'landing' ? (
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-sm mb-12 animate-fade-in">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-md mb-16 animate-fade-in">
           <button
             type="button"
             disabled={isLoading}
             onClick={handleStartNewClick}
-            className="w-full sm:w-auto flex-1 px-6 py-3 rounded-xl font-semibold text-xs sm:text-sm text-slate-950 bg-emerald-500 hover:bg-emerald-400 shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+            className="w-full sm:w-auto flex-1 px-8 py-3.5 rounded-full font-semibold text-sm text-white bg-[#6b8e7d] hover:bg-[#4a6b5b] shadow-[0_10px_25px_-5px_rgba(107,142,125,0.3)] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 hover:scale-[1.015] active:scale-[0.98]"
           >
-            <span>{isLoading ? 'Membuat Kode...' : 'Mulai Baru (Anonim)'}</span>
+            <span>{isLoading ? 'Menyiapkan Ruang...' : 'Mulai Cek-in (Anonim)'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
 
@@ -92,103 +91,99 @@ export default function LandingHero({ onStartNew, onLogin, onOpenGuide }: Landin
               setMode('login');
               setErrorMessage(null);
             }}
-            className="w-full sm:w-auto px-5 py-3 rounded-xl font-medium text-xs sm:text-sm text-slate-300 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-800 transition-colors flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full sm:w-auto px-6 py-3.5 rounded-full font-medium text-sm text-[#4a5568] hover:text-[#2d3748] bg-[#f5f0eb] hover:bg-[#eae2d8] border border-[#e4e2df] transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
           >
-            <KeyRound className="w-4 h-4 text-slate-400" />
-            <span>Masuk Kembali</span>
+            <KeyRound className="w-4 h-4 text-[#6b8e7d]" />
+            <span>Punya Kode Akses</span>
           </button>
         </div>
       ) : (
         <form
           onSubmit={handleLoginSubmit}
-          className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-2xl p-5 mb-12 text-left animate-fade-in shadow-xl"
+          className="w-full max-w-md bg-white border border-[#e4e2df] rounded-3xl p-6 sm:p-8 mb-16 text-left animate-fade-in shadow-[0_10px_25px_-5px_rgba(107,142,125,0.08),0_8px_10px_-6px_rgba(107,142,125,0.04)]"
         >
-          <div className="flex items-center justify-between mb-3">
-            <label className="text-xs font-semibold text-slate-200">Masukkan Kode Akses Anda:</label>
+          <div className="flex items-center justify-between mb-4">
+            <label className="text-sm font-semibold text-[#2d3748]">Masukkan Kode Akses Anda:</label>
             <button
               type="button"
               onClick={() => {
                 setMode('landing');
                 setErrorMessage(null);
               }}
-              className="text-[11px] text-slate-400 hover:text-slate-200 flex items-center gap-1"
+              className="text-xs text-[#4a5568] hover:text-[#2d3748] flex items-center gap-1 transition-colors cursor-pointer"
             >
-              <ChevronLeft className="w-3.5 h-3.5" />
+              <ChevronLeft className="w-4 h-4" />
               <span>Kembali</span>
             </button>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             <input
               type="text"
               value={loginCode}
               onChange={(e) => setLoginCode(e.target.value.toUpperCase())}
-              placeholder="Contoh: JD-A7F2K9"
+              placeholder="Contoh: K7M2P9X4"
               autoFocus
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 font-mono text-sm tracking-wider text-white placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 uppercase"
+              className="w-full px-4 py-3 rounded-2xl bg-[#fbf9f6] border border-[#e4e2df] font-mono text-base tracking-widest text-[#2d3748] placeholder:text-[#a0aec0] focus:outline-none focus:border-[#6b8e7d] focus:ring-2 focus:ring-[#6b8e7d]/10 uppercase text-center"
             />
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-2.5 rounded-xl font-semibold text-xs text-slate-950 bg-emerald-500 hover:bg-emerald-400 shadow-md shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
+              className="w-full py-3.5 rounded-full font-semibold text-sm text-white bg-[#6b8e7d] hover:bg-[#4a6b5b] shadow-[0_4px_16px_rgba(107,142,125,0.25)] transition-all flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer active:scale-[0.98]"
             >
               <LogIn className="w-4 h-4" />
-              <span>{isLoading ? 'Memvalidasi...' : 'Masuk ke Dasbor'}</span>
+              <span>{isLoading ? 'Memvalidasi...' : 'Masuk ke Ruang Dasbor'}</span>
             </button>
           </div>
-          <p className="text-[10px] text-slate-500 mt-2.5 text-center">
-            Kode tersimpan di cloud database — dapat digunakan lintas browser &amp; perangkat.
+          <p className="text-xs text-[#a0aec0] mt-3.5 text-center leading-relaxed">
+            Kode unik tersimpan aman di cloud — dapat diakses kembali dari ponsel maupun laptop Anda.
           </p>
         </form>
       )}
 
-      {/* 3 Core Value Pillars */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full text-left mt-4">
-        <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80">
-          <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-3">
-            <Clock className="w-4 h-4" />
+      {/* 3 Core Value Pillars (Serene Hearth Cards) */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full text-left">
+        <div className="p-6 rounded-3xl bg-white border border-[#e4e2df] shadow-[0_10px_25px_-5px_rgba(107,142,125,0.06)] hover:shadow-[0_14px_28px_-4px_rgba(107,142,125,0.1)] transition-all">
+          <div className="w-10 h-10 rounded-2xl bg-[#e8efea] border border-[#c5ebd7] flex items-center justify-center text-[#4a6b5b] mb-4">
+            <Clock className="w-5 h-5 text-[#6b8e7d]" />
           </div>
-          <h3 className="text-sm font-semibold text-white mb-1">&lt; 2 Menit Per Hari</h3>
-          <p className="text-xs text-slate-400 leading-relaxed">
-            9 item teradaptasi dari GAD-2, Chalder Fatigue Scale, dan PSQI yang dirancang ringkas
-            untuk evaluasi harian saat itu juga (momentary).
+          <h3 className="text-base font-semibold text-[#2d3748] mb-1.5 font-serif">1 Kali Refleksi Tiap Hari</h3>
+          <p className="text-xs sm:text-sm text-[#4a5568] leading-relaxed">
+            9 instrumen tervalidasi yang dirancang ringkas &lt; 2 menit. Melatih kebiasaan sadar (*mindfulness*) tanpa membebani rutinitas harianmu.
           </p>
         </div>
 
-        <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80">
-          <div className="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 mb-3">
-            <LineChart className="w-4 h-4" />
+        <div className="p-6 rounded-3xl bg-white border border-[#e4e2df] shadow-[0_10px_25px_-5px_rgba(107,142,125,0.06)] hover:shadow-[0_14px_28px_-4px_rgba(107,142,125,0.1)] transition-all">
+          <div className="w-10 h-10 rounded-2xl bg-[#f5f0eb] border border-[#eae2d8] flex items-center justify-center text-[#d98e73] mb-4">
+            <LineChart className="w-5 h-5 text-[#d98e73]" />
           </div>
-          <h3 className="text-sm font-semibold text-white mb-1">Dasbor Visualisasi Tren</h3>
-          <p className="text-xs text-slate-400 leading-relaxed">
-            4 grafik interaktif memantau dinamika cemas, kelelahan fisik-mental, progres skripsi,
-            dan pemetaan kategori sumber hambatan terbesar.
+          <h3 className="text-base font-semibold text-[#2d3748] mb-1.5 font-serif">Visualisasi Tren &amp; Pola</h3>
+          <p className="text-xs sm:text-sm text-[#4a5568] leading-relaxed">
+            Membantu mengenali keterkaitan antara kualitas tidur, rasa cemas, dan kemajuan pengerjaan skripsi dalam grafik yang menenangkan mata.
           </p>
         </div>
 
-        <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80">
-          <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-3">
-            <ShieldCheck className="w-4 h-4" />
+        <div className="p-6 rounded-3xl bg-white border border-[#e4e2df] shadow-[0_10px_25px_-5px_rgba(107,142,125,0.06)] hover:shadow-[0_14px_28px_-4px_rgba(107,142,125,0.1)] transition-all">
+          <div className="w-10 h-10 rounded-2xl bg-[#f4ddd4] border border-[#f4ddd4] flex items-center justify-center text-[#a6634b] mb-4">
+            <HeartHandshake className="w-5 h-5 text-[#a6634b]" />
           </div>
-          <h3 className="text-sm font-semibold text-white mb-1">Deteksi Pola Akut vs Kronis</h3>
-          <p className="text-xs text-slate-400 leading-relaxed">
-            Algoritma otomatis membedakan lonjakan stres situasional dari pola keletihan kronis
-            5-hari (stagnasi pengerjaan skripsi).
+          <h3 className="text-base font-semibold text-[#2d3748] mb-1.5 font-serif">Deteksi &amp; Pendampingan</h3>
+          <p className="text-xs sm:text-sm text-[#4a5568] leading-relaxed">
+            Mengenali tanda kelelahan berkepanjangan (5 hari stagnan) dan langsung menyuguhkan panduan pernapasan serta relaksasi grounding.
           </p>
         </div>
       </div>
 
       {/* Guide Link Button */}
-      <div className="mt-10">
+      <div className="mt-12">
         <button
           onClick={onOpenGuide}
-          className="text-xs text-slate-400 hover:text-emerald-400 underline underline-offset-4 transition-colors"
+          className="text-xs sm:text-sm text-[#6b8e7d] hover:text-[#4a6b5b] font-medium underline underline-offset-4 transition-colors cursor-pointer"
         >
-          Pelajari instrumen &amp; metodologi penelitian Jeda →
+          Pelajari metodologi ilmiah &amp; etika riset Jeda →
         </button>
       </div>
     </div>
   );
 }
-

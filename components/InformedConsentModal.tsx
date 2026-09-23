@@ -39,109 +39,99 @@ export default function InformedConsentModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl text-slate-100 animate-fade-in my-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#2d3748]/40 backdrop-blur-sm p-4 overflow-y-auto animate-fade-in">
+      <div className="bg-white border border-[#e4e2df] rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-[0_20px_35px_-10px_rgba(45,55,72,0.12),0_1px_3px_0_rgba(107,142,125,0.06)] text-[#2d3748] my-8">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-            <ShieldCheck className="w-5 h-5" />
+        <div className="flex items-center gap-3.5 mb-5">
+          <div className="w-11 h-11 rounded-2xl bg-[#e8efea] border border-[#c5ebd7] flex items-center justify-center text-[#4a6b5b]">
+            <ShieldCheck className="w-6 h-6 text-[#6b8e7d]" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-white tracking-tight">
-              Persetujuan &amp; Kode Akses
+            <h2 className="text-xl font-bold text-[#2d3748] tracking-tight font-serif">
+              Ruang Aman &amp; Kode Akses
             </h2>
-            <p className="text-xs text-slate-400">Informed Consent Penggunaan Aplikasi Jeda</p>
+            <p className="text-xs text-[#a0aec0]">Informed Consent Penggunaan Aplikasi Jeda</p>
           </div>
         </div>
 
         {/* Access Code Box */}
-        <div className="bg-slate-950 border border-emerald-500/40 rounded-xl p-4 mb-5 text-center relative overflow-hidden">
-          <div className="text-[11px] font-semibold text-emerald-400 uppercase tracking-wider mb-1">
-            Simpan Kode Akses Anonim Anda
+        <div className="bg-[#fbf9f6] border border-[#c5ebd7] rounded-2xl p-5 mb-5 text-center relative overflow-hidden shadow-inner">
+          <div className="text-[11px] font-semibold text-[#4a6b5b] uppercase tracking-wider mb-1">
+            Simpan Kode Akses Unik Anda
           </div>
-          <div className="font-mono text-2xl sm:text-3xl font-extrabold text-white tracking-wider my-1">
+          <div className="font-mono text-2xl sm:text-3xl font-extrabold text-[#2d3748] tracking-widest my-1.5">
             {accessCode}
           </div>
-          <p className="text-[11px] text-slate-400 mt-1 max-w-xs mx-auto">
-            Catat atau salin kode ini untuk masuk kembali dari perangkat/browser mana pun.
+          <p className="text-xs text-[#4a5568] mt-1 max-w-xs mx-auto leading-relaxed">
+            Catat atau salin kode ini untuk masuk kembali dari perangkat ponsel maupun laptop Anda kapan saja.
           </p>
 
           <button
             type="button"
             onClick={handleCopy}
-            className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 transition-colors"
+            className="mt-3.5 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-white border border-[#e4e2df] text-[#4a5568] hover:text-[#2d3748] shadow-sm transition-all cursor-pointer active:scale-95"
           >
             {copied ? (
               <>
-                <Check className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="text-emerald-400 font-semibold">Tersalin ke Clipboard!</span>
+                <Check className="w-3.5 h-3.5 text-[#6b8e7d]" />
+                <span className="text-[#4a6b5b]">Berhasil Disalin!</span>
               </>
             ) : (
               <>
-                <Copy className="w-3.5 h-3.5 text-slate-400" />
+                <Copy className="w-3.5 h-3.5 text-[#6b8e7d]" />
                 <span>Salin Kode Akses</span>
               </>
             )}
           </button>
         </div>
 
-        {/* Consent Text */}
-        <div className="bg-slate-950/60 border border-slate-800 rounded-xl p-4 text-xs text-slate-300 space-y-2.5 leading-relaxed max-h-56 overflow-y-auto mb-5">
-          <div className="font-semibold text-white">Saya memahami dan menyetujui bahwa:</div>
-          <ul className="space-y-1.5 list-disc pl-4 text-slate-300">
-            <li>Data yang saya isikan hanya untuk pemantauan pribadi dan kesadaran diri.</li>
-            <li>Identitas saya sepenuhnya anonim tanpa nomor induk, email, atau nama lengkap.</li>
-            <li>
-              Peringatan stres yang muncul adalah indikasi reflektif berbasis ambang batas (EMA),
-              bukan diagnosis psikologis klinis resmi.
-            </li>
-            <li>
-              Data saya tidak dikirim secara otomatis ke pihak ketiga atau konselor kampus tanpa
-              inisiatif saya sendiri.
-            </li>
-            <li>
-              Saya dapat mengunduh rekaman data ini (ekspor CSV) kapan saja untuk dibawa ke konseling.
-            </li>
-            <li>
-              Saya bebas berhenti dan menghapus seluruh data akun saya kapan saja di menu Pengaturan.
-            </li>
-          </ul>
+        {/* Informed Consent Text per PRD 5.1 */}
+        <div className="bg-[#fbf9f6] border border-[#e4e2df] rounded-2xl p-4 text-xs text-[#4a5568] space-y-2 mb-5 max-h-48 overflow-y-auto leading-relaxed">
+          <div className="font-bold text-[#2d3748]">Informasi Etika &amp; Privasi Partisipan:</div>
+          <p>
+            1. <strong>Kerahasiaan &amp; Anonimitas Penuh:</strong> Jeda tidak mengumpulkan nama, NIM, email, nomor HP, maupun identitas pribadi lainnya. Data Anda murni dihubungkan dengan kode unik di atas.
+          </p>
+          <p>
+            2. <strong>Bukan Pengganti Layanan Medis:</strong> Aplikasi ini merupakan sarana refleksi mandiri (self-reflection) dan pemantauan dinamika stres pengerjaan tugas akhir, bukan alat diagnosis medis/psikiatri resmi.
+          </p>
+          <p>
+            3. <strong>Hak Partisipan &amp; Portabilitas Data:</strong> Anda memiliki kendali penuh atas data Anda. Anda dapat mengekspor riwayat check-in ke format CSV atau menghapus seluruh riwayat kapan saja melalui menu Pengaturan.
+          </p>
         </div>
 
-        {/* Checkbox */}
-        <label className="flex items-start gap-3 cursor-pointer p-2.5 rounded-xl hover:bg-slate-800/40 border border-transparent hover:border-slate-800 transition-all mb-6">
+        {/* Checkbox agreement */}
+        <label className="flex items-start gap-3 p-3 rounded-2xl bg-[#e8efea]/60 border border-[#c5ebd7] cursor-pointer mb-6 transition-colors">
           <input
             type="checkbox"
             checked={agreed}
             onChange={(e) => setAgreed(e.target.checked)}
-            className="w-4 h-4 rounded border-slate-700 bg-slate-950 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-slate-900 mt-0.5"
+            className="w-5 h-5 rounded-md mt-0.5 accent-[#6b8e7d] cursor-pointer"
           />
-          <span className="text-xs text-slate-200 font-medium select-none leading-snug">
-            Saya telah membaca, memahami, dan menyetujui ketentuan partisipasi anonim di atas.
+          <span className="text-xs text-[#2c4d3f] leading-relaxed">
+            Saya telah membaca dan menyetujui ketentuan privasi di atas, serta memahami bahwa kode akses ini adalah satu-satunya kunci untuk membuka akun saya.
           </span>
         </label>
 
         {/* Actions */}
-        <div className="flex items-center justify-end gap-3 pt-2 border-t border-slate-800">
+        <div className="flex items-center justify-end gap-3">
           <button
             type="button"
             onClick={onDecline}
-            disabled={isSubmitting}
-            className="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="px-4 py-2.5 rounded-full text-xs font-semibold text-[#a0aec0] hover:text-[#4a5568] transition-colors cursor-pointer"
           >
             Batal
           </button>
+
           <button
             type="button"
             disabled={!agreed || isSubmitting}
             onClick={handleAgree}
-            className="px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-950 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-emerald-500/20 transition-all"
+            className="px-6 py-2.5 rounded-full text-xs font-semibold text-white bg-[#6b8e7d] hover:bg-[#4a6b5b] shadow-sm transition-all cursor-pointer disabled:opacity-40 active:scale-95"
           >
-            {isSubmitting ? 'Memproses...' : 'Saya Setuju & Mulai'}
+            {isSubmitting ? 'Menyiapkan...' : 'Mulai Perjalanan Refleksi'}
           </button>
         </div>
       </div>
     </div>
   );
 }
-

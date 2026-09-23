@@ -10,8 +10,10 @@ import HistoryTable from '@/components/HistoryTable';
 import AlertModal from '@/components/AlertModal';
 import GuideFaqModal from '@/components/GuideFaqModal';
 import SettingsModal from '@/components/SettingsModal';
+import RelaxationModal from '@/components/RelaxationModal';
 import { useSession } from '@/hooks/useSession';
 import type { CheckinItem, AlertRecord, DetectionResult } from '@/types/jeda';
+import { Check } from 'lucide-react';
 
 export default function HomePage() {
   const { session, setSession, isLoading: isSessionLoading, refresh: refreshSession } = useSession();
@@ -20,13 +22,14 @@ export default function HomePage() {
   const [alerts, setAlerts] = useState<AlertRecord[]>([]);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'checkin' | 'history'>('dashboard');
 
-  // Modals & Pending State
+  // Modals & State
   const [showConsentModal, setShowConsentModal] = useState(false);
   const [pendingAccessCode, setPendingAccessCode] = useState<string>('');
   const [activeAlert, setActiveAlert] = useState<AlertRecord | null>(null);
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [showGuideModal, setShowGuideModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [showRelaxationModal, setShowRelaxationModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -156,7 +159,11 @@ export default function HomePage() {
         setActiveAlert(latestAlert);
         setShowAlertModal(true);
       } else {
-        showToast('Check-in hari ini berhasil disimpan ke cloud database.');
+        showToast(
+          data.isUpdate
+            ? 'Catatan refleksi hari ini berhasil diperbarui.'
+            : 'Refleksi hari ini berhasil disimpan.'
+        );
       }
 
       setActiveTab('dashboard');
@@ -180,7 +187,6 @@ export default function HomePage() {
         const data = await res.json();
         throw new Error(data.error || 'Gagal memperbarui status alert');
       }
-      // Update state lokal
       setAlerts((prev) =>
         prev.map((a) =>
           a.id === alertId ? { ...a, reviewedAt: new Date().toISOString() } : a
@@ -235,19 +241,23 @@ export default function HomePage() {
 
   // Optional Demo load (inform user)
   const handleLoadDemo = () => {
-    showToast('Versi 2.0 terhubung dengan database sungguhan. Silakan isi check-in langsung.');
+    showToast('Versi 2.0 terhubung dengan database cloud nyata. Silakan lakukan check-in langsung.');
   };
 
   const todayStr = new Date().toISOString().split('T')[0];
+  const todayCheckin = checkins.find((c) => c.checkinDate === todayStr) || null;
+  const hasCheckedInToday = !!todayCheckin;
   const firstCheckin = checkins.length > 0 ? checkins[checkins.length - 1].checkinDate : null;
   const lastCheckin = checkins.length > 0 ? checkins[0].checkinDate : null;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-emerald-500/30 selection:text-emerald-200">
-      {/* Toast Notification */}
+    <div className="min-h-screen bg-[#fbf9f6] text-[#2d3748] flex flex-col font-sans selection:bg-[#c5ebd7] selection:text-[#2c4d3f]">
+      {/* Toast Notification (Serene Hearth Sage Toast) */}
       {toastMessage && (
-        <div className="fixed bottom-5 right-5 z-50 bg-slate-900 border border-emerald-500/60 text-slate-100 px-4 py-2.5 rounded-xl shadow-2xl text-xs flex items-center gap-2 animate-fade-in">
-          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+        <div className="fixed bottom-6 right-6 z-50 bg-[#6b8e7d] text-white px-5 py-3 rounded-full shadow-[0_10px_25px_-5px_rgba(107,142,125,0.3)] text-xs sm:text-sm font-medium flex items-center gap-2.5 animate-fade-in border border-white/20">
+          <div className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+            <Check className="w-2.5 h-2.5 text-white" />
+          </div>
           <span>{toastMessage}</span>
         </div>
       )}
@@ -261,15 +271,17 @@ export default function HomePage() {
         onOpenSettings={() => setShowSettingsModal(true)}
         onLogout={handleLogout}
         totalCheckins={checkins.length}
+        hasCheckedInToday={hasCheckedInToday}
+        onOpenRelaxation={() => setShowRelaxationModal(true)}
       />
 
       {/* Main Content Area */}
       <main className="flex-1 pb-16">
         {isSessionLoading ? (
           <div className="min-h-[60vh] flex items-center justify-center">
-            <div className="text-slate-400 text-xs flex items-center gap-2">
-              <div className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-              <span>Memeriksa sesi server...</span>
+            <div className="text-[#6b8e7d] text-xs sm:text-sm font-medium flex items-center gap-2.5">
+              <div className="w-4 h-4 border-2 border-[#6b8e7d] border-t-transparent rounded-full animate-spin" />
+              <span>Memeriksa sesi ruang aman...</span>
             </div>
           </div>
         ) : !session ? (
@@ -288,6 +300,7 @@ export default function HomePage() {
                 onExportCSV={handleExportCSV}
                 onReviewAlert={handleReviewAlert}
                 onLoadDemo={handleLoadDemo}
+                onOpenRelaxation={() => setShowRelaxationModal(true)}
               />
             )}
 
@@ -296,9 +309,8 @@ export default function HomePage() {
                 userId={session.userId}
                 onSave={handleSaveCheckin}
                 onCancel={() => setActiveTab('dashboard')}
-                existingTodayCheckin={
-                  checkins.find((c) => c.checkinDate === todayStr) || null
-                }
+                existingTodayCheckin={todayCheckin}
+                onOpenRelaxation={() => setShowRelaxationModal(true)}
               />
             )}
 
@@ -329,6 +341,7 @@ export default function HomePage() {
           handleExportCSV();
           setShowAlertModal(false);
         }}
+        onOpenRelaxation={() => setShowRelaxationModal(true)}
       />
 
       <GuideFaqModal
@@ -348,23 +361,28 @@ export default function HomePage() {
         onDeleteAccount={handleDeleteAccount}
       />
 
+      <RelaxationModal
+        isOpen={showRelaxationModal}
+        onClose={() => setShowRelaxationModal(false)}
+      />
+
       {/* Footer */}
-      <footer className="border-t border-slate-900 bg-slate-950 py-8 text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <footer className="border-t border-[#e4e2df] bg-[#fbf9f6] py-8 text-xs text-[#a0aec0]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-slate-400">Jeda v2.0</span>
+            <span className="font-semibold text-[#4a5568]">Jeda v2.0</span>
             <span aria-hidden="true">·</span>
             <span>Ecological Momentary Assessment untuk Mahasiswa Skripsi</span>
           </div>
 
-          <div className="flex items-center gap-4 text-[11px]">
+          <div className="flex items-center gap-4 text-[11px] text-[#4a5568]">
             <span>Saragih &amp; Situngkir (2022)</span>
             <span aria-hidden="true">·</span>
             <span>Supabase + Next.js</span>
             <span aria-hidden="true">·</span>
             <button
               onClick={() => setShowGuideModal(true)}
-              className="hover:text-slate-300 transition-colors cursor-pointer"
+              className="hover:text-[#2d3748] transition-colors cursor-pointer underline underline-offset-2"
             >
               Panduan Instrumen
             </button>
@@ -374,4 +392,3 @@ export default function HomePage() {
     </div>
   );
 }
-

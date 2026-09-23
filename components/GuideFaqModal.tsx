@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, HelpCircle, ChevronDown, ChevronUp, LineChart, AreaChart, BarChart2 } from 'lucide-react';
+import { X, HelpCircle, ChevronDown, ChevronUp, LineChart } from 'lucide-react';
 
 interface GuideFaqModalProps {
   isOpen: boolean;
@@ -20,88 +20,88 @@ export default function GuideFaqModal({ isOpen, onClose }: GuideFaqModalProps) {
   const faqs = [
     {
       q: 'Apakah aplikasi Jeda aman dan anonim?',
-      a: 'Ya, data Anda sepenuhnya anonim. Anda masuk hanya menggunakan kode akses unik (tanpa nama, email, nomor induk mahasiswa, atau kata sandi). Data Anda disimpan terenkripsi di server PostgreSQL (Supabase) dan tidak pernah dibagikan ke pihak ketiga atau pihak kampus.',
+      a: 'Ya, data Anda sepenuhnya anonim. Anda masuk hanya menggunakan kode akses unik (tanpa nama, email, nomor induk mahasiswa, atau kata sandi). Data Anda disimpan terenkripsi di server PostgreSQL (Supabase) dan tidak pernah dibagikan ke pihak ketiga atau dosen pembimbing.',
+    },
+    {
+      q: 'Mengapa check-in dibatasi 1 kali per hari?',
+      a: 'Instrumen refleksi Jeda (kualitas tidur, kepuasan progres hari ini, efikasi esok hari) mengukur siklus harian secara utuh. Pembatasan 1 kali sehari mencegah kejenuhan mengisi survei (survey fatigue) dan menjaga keakuratan algoritma deteksi pola 5 hari berturut-turut. Jika ada yang ingin direvisi, Anda bisa menggunakan tombol "Perbarui Catatan / Jawaban Hari Ini".',
+    },
+    {
+      q: 'Bagaimana jika saya merasa cemas di siang hari?',
+      a: 'Anda tidak perlu mengisi 9 pertanyaan check-in hanya untuk mencari ketenangan. Cukup tekan tombol "Butuh Jeda?" di navigasi atas atau tombol "Latihan Relaksasi" di dasbor untuk langsung membuka panduan napas 4-7-8 atau teknik grounding 5-4-3-2-1 kapan saja.',
     },
     {
       q: 'Apa arti dari peringatan (Alert Akut & Kronis) yang muncul?',
-      a: 'Peringatan bukanlah diagnosis klinis ataupun penilaian akademis. Peringatan adalah cerminan reflektif berbasis Ecological Momentary Assessment (EMA) untuk membantu Anda menyadari saat stres melonjak drastis (Akut) atau saat Anda mulai mengalami keletihan berkepanjangan disertai hambatan progres (Kronis / indikasi awal burnout).',
+      a: 'Peringatan bukanlah vonis ataupun nilai buruk. Peringatan adalah cermin reflektif agar Anda menyadari saat beban mental melonjak tajam (Akut) atau saat kelelahan berkepanjangan disertai hambatan progres (Kronis / indikasi awal burnout), sehingga Anda bisa mengambil jeda sebelum terlambat.',
     },
     {
       q: 'Dapatkah saya menggunakan akun saya di perangkat lain?',
-      a: 'Sangat bisa! Berbeda dengan versi lama, Jeda v2.0 menyimpan data di database cloud server. Cukup simpan atau catat kode akses Anda (contoh: JD-A7F2K9), lalu pilih "Masuk Kembali" dari HP, laptop, atau browser lain.',
+      a: 'Sangat bisa! Jeda v2.0 menyimpan data di database cloud server. Cukup simpan atau catat kode unik Anda, lalu pilih tombol "Punya Kode Akses" dari HP, tablet, maupun laptop lain.',
     },
     {
       q: 'Bisakah saya menghapus data saya?',
-      a: 'Tentu. Kedaulatan data sepenuhnya di tangan Anda. Di menu Pengaturan (ikon gir), pilih "Hapus Akun & Data Saya". Seluruh riwayat check-in, stressors, dan alert Anda akan dihapus permanen dari database.',
-    },
-    {
-      q: 'Bagaimana jika saya lupa kode akses?',
-      a: 'Karena aplikasi bersifat anonim mutlak tanpa email pemulihan, sistem tidak dapat mereset kode akses Anda. Pastikan mencatat kode Anda di tempat aman. Jika hilang, Anda harus membuat akun baru melalui tombol Mulai Baru.',
+      a: 'Tentu. Kedaulatan data sepenuhnya di tangan Anda. Di menu Pengaturan (ikon gir), pilih "Hapus Akun & Data Saya". Seluruh riwayat check-in, catatan, dan alert Anda akan terhapus permanen dari server.',
     },
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl text-slate-100 animate-fade-in my-8 max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#2d3748]/40 backdrop-blur-sm p-4 overflow-y-auto animate-fade-in">
+      <div className="bg-white border border-[#e4e2df] rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-[0_20px_35px_-10px_rgba(45,55,72,0.12),0_1px_3px_0_rgba(107,142,125,0.06)] text-[#2d3748] my-8 max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-              <HelpCircle className="w-4 h-4" />
+        <div className="flex items-center justify-between border-b border-[#e4e2df] pb-4 mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-[#e8efea] border border-[#c5ebd7] flex items-center justify-center text-[#4a6b5b]">
+              <HelpCircle className="w-5 h-5 text-[#6b8e7d]" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-white tracking-tight">
+              <h2 className="text-xl font-bold text-[#2d3748] tracking-tight font-serif">
                 Panduan Penggunaan &amp; FAQ
               </h2>
-              <p className="text-xs text-slate-400">Prinsip EMA &amp; Cara Membaca Dasbor Jeda</p>
+              <p className="text-xs text-[#a0aec0]">Prinsip EMA &amp; Cara Membaca Dasbor Jeda</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-2 rounded-full text-[#a0aec0] hover:text-[#2d3748] hover:bg-[#f5f0eb] transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Scrollable Body */}
-        <div className="space-y-6 overflow-y-auto pr-1 text-xs text-slate-300 leading-relaxed">
+        <div className="space-y-6 overflow-y-auto pr-1 text-xs text-[#4a5568] leading-relaxed">
           {/* Section: Cara Membaca Grafik */}
           <div>
-            <h3 className="text-sm font-semibold text-white mb-2.5 flex items-center gap-2">
-              <LineChart className="w-4 h-4 text-emerald-400" />
-              <span>Cara Membaca Dasbor 4 Grafik</span>
+            <h3 className="text-sm font-bold text-[#2d3748] font-serif mb-3 flex items-center gap-2">
+              <LineChart className="w-4 h-4 text-[#6b8e7d]" />
+              <span>Cara Membaca 4 Grafik Dasbor</span>
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              <div className="bg-slate-950 p-3 rounded-xl border border-slate-800/80">
-                <div className="font-semibold text-amber-400 mb-1">1. Tren Kecemasan (0-6)</div>
-                <p className="text-[11px] text-slate-400">
-                  Adaptasi momentary GAD-2. Jika grafik menyentuh atau melampaui garis putus-putus
-                  kuning (skor ≥ 5), sistem mengindikasikan lonjakan cemas akut.
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="bg-[#fbf9f6] p-4 rounded-2xl border border-[#e4e2df]">
+                <div className="font-semibold text-[#6b8e7d] mb-1">1. Tren Kecemasan (0-6)</div>
+                <p className="text-xs text-[#4a5568]">
+                  Adaptasi momentary GAD-2. Jika grafik melampaui garis putus-putus terracotta (skor ≥ 5), sistem mengindikasikan lonjakan cemas akut.
                 </p>
               </div>
 
-              <div className="bg-slate-950 p-3 rounded-xl border border-slate-800/80">
-                <div className="font-semibold text-rose-400 mb-1">2. Tren Kelelahan (1-10)</div>
-                <p className="text-[11px] text-slate-400">
-                  Rata-rata kelelahan mental &amp; fisik. Jika berada di atas batas merah (≥ 6) selama
-                  berhari-hari, energi kognitif Anda berada di ambang kejenuhan.
+              <div className="bg-[#fbf9f6] p-4 rounded-2xl border border-[#e4e2df]">
+                <div className="font-semibold text-[#d98e73] mb-1">2. Tren Kelelahan (1-10)</div>
+                <p className="text-xs text-[#4a5568]">
+                  Rata-rata kelelahan mental &amp; fisik. Jika berada di atas batas waspada (≥ 6) selama berhari-hari, daya kognitifmu sedang terkuras.
                 </p>
               </div>
 
-              <div className="bg-slate-950 p-3 rounded-xl border border-slate-800/80">
-                <div className="font-semibold text-emerald-400 mb-1">3. Tren Progres (1-5)</div>
-                <p className="text-[11px] text-slate-400">
-                  Kemajuan &amp; efikasi diri pengerjaan skripsi. Nilai ≤ 2 yang bertahan lama
-                  menandakan hambatan atau kebuntuan yang perlu dicari solusinya.
+              <div className="bg-[#fbf9f6] p-4 rounded-2xl border border-[#e4e2df]">
+                <div className="font-semibold text-[#4a6b5b] mb-1">3. Tren Progres (1-5)</div>
+                <p className="text-xs text-[#4a5568]">
+                  Kepuasan kemajuan skripsi &amp; efikasi diri. Nilai ≤ 2 yang bertahan lama menandakan hambatan yang butuh jeda atau bantuan bimbingan.
                 </p>
               </div>
 
-              <div className="bg-slate-950 p-3 rounded-xl border border-slate-800/80">
-                <div className="font-semibold text-sky-400 mb-1">4. Distribusi Stresor</div>
-                <p className="text-[11px] text-slate-400">
-                  Menghitung faktor apa yang paling sering Anda pilih sebagai pemicu stres (misal:
-                  teknis riset, bimbingan dosen, atau manajemen waktu).
+              <div className="bg-[#fbf9f6] p-4 rounded-2xl border border-[#e4e2df]">
+                <div className="font-semibold text-[#2c4d3f] mb-1">4. Distribusi Sumber Stres</div>
+                <p className="text-xs text-[#4a5568]">
+                  Menghitung faktor apa yang paling sering memicu stres (teknis riset, bimbingan dosen, atau manajemen waktu).
                 </p>
               </div>
             </div>
@@ -109,31 +109,31 @@ export default function GuideFaqModal({ isOpen, onClose }: GuideFaqModalProps) {
 
           {/* Section: FAQ Accordion */}
           <div>
-            <h3 className="text-sm font-semibold text-white mb-2.5">
+            <h3 className="text-sm font-bold text-[#2d3748] font-serif mb-3">
               Pertanyaan yang Sering Diajukan (FAQ)
             </h3>
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               {faqs.map((faq, idx) => {
                 const isOpen = openFaq === idx;
                 return (
                   <div
                     key={idx}
-                    className="border border-slate-800 bg-slate-950/70 rounded-xl overflow-hidden transition-all"
+                    className="border border-[#e4e2df] bg-[#fbf9f6] rounded-2xl overflow-hidden transition-all"
                   >
                     <button
                       type="button"
                       onClick={() => toggleFaq(idx)}
-                      className="w-full p-3.5 text-left flex items-center justify-between text-xs font-semibold text-slate-200 hover:text-white"
+                      className="w-full p-4 text-left flex items-center justify-between text-xs font-semibold text-[#2d3748] hover:text-[#6b8e7d] cursor-pointer"
                     >
                       <span>{faq.q}</span>
                       {isOpen ? (
-                        <ChevronUp className="w-4 h-4 text-emerald-400 shrink-0 ml-2" />
+                        <ChevronUp className="w-4 h-4 text-[#6b8e7d] shrink-0 ml-2" />
                       ) : (
-                        <ChevronDown className="w-4 h-4 text-slate-500 shrink-0 ml-2" />
+                        <ChevronDown className="w-4 h-4 text-[#a0aec0] shrink-0 ml-2" />
                       )}
                     </button>
                     {isOpen && (
-                      <div className="px-3.5 pb-3.5 text-[11px] text-slate-400 border-t border-slate-800/50 pt-2 leading-relaxed">
+                      <div className="px-4 pb-4 text-xs text-[#4a5568] border-t border-[#e4e2df] pt-3 leading-relaxed">
                         {faq.a}
                       </div>
                     )}
@@ -144,7 +144,7 @@ export default function GuideFaqModal({ isOpen, onClose }: GuideFaqModalProps) {
           </div>
 
           {/* Reference Citation */}
-          <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-[10px] text-slate-500">
+          <div className="p-3.5 rounded-2xl bg-[#f5f0eb] border border-[#e4e2df] text-[11px] text-[#4a5568]">
             <strong>Referensi Ilmiah:</strong> Saragih, S. F., &amp; Situngkir, T. T. (2022). Penerapan
             Aplikasi Web Ecological Momentary Assessment (EMA) &quot;Jeda&quot; untuk Deteksi Dini Pola
             Stres dan Pencegahan Burnout pada Mahasiswa Tingkat Akhir. <em>GIAT: Teknologi untuk Masyarakat</em>, 1(1).
@@ -152,10 +152,10 @@ export default function GuideFaqModal({ isOpen, onClose }: GuideFaqModalProps) {
         </div>
 
         {/* Footer */}
-        <div className="pt-4 mt-2 border-t border-slate-800 flex justify-end">
+        <div className="pt-4 mt-2 border-t border-[#e4e2df] flex justify-end">
           <button
             onClick={onClose}
-            className="px-5 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors"
+            className="px-6 py-2 rounded-full text-xs font-semibold bg-[#f5f0eb] hover:bg-[#eae2d8] text-[#4a5568] hover:text-[#2d3748] transition-colors cursor-pointer"
           >
             Tutup
           </button>
@@ -164,4 +164,3 @@ export default function GuideFaqModal({ isOpen, onClose }: GuideFaqModalProps) {
     </div>
   );
 }
-
