@@ -51,13 +51,15 @@ export default function DashboardView({
   onOpenRelaxation,
 }: DashboardViewProps) {
   const [dayFilter, setDayFilter] = useState<'7' | '14' | '30'>('30');
+  type FullCheckin = CheckinItem & Required<Pick<CheckinItem, 'anxietyQ1' | 'anxietyQ2' | 'fatigueMental' | 'fatiguePhysical' | 'sleepQuantity' | 'sleepQuality' | 'progress' | 'selfEfficacy'>>;
+  const fullCheckins = checkins.filter((checkin) => checkin.checkinType === 'full') as FullCheckin[];
 
   // Urutkan checkin kronologis (lama ke baru) untuk grafik
   const chronological = useMemo(() => {
-    return [...checkins].sort(
+    return [...fullCheckins].sort(
       (a, b) => new Date(a.checkinDate).getTime() - new Date(b.checkinDate).getTime()
     );
-  }, [checkins]);
+  }, [fullCheckins]);
 
   // Filter berdasarkan hari
   const filteredData = useMemo(() => {
@@ -68,8 +70,8 @@ export default function DashboardView({
 
   // Cek apakah hari ini sudah check-in
   const todayStr = new Date().toISOString().split('T')[0];
-  const latestCheckin = checkins.length > 0 ? checkins[0] : null;
-  const hasCheckedInToday = latestCheckin?.checkinDate === todayStr;
+  const latestCheckin = fullCheckins.length > 0 ? fullCheckins[0] : null;
+  const hasCheckedInToday = checkins.some((checkin) => checkin.checkinDate === todayStr);
 
   // Hitung streak check-in yang presisi & tahan multi-checkin per hari
   const { streakDays, isStreakActive, past7DaysStatus, nextMilestone, streakProgressPercent } = useMemo(() => {
@@ -471,6 +473,13 @@ export default function DashboardView({
         </div>
       )}
 
+      {checkins.length > 0 && fullCheckins.length === 0 && (
+        <div className="rounded-3xl border border-[#c5ebd7] bg-[#e8efea]/70 p-5 text-sm leading-relaxed text-[#2c4d3f]">
+          <p className="font-semibold">{checkins.length} check-in ringkas sudah tercatat.</p>
+          <p className="mt-1 text-xs">Stres dan energimu tetap dihargai sebagai bagian dari ritme. Untuk grafik tidur, progres, dan refleksi pola, pilih refleksi lengkap pada check-in berikutnya.</p>
+        </div>
+      )}
+
       {/* 4 Summary Cards (Serene Hearth Content Cards) */}
       {latestCheckin && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -561,7 +570,7 @@ export default function DashboardView({
       )}
 
       {/* Dynamic Clinical Insight Box (Serene Hearth Breather Box Pattern) */}
-      {checkins.length > 0 && (
+      {fullCheckins.length > 0 && (
         <div className="bg-[#e8efea] border-l-4 border-[#6b8e7d] p-5 rounded-2xl flex items-start gap-3.5 text-xs sm:text-sm leading-relaxed text-[#2c4d3f] shadow-sm">
           <Sparkles className="w-5 h-5 text-[#6b8e7d] shrink-0 mt-0.5" />
           <div>
@@ -572,7 +581,7 @@ export default function DashboardView({
       )}
 
       {/* Time Filter Controls */}
-      {checkins.length > 0 && (
+      {fullCheckins.length > 0 && (
         <div className="flex items-center justify-between border-b border-[#e4e2df] pb-3">
           <div className="text-sm font-bold text-[#2d3748] font-serif">
             Grafik Perjalanan Refleksi ({chartData.length} Titik Data)
@@ -596,7 +605,7 @@ export default function DashboardView({
       )}
 
       {/* 4 Interactive Recharts Charts Grid (Serene Hearth Visual Styling) */}
-      {checkins.length > 0 && (
+      {fullCheckins.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Chart 1: Kecemasan */}
           <div className="bg-white border border-[#e4e2df] rounded-3xl p-6 shadow-[0_10px_25px_-5px_rgba(107,142,125,0.06)] flex flex-col">

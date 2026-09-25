@@ -11,8 +11,12 @@ import AlertModal from '@/components/AlertModal';
 import GuideFaqModal from '@/components/GuideFaqModal';
 import SettingsModal from '@/components/SettingsModal';
 import RelaxationModal from '@/components/RelaxationModal';
+import FirstCheckinInsight from '@/components/FirstCheckinInsight';
+import QuickCheckinInsight from '@/components/QuickCheckinInsight';
+import SupportResourcesModal from '@/components/SupportResourcesModal';
 import { useSession } from '@/hooks/useSession';
 import type { CheckinItem, AlertRecord, DetectionResult } from '@/types/jeda';
+import type { CheckinInput } from '@/lib/validations';
 import { Check } from 'lucide-react';
 
 export default function HomePage() {
@@ -30,6 +34,10 @@ export default function HomePage() {
   const [showGuideModal, setShowGuideModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showRelaxationModal, setShowRelaxationModal] = useState(false);
+  const [showSupportResources, setShowSupportResources] = useState(false);
+  const [showFirstCheckinInsight, setShowFirstCheckinInsight] = useState(false);
+  const [quickFirstScores, setQuickFirstScores] = useState<{ stress: number; energy: number } | null>(null);
+  const [firstCheckinScores, setFirstCheckinScores] = useState<{ anxiety: number; fatigue: number; progress: number } | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -68,7 +76,7 @@ export default function HomePage() {
     }
   }, [session, fetchData]);
 
-  // 1. Generate code and start consent flow
+  // Generate code, then show concise consent before any reflection data is collected.
   const handleStartNew = async () => {
     try {
       const res = await fetch('/api/auth/generate-code', { method: 'POST' });
@@ -139,7 +147,7 @@ export default function HomePage() {
 
   // 4. Save checkin via API
   const handleSaveCheckin = async (
-    checkinPayload: Omit<CheckinItem, 'id' | 'createdAt'>
+    checkinPayload: CheckinInput
   ): Promise<DetectionResult> => {
     try {
       const res = await fetch('/api/checkins', {
@@ -159,6 +167,17 @@ export default function HomePage() {
         setActiveAlert(latestAlert);
         setShowAlertModal(true);
       } else {
+        if (!data.isUpdate && checkins.length === 0 && checkinPayload.checkinType === 'full') {
+          setFirstCheckinScores({
+            anxiety: checkinPayload.anxietyQ1 + checkinPayload.anxietyQ2,
+            fatigue: (checkinPayload.fatigueMental + checkinPayload.fatiguePhysical) / 2,
+            progress: (checkinPayload.progress + checkinPayload.selfEfficacy) / 2,
+          });
+          setShowFirstCheckinInsight(true);
+        }
+        if (!data.isUpdate && checkins.length === 0 && checkinPayload.checkinType === 'quick') {
+          setQuickFirstScores({ stress: checkinPayload.quickStress, energy: checkinPayload.quickEnergy });
+        }
         showToast(
           data.isUpdate
             ? 'Catatan refleksi hari ini berhasil diperbarui.'
@@ -177,6 +196,13 @@ export default function HomePage() {
       showToast(msg);
       throw err;
     }
+  };
+
+  const handleDeclineConsent = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    setShowConsentModal(false);
+    setPendingAccessCode('');
+    setSession(null);
   };
 
   // 5. Review Alert via API
@@ -330,7 +356,7 @@ export default function HomePage() {
         isOpen={showConsentModal}
         accessCode={pendingAccessCode}
         onAgree={handleAgreeConsent}
-        onDecline={() => setShowConsentModal(false)}
+        onDecline={handleDeclineConsent}
       />
 
       <AlertModal
@@ -342,6 +368,7 @@ export default function HomePage() {
           setShowAlertModal(false);
         }}
         onOpenRelaxation={() => setShowRelaxationModal(true)}
+        onOpenSupport={() => setShowSupportResources(true)}
       />
 
       <GuideFaqModal
@@ -365,6 +392,24 @@ export default function HomePage() {
         isOpen={showRelaxationModal}
         onClose={() => setShowRelaxationModal(false)}
       />
+
+      <SupportResourcesModal isOpen={showSupportResources} onClose={() => setShowSupportResources(false)} />
+
+      {showFirstCheckinInsight && firstCheckinScores && (
+        <FirstCheckinInsight
+          anxietyScore={firstCheckinScores.anxiety}
+          fatigueScore={firstCheckinScores.fatigue}
+          progressScore={firstCheckinScores.progress}
+          onOpenRelaxation={() => {
+            setShowFirstCheckinInsight(false);
+            setShowRelaxationModal(true);
+          }}
+          onContinue={() => setShowFirstCheckinInsight(false)}
+        />
+      )}
+      {quickFirstScores && !showAlertModal && (
+        <QuickCheckinInsight stress={quickFirstScores.stress} energy={quickFirstScores.energy} onOpenRelaxation={() => { setQuickFirstScores(null); setShowRelaxationModal(true); }} onContinue={() => setQuickFirstScores(null)} />
+      )}
 
       {/* Footer */}
       <footer className="border-t border-[#e4e2df] bg-[#fbf9f6] py-8 text-xs text-[#a0aec0]">

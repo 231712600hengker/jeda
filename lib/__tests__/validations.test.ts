@@ -40,6 +40,7 @@ describe('Validasi Skema Zod JEDA v2', () => {
 
   describe('CheckinSchema', () => {
     const validPayload = {
+      checkinType: 'full' as const,
       anxietyQ1: 1,
       anxietyQ2: 2,
       fatigueMental: 6,
@@ -86,6 +87,10 @@ describe('Validasi Skema Zod JEDA v2', () => {
       const invalidNote = CheckinSchema.safeParse({ ...validPayload, note: tooLongNote });
       assert.strictEqual(invalidNote.success, false);
     });
+
+    it('menerima quick check-in hanya dengan stres dan energi', () => {
+      const result = CheckinSchema.safeParse({ checkinType: 'quick', quickStress: 7, quickEnergy: 3 });
+      assert.strictEqual(result.success, true);
+    });
   });
 });
-

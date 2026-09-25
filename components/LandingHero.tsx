@@ -61,8 +61,8 @@ export default function LandingHero({ onStartNew, onLogin, onOpenGuide }: Landin
       </h1>
 
       <p className="text-base sm:text-lg text-[#4a5568] max-w-xl mb-10 leading-relaxed font-sans">
-        Jeda adalah ruang hening yang aman dan bebas penghakiman. Luangkan 2 menit setiap hari
-        untuk menyapa diri, mengenali rasa lelah, dan merawat semangat skripsimu dengan penuh kasih.
+        Mulai dengan kode anonim—tanpa nama, email, atau NIM. Dalam sekitar 2 menit, kamu bisa
+        menyapa diri, mengenali rasa lelah, dan menentukan jeda kecil yang kamu butuhkan.
       </p>
 
       {/* Error Banner */}
@@ -81,7 +81,7 @@ export default function LandingHero({ onStartNew, onLogin, onOpenGuide }: Landin
             onClick={handleStartNewClick}
             className="w-full sm:w-auto flex-1 px-8 py-3.5 rounded-full font-semibold text-sm text-white bg-[#6b8e7d] hover:bg-[#4a6b5b] shadow-[0_10px_25px_-5px_rgba(107,142,125,0.3)] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 hover:scale-[1.015] active:scale-[0.98]"
           >
-            <span>{isLoading ? 'Menyiapkan Ruang...' : 'Mulai Ruang Refleksi'}</span>
+            <span>{isLoading ? 'Menyiapkan Ruang...' : 'Mulai Check-in Anonim'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
 

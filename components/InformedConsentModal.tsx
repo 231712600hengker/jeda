@@ -50,7 +50,7 @@ export default function InformedConsentModal({
             <h2 className="text-xl font-bold text-[#2d3748] tracking-tight font-serif">
               Ruang Aman &amp; Kode Akses
             </h2>
-            <p className="text-xs text-[#a0aec0]">Informed Consent Penggunaan Aplikasi Jeda</p>
+            <p className="text-xs text-[#a0aec0]">Tiga hal penting sebelum check-in pertamamu</p>
           </div>
         </div>
 
@@ -85,17 +85,17 @@ export default function InformedConsentModal({
           </button>
         </div>
 
-        {/* Informed Consent Text per PRD 5.1 */}
-        <div className="bg-[#fbf9f6] border border-[#e4e2df] rounded-2xl p-4 text-xs text-[#4a5568] space-y-2 mb-5 max-h-48 overflow-y-auto leading-relaxed">
-          <div className="font-bold text-[#2d3748]">Informasi Etika &amp; Privasi Partisipan:</div>
+        {/* Consent remains before collection; it is intentionally concise at this decision point. */}
+        <div className="bg-[#fbf9f6] border border-[#e4e2df] rounded-2xl p-4 text-xs text-[#4a5568] space-y-2 mb-5 leading-relaxed">
+          <div className="font-bold text-[#2d3748]">Sebelum kamu mulai:</div>
           <p>
-            1. <strong>Kerahasiaan &amp; Anonimitas Penuh:</strong> Jeda tidak mengumpulkan nama, NIM, email, nomor HP, maupun identitas pribadi lainnya. Data Anda murni dihubungkan dengan kode unik di atas.
+            <strong>Privat secara desain:</strong> Jeda tidak meminta nama, NIM, email, atau nomor HP. Riwayatmu hanya terhubung ke kode akses ini.
           </p>
           <p>
-            2. <strong>Bukan Pengganti Layanan Medis:</strong> Aplikasi ini merupakan sarana refleksi mandiri (self-reflection) dan pemantauan dinamika stres pengerjaan tugas akhir, bukan alat diagnosis medis/psikiatri resmi.
+            <strong>Bukan layanan diagnosis:</strong> Jeda adalah ruang refleksi mandiri, bukan pengganti bantuan medis atau psikologis profesional.
           </p>
           <p>
-            3. <strong>Hak Partisipan &amp; Portabilitas Data:</strong> Anda memiliki kendali penuh atas data Anda. Anda dapat mengekspor riwayat check-in ke format CSV atau menghapus seluruh riwayat kapan saja melalui menu Pengaturan.
+            <strong>Kendalimu tetap penuh:</strong> kamu dapat mengunduh atau menghapus seluruh riwayat melalui Pengaturan kapan saja.
           </p>
         </div>
 

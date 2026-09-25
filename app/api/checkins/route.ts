@@ -3,7 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { getSessionFromRequest } from '@/lib/auth/session';
-import { evaluateCheckinAlerts } from '@/lib/detection';
+import { evaluateCheckinAlerts, evaluateQuickCheckinAlert } from '@/lib/detection';
 import { CheckinSchema } from '@/lib/validations';
 import type { CheckinItem, AlertRecord } from '@/types/jeda';
 
@@ -52,15 +52,7 @@ export async function POST(req: NextRequest) {
         .from('checkins')
         .update({
           checkin_time: checkinTime,
-          anxiety_q1: data.anxietyQ1,
-          anxiety_q2: data.anxietyQ2,
-          fatigue_mental: data.fatigueMental,
-          fatigue_physical: data.fatiguePhysical,
-          sleep_quantity: data.sleepQuantity,
-          sleep_quality: data.sleepQuality,
-          progress: data.progress,
-          self_efficacy: data.selfEfficacy,
-          note: data.note ?? null,
+          ...toDatabasePayload(data),
           updated_at: checkinTime,
         })
         .eq('id', existingCheckin.id)
@@ -83,15 +75,7 @@ export async function POST(req: NextRequest) {
           user_id: session.userId,
           checkin_date: checkinDate,
           checkin_time: checkinTime,
-          anxiety_q1: data.anxietyQ1,
-          anxiety_q2: data.anxietyQ2,
-          fatigue_mental: data.fatigueMental,
-          fatigue_physical: data.fatiguePhysical,
-          sleep_quantity: data.sleepQuantity,
-          sleep_quality: data.sleepQuality,
-          progress: data.progress,
-          self_efficacy: data.selfEfficacy,
-          note: data.note ?? null,
+          ...toDatabasePayload(data),
         })
         .select('id')
         .single();
@@ -104,7 +88,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ─── Simpan stressors ─────────────────────────────────
-    if (data.stressors.length > 0) {
+    if (data.checkinType === 'full' && data.stressors.length > 0) {
       const stressorRows = data.stressors.map((cat) => ({
         checkin_id: checkinId,
         stressor_category: cat,
@@ -126,6 +110,7 @@ export async function POST(req: NextRequest) {
       .from('checkins')
       .select('anxiety_q1, anxiety_q2, fatigue_mental, fatigue_physical, progress, self_efficacy, checkin_time')
       .eq('user_id', session.userId)
+      .eq('checkin_type', 'full')
       .neq('id', checkinId)
       .order('checkin_date', { ascending: false })
       .limit(4);
@@ -157,7 +142,7 @@ export async function POST(req: NextRequest) {
     }));
 
     // ─── Jalankan deteksi alert ───────────────────────────
-    const currentForDetection = {
+    const currentForDetection = data.checkinType === 'full' ? {
       anxietyQ1: data.anxietyQ1,
       anxietyQ2: data.anxietyQ2,
       fatigueMental: data.fatigueMental,
@@ -165,9 +150,12 @@ export async function POST(req: NextRequest) {
       progress: data.progress,
       selfEfficacy: data.selfEfficacy,
       checkinTime,
-    };
+    } : null;
 
-    const detection = evaluateCheckinAlerts(currentForDetection, pastCheckins, pastAlerts);
+    // Chronic detection intentionally uses full check-ins only (query above filters `checkin_type = full`).
+    const detection = data.checkinType === 'full'
+      ? evaluateCheckinAlerts(currentForDetection!, pastCheckins, pastAlerts)
+      : evaluateQuickCheckinAlert(data.quickStress, data.quickEnergy);
 
     const generatedAlerts: AlertRecord[] = [];
 
@@ -180,6 +168,9 @@ export async function POST(req: NextRequest) {
           alert_type: 'acute',
           triggered_at: checkinTime,
           alert_data: {
+            source: detection.acuteDetails.source ?? 'full',
+            quickStress: detection.acuteDetails.quickStress,
+            quickEnergy: detection.acuteDetails.quickEnergy,
             anxietyScore: detection.acuteDetails.combinedAnxiety,
             fatigueScore: detection.acuteDetails.avgFatigue,
             message: detection.acuteDetails.reason,
@@ -245,6 +236,23 @@ export async function POST(req: NextRequest) {
   }
 }
 
+function toDatabasePayload(data: import('@/lib/validations').CheckinInput) {
+  if (data.checkinType === 'quick') {
+    return {
+      checkin_type: 'quick', quick_stress: data.quickStress, quick_energy: data.quickEnergy,
+      anxiety_q1: null, anxiety_q2: null, fatigue_mental: null, fatigue_physical: null,
+      sleep_quantity: null, sleep_quality: null, progress: null, self_efficacy: null, note: null,
+    };
+  }
+  return {
+    checkin_type: 'full', quick_stress: null, quick_energy: null,
+    anxiety_q1: data.anxietyQ1, anxiety_q2: data.anxietyQ2,
+    fatigue_mental: data.fatigueMental, fatigue_physical: data.fatiguePhysical,
+    sleep_quantity: data.sleepQuantity, sleep_quality: data.sleepQuality,
+    progress: data.progress, self_efficacy: data.selfEfficacy, note: data.note ?? null,
+  };
+}
+
 // ─── GET /api/checkins ────────────────────────────────────
 
 export async function GET(req: NextRequest) {
@@ -266,7 +274,7 @@ export async function GET(req: NextRequest) {
       .from('checkins')
       .select(`
         id, user_id, checkin_date, checkin_time,
-        anxiety_q1, anxiety_q2, fatigue_mental, fatigue_physical,
+        checkin_type, quick_stress, quick_energy, anxiety_q1, anxiety_q2, fatigue_mental, fatigue_physical,
         sleep_quantity, sleep_quality, progress, self_efficacy, note,
         created_at,
         checkin_stressors(stressor_category)
@@ -282,6 +290,9 @@ export async function GET(req: NextRequest) {
       userId: r.user_id,
       checkinDate: r.checkin_date,
       checkinTime: r.checkin_time,
+      checkinType: r.checkin_type ?? 'full',
+      quickStress: r.quick_stress ?? undefined,
+      quickEnergy: r.quick_energy ?? undefined,
       anxietyQ1: r.anxiety_q1,
       anxietyQ2: r.anxiety_q2,
       fatigueMental: r.fatigue_mental,

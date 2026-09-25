@@ -8,6 +8,7 @@
 export type SleepQuantity = '< 5 jam' | '5-6 jam' | '6-7 jam' | '7-8 jam' | '> 8 jam';
 export type SleepQuality = 'buruk' | 'cukup' | 'baik';
 export type AlertType = 'acute' | 'chronic';
+export type CheckinType = 'full' | 'quick';
 
 export type StressorCategory =
   | 'technical'             // Beban teknis/kognitif (riset, analisis data, menulis)
@@ -29,14 +30,17 @@ export interface CheckinItem {
   checkinTime: string;   // ISO 8601
 
   // 9 Item EMA
-  anxietyQ1: number;     // 0-3, GAD-2 adaptasi
-  anxietyQ2: number;     // 0-3, GAD-2 adaptasi
-  fatigueMental: number; // 1-10, Chalder Fatigue Scale
-  fatiguePhysical: number; // 1-10, Chalder Fatigue Scale
-  sleepQuantity: SleepQuantity;
-  sleepQuality: SleepQuality;
-  progress: number;      // 1-5, Likert
-  selfEfficacy: number;  // 1-5, Likert
+  checkinType: CheckinType;
+  anxietyQ1?: number;     // 0-3, GAD-2 adaptasi
+  anxietyQ2?: number;     // 0-3, GAD-2 adaptasi
+  fatigueMental?: number; // 1-10, Chalder Fatigue Scale
+  fatiguePhysical?: number; // 1-10, Chalder Fatigue Scale
+  sleepQuantity?: SleepQuantity;
+  sleepQuality?: SleepQuality;
+  progress?: number;      // 1-5, Likert
+  selfEfficacy?: number;  // 1-5, Likert
+  quickStress?: number;
+  quickEnergy?: number;
   stressors: StressorCategory[];
 
   note?: string;
@@ -52,6 +56,9 @@ export interface AlertRecord {
   triggeredAt: string;   // ISO 8601
   reviewedAt: string | null;
   alertData: {
+    source?: 'full' | 'quick';
+    quickStress?: number;
+    quickEnergy?: number;
     anxietyScore?: number;
     fatigueScore?: number;
     avgProgress5Days?: number;
@@ -76,6 +83,9 @@ export interface UserSession {
 export interface DetectionResult {
   isAcute: boolean;
   acuteDetails?: {
+    source?: 'full' | 'quick';
+    quickStress?: number;
+    quickEnergy?: number;
     combinedAnxiety: number;
     avgFatigue: number;
     reason: string;
@@ -151,4 +161,3 @@ export interface StressorDistributionPoint {
   name: string;
   frekuensi: number;
 }
-

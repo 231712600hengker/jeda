@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
-export const CheckinSchema = z.object({
+const FullCheckinSchema = z.object({
+  checkinType: z.literal('full'),
   anxietyQ1: z.number().int().min(0).max(3),
   anxietyQ2: z.number().int().min(0).max(3),
   fatigueMental: z.number().int().min(1).max(10),
@@ -14,6 +15,14 @@ export const CheckinSchema = z.object({
   ),
   note: z.string().max(500).optional(),
 });
+
+const QuickCheckinSchema = z.object({
+  checkinType: z.literal('quick'),
+  quickStress: z.number().int().min(1).max(10),
+  quickEnergy: z.number().int().min(1).max(10),
+});
+
+export const CheckinSchema = z.discriminatedUnion('checkinType', [FullCheckinSchema, QuickCheckinSchema]);
 
 export const LoginSchema = z.object({
   accessCode: z
@@ -33,4 +42,3 @@ export const ConsentSchema = z.object({
 export type CheckinInput = z.infer<typeof CheckinSchema>;
 export type LoginInput = z.infer<typeof LoginSchema>;
 export type ConsentInput = z.infer<typeof ConsentSchema>;
-

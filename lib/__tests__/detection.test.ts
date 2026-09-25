@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
-import { evaluateCheckinAlerts } from '../detection';
+import { evaluateCheckinAlerts, evaluateQuickCheckinAlert } from '../detection';
 
 describe('Sistem Deteksi Alert JEDA (PRD Appendix B)', () => {
   it('Skenario 1: Memicu Alert Akut jika Kecemasan gabungan >= 5', () => {
@@ -102,5 +102,12 @@ describe('Sistem Deteksi Alert JEDA (PRD Appendix B)', () => {
 
     const res = evaluateCheckinAlerts(current, past, pastAlerts);
     assert.strictEqual(res.isChronic, false, 'Seharusnya suppressed karena ada alert kronis aktif');
+  });
+
+  it('check-in ringkas memicu alert akut tanpa memicu alert kronis', () => {
+    const res = evaluateQuickCheckinAlert(9, 2);
+    assert.strictEqual(res.isAcute, true);
+    assert.strictEqual(res.isChronic, false);
+    assert.strictEqual(res.acuteDetails?.source, 'quick');
   });
 });

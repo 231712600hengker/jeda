@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
       .from('checkins')
       .select(`
         id, user_id, checkin_date, checkin_time,
-        anxiety_q1, anxiety_q2, fatigue_mental, fatigue_physical,
+        checkin_type, quick_stress, quick_energy, anxiety_q1, anxiety_q2, fatigue_mental, fatigue_physical,
         sleep_quantity, sleep_quality, progress, self_efficacy, note,
         created_at,
         checkin_stressors(stressor_category)
@@ -39,6 +39,7 @@ export async function GET(req: NextRequest) {
       userId: r.user_id,
       checkinDate: r.checkin_date,
       checkinTime: r.checkin_time,
+      checkinType: r.checkin_type ?? 'full', quickStress: r.quick_stress ?? undefined, quickEnergy: r.quick_energy ?? undefined,
       anxietyQ1: r.anxiety_q1,
       anxietyQ2: r.anxiety_q2,
       fatigueMental: r.fatigue_mental,
@@ -54,22 +55,23 @@ export async function GET(req: NextRequest) {
       createdAt: r.created_at,
     }));
 
+    const fullCheckins = checkins.filter((checkin) => checkin.checkinType === 'full') as Array<CheckinItem & Required<Pick<CheckinItem, 'anxietyQ1' | 'anxietyQ2' | 'fatigueMental' | 'fatiguePhysical' | 'progress' | 'selfEfficacy'>>>;
     const latestCheckin = checkins.length > 0 ? checkins[checkins.length - 1] : null;
 
     // ─── Tren data untuk grafik ───────────────────────────
-    const anxietyTrend = checkins.map((c) => ({
+    const anxietyTrend = fullCheckins.map((c) => ({
       date: formatDateShort(c.checkinDate),
       rawDate: c.checkinDate,
       value: c.anxietyQ1 + c.anxietyQ2,
     }));
 
-    const fatigueTrend = checkins.map((c) => ({
+    const fatigueTrend = fullCheckins.map((c) => ({
       date: formatDateShort(c.checkinDate),
       rawDate: c.checkinDate,
       value: Number(((c.fatigueMental + c.fatiguePhysical) / 2).toFixed(1)),
     }));
 
-    const progressTrend = checkins.map((c) => ({
+    const progressTrend = fullCheckins.map((c) => ({
       date: formatDateShort(c.checkinDate),
       rawDate: c.checkinDate,
       value: Number(((c.progress + c.selfEfficacy) / 2).toFixed(1)),
@@ -119,8 +121,8 @@ export async function GET(req: NextRequest) {
     // ─── Dynamic insight ──────────────────────────────────
     let insights = 'Mulai lakukan check-in harian untuk melihat pola dinamika stres dan progres skripsi Anda.';
 
-    if (checkins.length >= 3) {
-      const last3 = checkins.slice(-3);
+    if (fullCheckins.length >= 3) {
+      const last3 = fullCheckins.slice(-3);
       const avgFatLast3 = last3.reduce((acc, c) => acc + (c.fatigueMental + c.fatiguePhysical) / 2, 0) / 3;
       const avgProgLast3 = last3.reduce((acc, c) => acc + (c.progress + c.selfEfficacy) / 2, 0) / 3;
       const avgAnxLast3 = last3.reduce((acc, c) => acc + c.anxietyQ1 + c.anxietyQ2, 0) / 3;
@@ -134,7 +136,7 @@ export async function GET(req: NextRequest) {
       } else {
         insights = `Rata-rata kelelahan Anda dalam periode ini adalah ${avgFatLast3.toFixed(1)}/10 dengan progres pengerjaan stabil (${avgProgLast3.toFixed(1)}/5).`;
       }
-    } else if (checkins.length > 0) {
+    } else if (fullCheckins.length > 0) {
       insights = 'Data sedang terkumpul. Lanjutkan check-in rutin selama beberapa hari untuk membentuk kurva tren yang akurat.';
     }
 
@@ -157,4 +159,3 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-

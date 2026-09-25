@@ -10,7 +10,7 @@ import type { CheckinItem, AlertRecord, DetectionResult } from '@/types/jeda';
 
 // ─── TIPE INPUT UNTUK DETEKSI ─────────────────────────────
 
-type CheckinForDetection = Pick<
+type CheckinForDetection = Required<Pick<
   CheckinItem,
   | 'anxietyQ1'
   | 'anxietyQ2'
@@ -19,7 +19,7 @@ type CheckinForDetection = Pick<
   | 'progress'
   | 'selfEfficacy'
   | 'checkinTime'
->;
+>>;
 
 // ─── FUNGSI UTAMA ─────────────────────────────────────────
 
@@ -127,3 +127,19 @@ export function evaluateCheckinAlerts(
   };
 }
 
+/** Quick check-ins can raise an immediate caring alert, but never feed chronic detection. */
+export function evaluateQuickCheckinAlert(quickStress: number, quickEnergy: number): DetectionResult {
+  const isAcute = quickStress >= 8 || quickEnergy <= 2;
+  const reasons = [
+    quickStress >= 8 ? `Stres saat ini ${quickStress}/10 (ambang: ≥ 8)` : null,
+    quickEnergy <= 2 ? `Energi saat ini ${quickEnergy}/10 (ambang: ≤ 2)` : null,
+  ].filter(Boolean).join(' dan ');
+  return {
+    isAcute,
+    isChronic: false,
+    acuteDetails: isAcute ? {
+      source: 'quick', quickStress, quickEnergy,
+      combinedAnxiety: 0, avgFatigue: 0, reason: reasons,
+    } : undefined,
+  };
+}

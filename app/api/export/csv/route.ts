@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
       .from('checkins')
       .select(`
         id, checkin_date, checkin_time,
-        anxiety_q1, anxiety_q2, fatigue_mental, fatigue_physical,
+        checkin_type, quick_stress, quick_energy, anxiety_q1, anxiety_q2, fatigue_mental, fatigue_physical,
         sleep_quantity, sleep_quality, progress, self_efficacy, note,
         created_at,
         checkin_stressors(stressor_category)
@@ -57,6 +57,9 @@ export async function GET(req: NextRequest) {
     const columns = [
       'Timestamp',
       'Tanggal',
+      'Jenis_Checkin',
+      'Stres_Ringkas',
+      'Energi_Ringkas',
       'Kecemasan_1',
       'Kecemasan_2',
       'Kecemasan_Gabungan',
@@ -80,15 +83,19 @@ export async function GET(req: NextRequest) {
         .map((s: { stressor_category: string }) => s.stressor_category)
         .join(';');
 
-      const combinedAnxiety = r.anxiety_q1 + r.anxiety_q2;
-      const avgFatigue = ((r.fatigue_mental + r.fatigue_physical) / 2).toFixed(1);
-      const avgProgress = ((r.progress + r.self_efficacy) / 2).toFixed(1);
+      const isQuick = r.checkin_type === 'quick';
+      const combinedAnxiety = isQuick ? '' : r.anxiety_q1 + r.anxiety_q2;
+      const avgFatigue = isQuick ? '' : ((r.fatigue_mental + r.fatigue_physical) / 2).toFixed(1);
+      const avgProgress = isQuick ? '' : ((r.progress + r.self_efficacy) / 2).toFixed(1);
 
       const dateAlerts = alertsByDate[r.checkin_date] ?? { acute: false, chronic: false };
 
       const cells = [
         r.checkin_time,
         r.checkin_date,
+        isQuick ? 'Ringkas' : 'Lengkap',
+        isQuick ? r.quick_stress : '',
+        isQuick ? r.quick_energy : '',
         r.anxiety_q1,
         r.anxiety_q2,
         combinedAnxiety,
@@ -127,4 +134,3 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-

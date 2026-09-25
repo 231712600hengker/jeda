@@ -2,7 +2,7 @@
 
 import React from 'react';
 import type { AlertRecord } from '@/types/jeda';
-import { AlertTriangle, ShieldAlert, CheckCircle2, Download, Wind } from 'lucide-react';
+import { AlertTriangle, ShieldAlert, CheckCircle2, Download, Wind, HeartHandshake } from 'lucide-react';
 
 interface AlertModalProps {
   isOpen: boolean;
@@ -10,6 +10,7 @@ interface AlertModalProps {
   onDismiss: () => void;
   onExportData: () => void;
   onOpenRelaxation?: () => void;
+  onOpenSupport?: () => void;
 }
 
 export default function AlertModal({
@@ -18,10 +19,12 @@ export default function AlertModal({
   onDismiss,
   onExportData,
   onOpenRelaxation,
+  onOpenSupport,
 }: AlertModalProps) {
   if (!isOpen || !alert) return null;
 
   const isChronic = alert.alertType === 'chronic';
+  const isQuickAlert = alert.alertData.source === 'quick';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#2d3748]/40 backdrop-blur-sm p-4 overflow-y-auto animate-fade-in">
@@ -47,10 +50,10 @@ export default function AlertModal({
                 isChronic ? 'text-[#a6634b]' : 'text-[#b8630b]'
               }`}
             >
-              {isChronic ? 'Peringatan Pola Berkepanjangan' : 'Lonjakan Ketegangan Akut'}
+              {isChronic ? 'Peringatan Pola Berkepanjangan' : isQuickAlert ? 'Sinyal Check-in Ringkas' : 'Lonjakan Ketegangan Akut'}
             </div>
             <h3 className="text-xl font-bold text-[#2d3748] mt-0.5 tracking-tight font-serif">
-              {isChronic ? 'Terdeteksi Pola Stagnasi & Keletihan' : 'Tingkat Stres Meningkat Hari Ini'}
+              {isChronic ? 'Terdeteksi Pola Stagnasi & Keletihan' : isQuickAlert ? 'Sepertinya kamu sedang membutuhkan jeda.' : 'Tingkat Stres Meningkat Hari Ini'}
             </h3>
           </div>
         </div>
@@ -83,7 +86,7 @@ export default function AlertModal({
           ) : (
             <>
               <p>
-                Kondisi kecemasan atau kelelahanmu sedang berada di titik tinggi saat ini. Tubuh dan pikiranmu sedang memberi sinyal untuk melambat.
+                {isQuickAlert ? 'Dari check-in ringkasmu, stres atau energi sedang berada di titik yang berat. Tidak perlu menyelesaikan semuanya sekarang—ambil satu jeda kecil terlebih dahulu.' : 'Kondisi kecemasan atau kelelahanmu sedang berada di titik tinggi saat ini. Tubuh dan pikiranmu sedang memberi sinyal untuk melambat.'}
               </p>
               <div className="bg-[#e8efea] border border-[#c5ebd7] rounded-2xl p-4 text-[#2c4d3f] space-y-1.5">
                 <div className="font-bold text-[#4a6b5b]">Saran Menenangkan:</div>
@@ -113,6 +116,12 @@ export default function AlertModal({
             >
               <Wind className="w-3.5 h-3.5 text-[#6b8e7d]" />
               <span>Latihan Relaksasi</span>
+            </button>
+          )}
+
+          {onOpenSupport && (
+            <button type="button" onClick={onOpenSupport} className="w-full sm:w-auto px-5 py-2.5 rounded-full border border-[#c5ebd7] bg-[#e8efea] text-[#4a6b5b] text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer">
+              <HeartHandshake className="w-3.5 h-3.5" /><span>Cari bantuan</span>
             </button>
           )}
 

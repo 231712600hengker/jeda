@@ -111,9 +111,10 @@ export default function HistoryTable({
               </thead>
               <tbody className="divide-y divide-[#f5f0eb]">
                 {filtered.map((item) => {
-                  const combinedAnxiety = item.anxietyQ1 + item.anxietyQ2;
-                  const avgFatigue = ((item.fatigueMental + item.fatiguePhysical) / 2).toFixed(1);
-                  const avgProg = ((item.progress + item.selfEfficacy) / 2).toFixed(1);
+                  const isQuick = item.checkinType === 'quick';
+                  const combinedAnxiety = isQuick ? null : item.anxietyQ1! + item.anxietyQ2!;
+                  const avgFatigue = isQuick ? null : ((item.fatigueMental! + item.fatiguePhysical!) / 2).toFixed(1);
+                  const avgProg = isQuick ? null : ((item.progress! + item.selfEfficacy!) / 2).toFixed(1);
                   const isExpanded = expandedId === item.id;
                   const d = new Date(item.checkinTime);
                   const formattedDate = d.toLocaleDateString('id-ID', {
@@ -131,7 +132,7 @@ export default function HistoryTable({
                     <React.Fragment key={item.id}>
                       <tr
                         onClick={() => setExpandedId(isExpanded ? null : item.id)}
-                        className={`hover:bg-[#f5f0eb]/50 transition-colors cursor-pointer ${
+                        className={`hover:bg-[#f5f0eb]/50 transition-colors cursor-pointer ${isQuick ? 'bg-[#e8efea]/35 ' : ''}${
                           isExpanded ? 'bg-[#f5f0eb]/70' : ''
                         }`}
                       >
@@ -141,18 +142,19 @@ export default function HistoryTable({
                           <div className="text-[11px] text-[#a0aec0] font-mono tabular-nums">
                             {formattedTime} WIB
                           </div>
+                          <span className={`mt-1 inline-flex rounded-full px-2 py-0.5 text-[9px] font-semibold ${isQuick ? 'bg-[#e8efea] text-[#4a6b5b]' : 'bg-[#f5f0eb] text-[#4a5568]'}`}>{isQuick ? 'RINGKAS' : 'LENGKAP'}</span>
                         </td>
 
                         {/* Kecemasan */}
                         <td className="py-4 px-3 text-right font-mono tabular-nums">
                           <span
                             className={
-                              combinedAnxiety >= 5
+                              (combinedAnxiety ?? 0) >= 5
                                 ? 'text-[#d98e73] font-bold'
                                 : 'text-[#2d3748]'
                             }
                           >
-                            {combinedAnxiety} / 6
+                            {isQuick ? `${item.quickStress}/10 stres` : `${combinedAnxiety} / 6`}
                           </span>
                         </td>
 
@@ -160,20 +162,20 @@ export default function HistoryTable({
                         <td className="py-4 px-3 text-right font-mono tabular-nums">
                           <span
                             className={
-                              Number(avgFatigue) >= 6
+                              Number(avgFatigue ?? 0) >= 6
                                 ? 'text-[#d98e73] font-bold'
                                 : 'text-[#2d3748]'
                             }
                           >
-                            {avgFatigue} / 10
+                            {isQuick ? `${item.quickEnergy}/10 energi` : `${avgFatigue} / 10`}
                           </span>
                         </td>
 
                         {/* Tidur */}
                         <td className="py-4 px-3">
-                          <div className="text-[#2d3748] font-medium">{item.sleepQuantity}</div>
+                          <div className="text-[#2d3748] font-medium">{isQuick ? 'Tidak diisi' : item.sleepQuantity}</div>
                           <div className="text-[11px] text-[#a0aec0] capitalize">
-                            Kualitas: {item.sleepQuality}
+                            {isQuick ? 'Check-in ringkas' : `Kualitas: ${item.sleepQuality}`}
                           </div>
                         </td>
 
@@ -186,7 +188,7 @@ export default function HistoryTable({
                                 : 'text-[#6b8e7d] font-bold'
                             }
                           >
-                            {avgProg} / 5
+                            {isQuick ? '—' : `${avgProg} / 5`}
                           </span>
                         </td>
 
@@ -214,6 +216,9 @@ export default function HistoryTable({
                         <tr className="bg-[#fbf9f6]">
                           <td colSpan={7} className="p-5">
                             <div className="space-y-4">
+                              {isQuick ? (
+                                <div className="grid grid-cols-2 gap-3"><div className="rounded-2xl border border-[#e4e2df] bg-white p-3"><div className="text-[10px] text-[#a0aec0]">Stres saat check-in</div><div className="mt-0.5 font-mono text-sm font-bold">{item.quickStress}/10</div></div><div className="rounded-2xl border border-[#e4e2df] bg-white p-3"><div className="text-[10px] text-[#a0aec0]">Energi saat check-in</div><div className="mt-0.5 font-mono text-sm font-bold">{item.quickEnergy}/10</div></div></div>
+                              ) : <>
                               {/* 9 Items Detail Grid */}
                               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                 <div className="p-3 bg-white rounded-2xl border border-[#e4e2df]">
@@ -270,6 +275,7 @@ export default function HistoryTable({
                                   &ldquo;{item.note}&rdquo;
                                 </div>
                               )}
+                              </>}
                             </div>
                           </td>
                         </tr>

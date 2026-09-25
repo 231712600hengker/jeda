@@ -85,6 +85,7 @@ Jalankan query SQL berikut di **SQL Editor** pada dashboard Supabase Anda secara
 1. `supabase/migrations/001_initial_schema.sql` — Membuat tabel `users`, `checkins`, `checkin_stressors`, dan `alerts`.
 2. `supabase/migrations/002_rls.sql` — Mengaktifkan Row-Level Security (RLS).
 3. `supabase/migrations/003_daily_checkin_constraint.sql` — Menambahkan constraint unik 1 check-in per hari.
+4. `supabase/migrations/004_quick_checkins.sql` — Menambahkan check-in ringkas (stres dan energi) tanpa mengisi data refleksi lengkap secara artifisial.
 
 ### 4. Menjalankan Server Pengembangan
 

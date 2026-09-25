@@ -22,10 +22,12 @@ import {
   Heart,
   Wind,
 } from 'lucide-react';
+import QuickCheckin from '@/components/QuickCheckin';
+import type { CheckinInput } from '@/lib/validations';
 
 interface CheckInFormProps {
   userId: string;
-  onSave: (checkinData: Omit<CheckinItem, 'id' | 'createdAt'>) => Promise<DetectionResult>;
+  onSave: (checkinData: CheckinInput) => Promise<DetectionResult>;
   onCancel: () => void;
   existingTodayCheckin?: CheckinItem | null;
   onOpenRelaxation?: () => void;
@@ -40,6 +42,7 @@ export default function CheckInForm({
 }: CheckInFormProps) {
   // Mode edit jika user ingin mengubah entri hari ini
   const [isEditing, setIsEditing] = useState(false);
+  const [mode, setMode] = useState<'choose' | 'full' | 'quick'>('choose');
   const hasExistingCheckin = !!existingTodayCheckin;
 
   // Step state (0: Kecemasan, 1: Kelelahan, 2: Tidur, 3: Progres, 4: Sumber Stres)
@@ -80,18 +83,16 @@ export default function CheckInForm({
     }
   };
 
+  if (hasExistingCheckin && existingTodayCheckin.checkinType === 'quick') {
+    return <div className="mx-auto max-w-2xl animate-fade-in px-4 py-8 sm:py-12"><div className="rounded-3xl border border-[#e4e2df] bg-white p-8 text-center"><Heart className="mx-auto mb-4 h-10 w-10 text-[#6b8e7d]" /><span className="rounded-full border border-[#c5ebd7] bg-[#e8efea] px-3 py-1 text-xs font-semibold text-[#4a6b5b]">Check-in ringkas tersimpan</span><h2 className="mt-4 font-serif text-2xl font-bold">Kamu sudah hadir untuk dirimu hari ini.</h2><p className="mt-3 text-sm text-[#4a5568]">Stres: {existingTodayCheckin.quickStress}/10 · Energi: {existingTodayCheckin.quickEnergy}/10</p><p className="mt-3 text-xs text-[#a0aec0]">Besok kamu dapat memilih check-in ringkas atau refleksi lengkap lagi.</p></div></div>;
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const now = new Date();
-    const checkinDate = now.toISOString().split('T')[0];
-    const checkinTime = now.toISOString();
-
-    const checkinPayload: Omit<CheckinItem, 'id' | 'createdAt'> = {
-      userId,
-      checkinDate,
-      checkinTime,
+    const checkinPayload: CheckinInput = {
+      checkinType: 'full',
       anxietyQ1,
       anxietyQ2,
       fatigueMental,
@@ -111,6 +112,9 @@ export default function CheckInForm({
       setIsSubmitting(false);
     }
   };
+
+  if (!hasExistingCheckin && !isEditing && mode === 'choose') return <div className="mx-auto max-w-2xl animate-fade-in px-4 py-8"><div className="rounded-3xl border border-[#e4e2df] bg-white p-6 sm:p-8"><p className="text-xs font-semibold uppercase tracking-wider text-[#6b8e7d]">Hari ini</p><h2 className="mt-1 font-serif text-2xl font-bold">Pilih ruang yang kamu punya.</h2><p className="mt-2 text-sm text-[#4a5568]">Konsistensi tidak harus sempurna. Check-in ringkas lebih baik daripada tidak hadir sama sekali.</p><div className="mt-6 grid gap-3 sm:grid-cols-2"><button type="button" onClick={() => setMode('quick')} className="rounded-2xl border border-[#c5ebd7] bg-[#e8efea] p-5 text-left"><span className="text-xs font-semibold text-[#4a6b5b]">±30 detik</span><p className="mt-1 font-semibold">Check-in ringkas</p><p className="mt-1 text-xs text-[#4a5568]">Stres dan energi saat ini.</p></button><button type="button" onClick={() => setMode('full')} className="rounded-2xl border border-[#e4e2df] bg-[#fbf9f6] p-5 text-left"><span className="text-xs font-semibold text-[#6b8e7d]">±2 menit</span><p className="mt-1 font-semibold">Refleksi lengkap</p><p className="mt-1 text-xs text-[#4a5568]">Tidur, progres, dan hal yang mengganjal.</p></button></div><button type="button" onClick={onCancel} className="mt-6 text-xs font-semibold text-[#4a5568]">Kembali ke dasbor</button></div></div>;
+  if (!hasExistingCheckin && mode === 'quick') return <QuickCheckin onSave={onSave} onBack={() => setMode('choose')} />;
 
   // ─── 1. TAMPILAN JIKA SUDAH CHECK-IN HARI INI (Serene Hearth Sanctuary) ───
   if (hasExistingCheckin && !isEditing) {
@@ -145,13 +149,13 @@ export default function CheckInForm({
               <div className="p-3 bg-white rounded-xl border border-[#e4e2df]">
                 <div className="text-[11px] text-[#a0aec0]">Cemas (0-6)</div>
                 <div className="text-lg font-bold text-[#2d3748] mt-0.5">
-                  {existingTodayCheckin.anxietyQ1 + existingTodayCheckin.anxietyQ2}/6
+                  {existingTodayCheckin.anxietyQ1! + existingTodayCheckin.anxietyQ2!}/6
                 </div>
               </div>
               <div className="p-3 bg-white rounded-xl border border-[#e4e2df]">
                 <div className="text-[11px] text-[#a0aec0]">Lelah (1-10)</div>
                 <div className="text-lg font-bold text-[#2d3748] mt-0.5">
-                  {((existingTodayCheckin.fatigueMental + existingTodayCheckin.fatiguePhysical) / 2).toFixed(1)}
+                  {((existingTodayCheckin.fatigueMental! + existingTodayCheckin.fatiguePhysical!) / 2).toFixed(1)}
                 </div>
               </div>
               <div className="p-3 bg-white rounded-xl border border-[#e4e2df]">
@@ -163,7 +167,7 @@ export default function CheckInForm({
               <div className="p-3 bg-white rounded-xl border border-[#e4e2df]">
                 <div className="text-[11px] text-[#a0aec0]">Progres Skripsi</div>
                 <div className="text-lg font-bold text-[#6b8e7d] mt-0.5">
-                  {existingTodayCheckin.progress}/5
+                  {existingTodayCheckin.progress!}/5
                 </div>
               </div>
             </div>
