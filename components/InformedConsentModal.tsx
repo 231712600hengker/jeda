@@ -113,11 +113,11 @@ export default function InformedConsentModal({
         </label>
 
         {/* Actions */}
-        <div className="flex items-center justify-end gap-3">
+        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
           <button
             type="button"
             onClick={onDecline}
-            className="px-4 py-2.5 rounded-full text-xs font-semibold text-[#a0aec0] hover:text-[#4a5568] transition-colors cursor-pointer"
+            className="w-full px-4 py-2.5 rounded-full text-xs font-semibold text-[#a0aec0] hover:text-[#4a5568] transition-colors cursor-pointer sm:w-auto"
           >
             Batal
           </button>
@@ -126,7 +126,7 @@ export default function InformedConsentModal({
             type="button"
             disabled={!agreed || isSubmitting}
             onClick={handleAgree}
-            className="px-6 py-2.5 rounded-full text-xs font-semibold text-white bg-[#6b8e7d] hover:bg-[#4a6b5b] shadow-sm transition-all cursor-pointer disabled:opacity-40 active:scale-95"
+            className="w-full px-6 py-2.5 rounded-full text-xs font-semibold text-white bg-[#6b8e7d] hover:bg-[#4a6b5b] shadow-sm transition-all cursor-pointer disabled:opacity-40 active:scale-95 sm:w-auto"
           >
             {isSubmitting ? 'Menyiapkan...' : 'Mulai Perjalanan Refleksi'}
           </button>

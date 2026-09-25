@@ -231,7 +231,7 @@ export default function DashboardView({
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-8 text-[#2d3748]">
       {/* Top Banner / Today Status (Serene Hearth Style) */}
-      <div className="bg-white border border-[#e4e2df] p-6 rounded-3xl shadow-[0_10px_25px_-5px_rgba(107,142,125,0.08),0_8px_10px_-6px_rgba(107,142,125,0.04)] flex flex-col md:flex-row md:items-center justify-between gap-5">
+      <div className="flex flex-col justify-between gap-5 rounded-3xl border border-[#e4e2df] bg-white p-5 shadow-[0_10px_25px_-5px_rgba(107,142,125,0.08),0_8px_10px_-6px_rgba(107,142,125,0.04)] md:flex-row md:items-center sm:p-6">
         <div className="space-y-1.5">
           <div className="flex items-center gap-2 text-xs font-semibold text-[#6b8e7d] uppercase tracking-wider">
             <span>Dasbor Refleksi Diri</span>
@@ -351,7 +351,7 @@ export default function DashboardView({
 
       {/* Consistent Check-in Counter Section (Serene Hearth Warm Streak Tracker) */}
       {checkins.length > 0 && (
-        <div className="bg-white border border-[#e4e2df] rounded-3xl p-6 sm:p-8 shadow-[0_10px_25px_-5px_rgba(107,142,125,0.08),0_8px_10px_-6px_rgba(107,142,125,0.04)] relative overflow-hidden">
+        <div className="relative overflow-hidden rounded-3xl border border-[#e4e2df] bg-white p-5 shadow-[0_10px_25px_-5px_rgba(107,142,125,0.08),0_8px_10px_-6px_rgba(107,142,125,0.04)] sm:p-8">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 relative z-10">
             {/* Left: Streak Counter & Status */}
             <div className="space-y-3">
@@ -408,7 +408,7 @@ export default function DashboardView({
             </div>
 
             {/* Right: 7-Day Mini Calendar Rhythm Tracker */}
-            <div className="bg-[#fbf9f6] border border-[#e4e2df] rounded-2xl p-4 sm:p-5 flex flex-col gap-3 min-w-[280px]">
+            <div className="flex w-full min-w-0 flex-col gap-3 rounded-2xl border border-[#e4e2df] bg-[#fbf9f6] p-4 sm:p-5 lg:w-auto lg:min-w-[280px]">
               <div className="flex items-center justify-between text-xs text-[#4a5568]">
                 <span className="font-semibold text-[#2d3748]">Ritme 7 Hari Terakhir</span>
                 <span className="text-[11px] text-[#a0aec0]">

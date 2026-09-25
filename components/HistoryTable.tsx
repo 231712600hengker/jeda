@@ -55,21 +55,21 @@ export default function HistoryTable({
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="relative">
+        <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
+          <div className="relative w-full sm:w-auto">
             <Search className="w-3.5 h-3.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#a0aec0]" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Cari catatan / tanggal..."
-              className="pl-9 pr-4 py-2 bg-[#fbf9f6] border border-[#e4e2df] rounded-full text-xs text-[#2d3748] placeholder:text-[#a0aec0] focus:outline-none focus:border-[#6b8e7d]"
+              className="w-full min-w-0 pl-9 pr-4 py-2 bg-[#fbf9f6] border border-[#e4e2df] rounded-full text-xs text-[#2d3748] placeholder:text-[#a0aec0] focus:outline-none focus:border-[#6b8e7d] sm:w-56"
             />
           </div>
 
           <button
             onClick={onExportCSV}
-            className="px-4 py-2 rounded-full bg-[#f5f0eb] hover:bg-[#eae2d8] border border-[#e4e2df] text-xs font-semibold text-[#4a5568] hover:text-[#2d3748] flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="w-full justify-center px-4 py-2 rounded-full bg-[#f5f0eb] hover:bg-[#eae2d8] border border-[#e4e2df] text-xs font-semibold text-[#4a5568] hover:text-[#2d3748] flex items-center gap-1.5 transition-colors cursor-pointer sm:w-auto"
           >
             <Download className="w-3.5 h-3.5 text-[#6b8e7d]" />
             <span>Ekspor CSV</span>

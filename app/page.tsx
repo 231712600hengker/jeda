@@ -254,11 +254,11 @@ export default function HomePage() {
     <div className="min-h-screen bg-[#fbf9f6] text-[#2d3748] flex flex-col font-sans selection:bg-[#c5ebd7] selection:text-[#2c4d3f]">
       {/* Toast Notification (Serene Hearth Sage Toast) */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#6b8e7d] text-white px-5 py-3 rounded-full shadow-[0_10px_25px_-5px_rgba(107,142,125,0.3)] text-xs sm:text-sm font-medium flex items-center gap-2.5 animate-fade-in border border-white/20">
+        <div className="fixed bottom-4 left-4 right-4 z-50 mx-auto flex w-auto max-w-md items-start gap-2.5 rounded-2xl border border-white/20 bg-[#6b8e7d] px-5 py-3 text-xs font-medium text-white shadow-[0_10px_25px_-5px_rgba(107,142,125,0.3)] animate-fade-in sm:bottom-6 sm:left-auto sm:right-6 sm:w-fit sm:items-center sm:rounded-full sm:text-sm">
           <div className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center shrink-0">
             <Check className="w-2.5 h-2.5 text-white" />
           </div>
-          <span>{toastMessage}</span>
+          <span className="min-w-0">{toastMessage}</span>
         </div>
       )}
 
@@ -368,14 +368,14 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="border-t border-[#e4e2df] bg-[#fbf9f6] py-8 text-xs text-[#a0aec0]">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
             <span className="font-semibold text-[#4a5568] font-serif">Jeda</span>
             <span aria-hidden="true">·</span>
             <span>Ruang refleksi dan pemantauan kesejahteraan mahasiswa</span>
           </div>
 
-          <div className="flex items-center gap-4 text-[11px] text-[#4a5568]">
+          <div className="flex flex-wrap items-center justify-center gap-4 text-[11px] text-[#4a5568]">
             <span className="font-medium text-[#4a6b5b]">made by sixy with &lt;3</span>
             <span aria-hidden="true">·</span>
             <button

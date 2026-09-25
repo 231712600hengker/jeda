@@ -205,8 +205,8 @@ export default function CheckInForm({
     <div className="max-w-2xl mx-auto px-4 py-8 animate-fade-in">
       {/* Banner mode edit jika memperbarui */}
       {isEditing && (
-        <div className="mb-4 p-3.5 bg-[#e8efea] border border-[#c5ebd7] rounded-2xl flex items-center justify-between text-xs text-[#4a6b5b]">
-          <div className="flex items-center gap-2">
+        <div className="mb-4 flex flex-col gap-2 rounded-2xl border border-[#c5ebd7] bg-[#e8efea] p-3.5 text-xs text-[#4a6b5b] sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 items-center gap-2">
             <Edit3 className="w-4 h-4 text-[#6b8e7d]" />
             <span>Sedang memperbarui catatan refleksi hari ini.</span>
           </div>
@@ -337,11 +337,11 @@ export default function CheckInForm({
           <div className="space-y-6 animate-fade-in">
             {/* Mental Fatigue Slider */}
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-[#2d3748]">
+              <div className="flex items-start justify-between gap-3">
+                <label className="min-w-0 flex-1 text-sm font-medium text-[#2d3748]">
                   3. Seberapa lelah pikiranmu saat ini?
                 </label>
-                <span className="font-mono text-sm font-bold px-3 py-0.5 rounded-full bg-[#e8efea] text-[#4a6b5b]">
+                <span className="shrink-0 rounded-full bg-[#e8efea] px-3 py-0.5 font-mono text-sm font-bold text-[#4a6b5b]">
                   {fatigueMental} / 10
                 </span>
               </div>
@@ -460,7 +460,7 @@ export default function CheckInForm({
                   {progress} / 5
                 </span>
               </div>
-              <div className="grid grid-cols-5 gap-2">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
                 {[
                   { val: 1, label: 'Belum Ada Progres' },
                   { val: 2, label: 'Kurang Puas' },
@@ -472,14 +472,14 @@ export default function CheckInForm({
                     key={item.val}
                     type="button"
                     onClick={() => setProgress(item.val)}
-                    className={`p-2.5 rounded-2xl text-center border transition-all cursor-pointer ${
+                    className={`min-h-[76px] p-2.5 rounded-2xl text-center border transition-all cursor-pointer sm:min-h-0 ${item.val === 5 ? 'col-span-2 w-[calc(50%-0.25rem)] justify-self-center sm:col-span-1 sm:w-auto' : ''} ${
                       progress === item.val
                         ? 'bg-[#6b8e7d] border-[#4a6b5b] text-white shadow-md'
                         : 'bg-[#fbf9f6] border-[#e4e2df] text-[#4a5568] hover:bg-[#f5f0eb]'
                     }`}
                   >
                     <div className="text-sm font-bold">{item.val}</div>
-                    <div className={`text-[10px] mt-0.5 line-clamp-2 ${progress === item.val ? 'text-white/80' : 'text-[#a0aec0]'}`}>
+                    <div className={`mt-0.5 text-[10px] leading-snug ${progress === item.val ? 'text-white/80' : 'text-[#a0aec0]'}`}>
                       {item.label}
                     </div>
                   </button>
@@ -489,15 +489,15 @@ export default function CheckInForm({
 
             {/* Self-Efficacy Likert */}
             <div className="space-y-3 pt-3">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-[#2d3748]">
+              <div className="flex items-start justify-between gap-3">
+                <label className="min-w-0 flex-1 text-sm font-medium text-[#2d3748]">
                   8. Keyakinanmu untuk melangkah dan melanjutkan esok hari:
                 </label>
-                <span className="font-mono text-sm font-bold px-3 py-0.5 rounded-full bg-[#f4ddd4] text-[#a6634b]">
+                <span className="shrink-0 rounded-full bg-[#f4ddd4] px-3 py-0.5 font-mono text-sm font-bold text-[#a6634b]">
                   {selfEfficacy} / 5
                 </span>
               </div>
-              <div className="grid grid-cols-5 gap-2">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
                 {[
                   { val: 1, label: 'Masih Ragu' },
                   { val: 2, label: 'Sedikit Cemas' },
@@ -509,14 +509,14 @@ export default function CheckInForm({
                     key={item.val}
                     type="button"
                     onClick={() => setSelfEfficacy(item.val)}
-                    className={`p-2.5 rounded-2xl text-center border transition-all cursor-pointer ${
+                    className={`min-h-[76px] p-2.5 rounded-2xl text-center border transition-all cursor-pointer sm:min-h-0 ${item.val === 5 ? 'col-span-2 w-[calc(50%-0.25rem)] justify-self-center sm:col-span-1 sm:w-auto' : ''} ${
                       selfEfficacy === item.val
                         ? 'bg-[#d98e73] border-[#a6634b] text-white shadow-md'
                         : 'bg-[#fbf9f6] border-[#e4e2df] text-[#4a5568] hover:bg-[#f5f0eb]'
                     }`}
                   >
                     <div className="text-sm font-bold">{item.val}</div>
-                    <div className={`text-[10px] mt-0.5 line-clamp-2 ${selfEfficacy === item.val ? 'text-white/80' : 'text-[#a0aec0]'}`}>
+                    <div className={`mt-0.5 text-[10px] leading-snug ${selfEfficacy === item.val ? 'text-white/80' : 'text-[#a0aec0]'}`}>
                       {item.label}
                     </div>
                   </button>
@@ -609,12 +609,12 @@ export default function CheckInForm({
         )}
 
         {/* Footer Navigation Buttons */}
-        <div className="flex items-center justify-between border-t border-[#e4e2df] pt-6 mt-8">
+        <div className="mt-8 flex flex-col-reverse gap-3 border-t border-[#e4e2df] pt-6 sm:flex-row sm:items-center sm:justify-between">
           {currentStep > 0 ? (
             <button
               type="button"
               onClick={() => setCurrentStep((prev) => prev - 1)}
-              className="px-5 py-2.5 rounded-full text-xs font-semibold text-[#4a5568] hover:text-[#2d3748] bg-[#f5f0eb] hover:bg-[#eae2d8] border border-[#e4e2df] flex items-center gap-1.5 transition-all cursor-pointer"
+              className="w-full justify-center px-5 py-2.5 rounded-full text-xs font-semibold text-[#4a5568] hover:text-[#2d3748] bg-[#f5f0eb] hover:bg-[#eae2d8] border border-[#e4e2df] flex items-center gap-1.5 transition-all cursor-pointer sm:w-auto"
             >
               <ChevronLeft className="w-4 h-4" />
               <span>Kembali</span>
@@ -623,7 +623,7 @@ export default function CheckInForm({
             <button
               type="button"
               onClick={onCancel}
-              className="px-5 py-2.5 rounded-full text-xs font-semibold text-[#a0aec0] hover:text-[#4a5568] transition-colors cursor-pointer"
+              className="w-full px-5 py-2.5 rounded-full text-xs font-semibold text-[#a0aec0] hover:text-[#4a5568] transition-colors cursor-pointer sm:w-auto"
             >
               Batal
             </button>
@@ -633,7 +633,7 @@ export default function CheckInForm({
             <button
               type="button"
               onClick={() => setCurrentStep((prev) => prev + 1)}
-              className="px-6 py-2.5 rounded-full text-xs font-semibold text-white bg-[#6b8e7d] hover:bg-[#4a6b5b] shadow-[0_4px_14px_rgba(107,142,125,0.25)] flex items-center gap-1.5 transition-all cursor-pointer hover:scale-[1.015] active:scale-[0.98]"
+              className="w-full justify-center px-6 py-2.5 rounded-full text-xs font-semibold text-white bg-[#6b8e7d] hover:bg-[#4a6b5b] shadow-[0_4px_14px_rgba(107,142,125,0.25)] flex items-center gap-1.5 transition-all cursor-pointer hover:scale-[1.015] active:scale-[0.98] sm:w-auto"
             >
               <span>Selanjutnya</span>
               <ChevronRight className="w-4 h-4" />
@@ -643,7 +643,7 @@ export default function CheckInForm({
               type="button"
               disabled={isSubmitting}
               onClick={handleSubmit}
-              className="px-7 py-2.5 rounded-full text-xs font-semibold text-white bg-[#6b8e7d] hover:bg-[#4a6b5b] shadow-[0_6px_20px_rgba(107,142,125,0.3)] flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50 hover:scale-[1.015] active:scale-[0.98]"
+              className="w-full justify-center px-7 py-2.5 rounded-full text-xs font-semibold text-white bg-[#6b8e7d] hover:bg-[#4a6b5b] shadow-[0_6px_20px_rgba(107,142,125,0.3)] flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50 hover:scale-[1.015] active:scale-[0.98] sm:w-auto"
             >
               <CheckCircle2 className="w-4 h-4" />
               <span>

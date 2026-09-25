@@ -31,7 +31,7 @@ export default function Navbar({
 }: NavbarProps) {
   return (
     <header className="sticky top-0 z-40 bg-[#fbf9f6]/90 backdrop-blur-md border-b border-[#e4e2df] px-4 sm:px-6 py-3 transition-colors">
-      <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
+      <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3 sm:flex-nowrap sm:gap-4">
         {/* Logo & Brand Identity */}
         <div className="flex items-center gap-3">
           <div className="relative h-9 w-9 rounded-2xl overflow-hidden shadow-[0_4px_12px_rgba(107,142,125,0.2)] bg-[#6b8e7d] flex items-center justify-center">
@@ -57,7 +57,7 @@ export default function Navbar({
 
         {/* Center Navigation Tabs (Only when logged in) */}
         {session && (
-          <nav className="flex items-center p-1 rounded-full bg-[#f5f0eb] border border-[#e4e2df] shadow-inner">
+          <nav className="order-3 flex w-full items-center justify-center p-1 rounded-full bg-[#f5f0eb] border border-[#e4e2df] shadow-inner sm:order-none sm:w-auto">
             <button
               onClick={() => onSelectTab('dashboard')}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
@@ -109,7 +109,7 @@ export default function Navbar({
         )}
 
         {/* Right Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-1 sm:gap-2">
           {/* Quick Relaxation Button "Butuh Jeda?" Available Anytime */}
           {onOpenRelaxation && (
             <button

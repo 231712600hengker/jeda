@@ -54,6 +54,16 @@
     line-height: 1.68;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  /* Keep long Indonesian copy and user-entered notes inside their containers. */
+  h1, h2, h3, h4, p, label, li, td, th, span {
+    overflow-wrap: anywhere;
+  }
+
+  button, input, textarea, select {
+    font: inherit;
   }
 
   ::selection {
@@ -90,4 +100,3 @@
     background: #d98e73;
   }
 }
-
