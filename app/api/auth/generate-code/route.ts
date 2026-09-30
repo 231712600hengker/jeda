@@ -1,20 +1,23 @@
 // POST /api/auth/generate-code
 // Membuat kode akses anonim baru dan menyimpan user baru ke Supabase
 import { NextResponse } from 'next/server';
+import { randomInt } from 'node:crypto';
 import { supabaseAdmin } from '@/lib/supabase/server';
 
 /**
  * Generate kode akses anonim format "JD-XXXXXX"
- * Karakter: alfanumerik, tanpa 0,1,I,O untuk menghindari kebingungan
+ * Karakter: alfanumerik, tanpa 0,1,I,O untuk menghindari kebingungan.
+ * Menggunakan crypto.randomInt (CSPRNG) — bukan Math.random().
  */
 function generateAccessCode(): string {
   const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
   let code = '';
   for (let i = 0; i < 6; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
+    code += chars[randomInt(chars.length)];
   }
   return `JD-${code}`;
 }
+
 
 export async function POST() {
   try {

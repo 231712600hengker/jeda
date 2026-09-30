@@ -110,4 +110,30 @@ describe('Sistem Deteksi Alert JEDA (PRD Appendix B)', () => {
     assert.strictEqual(res.isChronic, false);
     assert.strictEqual(res.acuteDetails?.source, 'quick');
   });
+
+  it('Skenario 7: 5 check-in dengan nilai memenuhi syarat kronis TAPI berselang-seling hari → tidak kronis', () => {
+    // Tanggal: 23, 21, 19, 17, 15 Sep (loncat 2 hari setiap kali — bukan berturut-turut)
+    const past = [
+      { anxietyQ1: 1, anxietyQ2: 1, fatigueMental: 7, fatiguePhysical: 7, progress: 2, selfEfficacy: 1, checkinTime: '2026-09-21T10:00:00.000Z' },
+      { anxietyQ1: 1, anxietyQ2: 1, fatigueMental: 8, fatiguePhysical: 6, progress: 1, selfEfficacy: 2, checkinTime: '2026-09-19T10:00:00.000Z' },
+      { anxietyQ1: 1, anxietyQ2: 1, fatigueMental: 7, fatiguePhysical: 7, progress: 2, selfEfficacy: 1, checkinTime: '2026-09-17T10:00:00.000Z' },
+      { anxietyQ1: 1, anxietyQ2: 1, fatigueMental: 6, fatiguePhysical: 6, progress: 1, selfEfficacy: 1, checkinTime: '2026-09-15T10:00:00.000Z' },
+    ];
+    const current = {
+      anxietyQ1: 1,
+      anxietyQ2: 1,
+      fatigueMental: 7,
+      fatiguePhysical: 7,
+      progress: 1,
+      selfEfficacy: 1,
+      checkinTime: '2026-09-23T10:00:00.000Z',
+    };
+
+    const res = evaluateCheckinAlerts(current, past, []);
+    assert.strictEqual(
+      res.isChronic,
+      false,
+      '5 check-in yang berselang-seling seharusnya TIDAK memicu alert kronis (harus 5 hari berturut-turut)'
+    );
+  });
 });

@@ -31,8 +31,12 @@ export default function GuideFaqModal({ isOpen, onClose }: GuideFaqModalProps) {
       a: 'Kamu tidak perlu mengisi 9 pertanyaan check-in hanya untuk mencari ketenangan. Cukup tekan tombol "Butuh Jeda?" di navigasi atas atau tombol "Latihan Relaksasi" di dasbor untuk langsung membuka panduan napas 4-7-8 atau teknik grounding 5-4-3-2-1 kapan pun kamu butuhkan.',
     },
     {
-      q: 'Apa maksud pengingat atau alert yang muncul?',
-      a: 'Pengingat bukanlah vonis ataupun penilaian buruk. Ini adalah cermin lembut yang mengingatkanmu saat rasa cemas sedang tinggi atau saat tubuh dan pikiranmu sudah terlalu lelah, agar kamu bisa beristirahat sejenak sebelum kelelahan berlanjut.',
+      q: 'Apa maksud pengingat atau alert yang muncul, dan bagaimana cara membacanya?',
+      a: 'Ada dua jenis alert: (1) Alert Akut — muncul saat skor kecemasan gabungan ≥ 5/6 atau rata-rata kelelahan ≥ 8/10 pada hari yang sama. Ini sinyal bahwa kondisimu hari ini membutuhkan perhatian segera. (2) Alert Kronis — muncul hanya jika rata-rata progres ≤ 2/5 DAN rata-rata kelelahan ≥ 6/10 selama 5 hari berturut-turut tanpa jeda. Ini sinyal pola jangka panjang yang butuh intervensi. Pengingat bukan vonis — ia adalah cermin lembut agar kamu bisa beristirahat sebelum kelelahan berlanjut. Setelah membaca, tekan "Oke, Sudah Ditinjau" untuk menutupnya.',
+    },
+    {
+      q: 'Bagaimana cara membaca angka pada grafik dasbor?',
+      a: 'Grafik Kecemasan: Skala 0-6 (gabungan 2 pertanyaan GAD-2 adaptasi). Waspada jika ≥ 5. Grafik Kelelahan: Skala 1-10 (rata-rata kelelahan mental & fisik). Waspada jika ≥ 8 untuk alert akut, atau ≥ 6 selama 5 hari untuk alert kronis. Grafik Progres: Skala 1-5 (rata-rata kepuasan kemajuan skripsi & efikasi diri). Waspada jika ≤ 2 terus-menerus. Streak: menghitung berapa hari berturut-turut kamu melakukan check-in. Pertahankan ritme ini!',
     },
     {
       q: 'Dapatkah saya membuka akun ini di perangkat lain?',
@@ -87,21 +91,21 @@ export default function GuideFaqModal({ isOpen, onClose }: GuideFaqModalProps) {
               <div className="bg-[#fbf9f6] p-4 rounded-2xl border border-[#e4e2df]">
                 <div className="font-semibold text-[#d98e73] mb-1">2. Tren Kelelahan (1-10)</div>
                 <p className="text-xs text-[#4a5568]">
-                  Rata-rata kelelahan mental &amp; fisik. Jika berada di atas batas waspada (≥ 6) selama berhari-hari, daya kognitifmu sedang terkuras.
+                  Rata-rata kelelahan mental &amp; fisik. Jika berada di atas batas waspada (≥ 6) selama 5 hari berturut-turut, sistem akan memberi pengingat kronis.
                 </p>
               </div>
 
               <div className="bg-[#fbf9f6] p-4 rounded-2xl border border-[#e4e2df]">
                 <div className="font-semibold text-[#4a6b5b] mb-1">3. Tren Progres (1-5)</div>
                 <p className="text-xs text-[#4a5568]">
-                  Kepuasan kemajuan skripsi &amp; efikasi diri. Nilai ≤ 2 yang bertahan lama menandakan hambatan yang butuh jeda atau bantuan bimbingan.
+                  Kepuasan kemajuan skripsi &amp; efikasi diri. Nilai ≤ 2 yang bertahan 5 hari berturut-turut (bersamaan kelelahan tinggi) menandakan hambatan yang butuh jeda atau bantuan bimbingan.
                 </p>
               </div>
 
               <div className="bg-[#fbf9f6] p-4 rounded-2xl border border-[#e4e2df]">
                 <div className="font-semibold text-[#2c4d3f] mb-1">4. Distribusi Sumber Stres</div>
                 <p className="text-xs text-[#4a5568]">
-                  Menghitung faktor apa yang paling sering memicu stres (teknis riset, bimbingan dosen, atau manajemen waktu).
+                  Menghitung faktor apa yang paling sering memicu stres (teknis riset, bimbingan dosen, atau manajemen waktu). Semakin panjang batang, semakin sering faktor itu muncul.
                 </p>
               </div>
             </div>
@@ -145,7 +149,7 @@ export default function GuideFaqModal({ isOpen, onClose }: GuideFaqModalProps) {
 
           {/* Reference Citation */}
           <div className="p-3.5 rounded-2xl bg-[#f5f0eb] border border-[#e4e2df] text-[11px] text-[#4a5568]">
-            <strong>Referensi Ilmiah:</strong> Saragih, S. F., &amp; Situngkir, T. T. (2022). Penerapan
+            <strong>Referensi Ilmiah:</strong> Saragih, S. F., &amp; Situngkir, T. T. (2026). Penerapan
             Aplikasi Web Ecological Momentary Assessment (EMA) &quot;Jeda&quot; untuk Deteksi Dini Pola
             Stres dan Pencegahan Burnout pada Mahasiswa Tingkat Akhir. <em>GIAT: Teknologi untuk Masyarakat</em>, 1(1).
           </div>
@@ -164,3 +168,4 @@ export default function GuideFaqModal({ isOpen, onClose }: GuideFaqModalProps) {
     </div>
   );
 }
+

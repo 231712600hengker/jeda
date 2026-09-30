@@ -1,8 +1,7 @@
-// GET /api/dashboard/summary — Data agregat untuk dashboard
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { getSessionFromRequest } from '@/lib/auth/session';
-import { formatDateShort, getTodayString } from '@/lib/utils';
+import { formatDateShort, getTodayString, getDateStringWIB } from '@/lib/utils';
 import type { CheckinItem, ApiDashboardSummary } from '@/types/jeda';
 
 export async function GET(req: NextRequest) {
@@ -14,9 +13,11 @@ export async function GET(req: NextRequest) {
 
     const url = new URL(req.url);
     const days = parseInt(url.searchParams.get('days') ?? '30', 10);
-    const limitDate = new Date();
-    limitDate.setDate(limitDate.getDate() - days);
-    const limitDateStr = limitDate.toISOString().split('T')[0];
+    // Hitung batas tanggal dalam WIB agar konsisten dengan data tersimpan
+    const limitDateWIB = new Date();
+    limitDateWIB.setDate(limitDateWIB.getDate() - days);
+    const limitDateStr = getDateStringWIB(limitDateWIB);
+
 
     // ─── Ambil semua checkins dalam period ───────────────
     const { data: rows, error } = await supabaseAdmin

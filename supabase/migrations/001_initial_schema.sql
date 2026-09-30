@@ -1,8 +1,9 @@
 -- ============================================================
 -- Jeda v2.0 — Initial Schema
 -- Referensi PRD section 6.2
--- Saragih & Situngkir (2022), GIAT: Teknologi untuk Masyarakat
+-- Saragih & Situngkir (2026), GIAT: Teknologi untuk Masyarakat
 -- ============================================================
+
 
 -- ─── 1. USERS ─────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS users (

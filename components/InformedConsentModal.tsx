@@ -86,18 +86,25 @@ export default function InformedConsentModal({
         </div>
 
         {/* Consent remains before collection; it is intentionally concise at this decision point. */}
-        <div className="bg-[#fbf9f6] border border-[#e4e2df] rounded-2xl p-4 text-xs text-[#4a5568] space-y-2 mb-5 leading-relaxed">
-          <div className="font-bold text-[#2d3748]">Sebelum kamu mulai:</div>
+        <div className="bg-[#fbf9f6] border border-[#e4e2df] rounded-2xl p-4 text-xs text-[#4a5568] space-y-2.5 mb-5 leading-relaxed">
+          <div className="font-bold text-[#2d3748]">Sebelum kamu mulai — baca dengan seksama:</div>
           <p>
-            <strong>Privat secara desain:</strong> Jeda tidak meminta nama, NIM, email, atau nomor HP. Riwayatmu hanya terhubung ke kode akses ini.
+            <strong>Privat secara desain:</strong> Jeda tidak meminta nama, NIM, email, atau nomor HP. Riwayatmu hanya terhubung ke kode akses ini. <strong>Tidak ada data identitas yang dikumpulkan.</strong>
           </p>
           <p>
-            <strong>Bukan layanan diagnosis:</strong> Jeda adalah ruang refleksi mandiri, bukan pengganti bantuan medis atau psikologis profesional.
+            <strong>Bukan alat diagnosis:</strong> Jeda adalah ruang refleksi mandiri, bukan pengganti bantuan medis atau psikologis profesional. Jika kamu membutuhkan pertolongan, segera hubungi konselor kampus atau tenaga kesehatan jiwa.
           </p>
           <p>
-            <strong>Kendalimu tetap penuh:</strong> kamu dapat mengunduh atau menghapus seluruh riwayat melalui Pengaturan kapan saja.
+            <strong>Kendalimu tetap penuh:</strong> Kamu dapat mengunduh atau menghapus seluruh riwayat melalui Pengaturan kapan saja, tanpa syarat.
+          </p>
+          <p>
+            <strong>Penggunaan data untuk penelitian:</strong> Data yang kamu masukkan bersifat anonim. <strong>Data anonim dan agregat (tanpa informasi yang dapat mengidentifikasi individu) dapat digunakan dalam laporan dan publikasi ilmiah</strong> sebagai bagian dari penelitian kesejahteraan mahasiswa. Tidak ada data yang dapat dikaitkan kembali ke dirimu secara pribadi.
+          </p>
+          <p>
+            <strong>Kontak penulis:</strong> Jika ada pertanyaan tentang penelitian ini, kamu dapat menghubungi peneliti melalui email yang tertera di lembar informasi penelitian yang dibagikan sebelum kegiatan, atau bertanya langsung kepada penyelenggara.
           </p>
         </div>
+
 
         {/* Checkbox agreement */}
         <label className="flex items-start gap-3 p-3 rounded-2xl bg-[#e8efea]/60 border border-[#c5ebd7] cursor-pointer mb-6 transition-colors">
@@ -108,8 +115,9 @@ export default function InformedConsentModal({
             className="w-5 h-5 rounded-md mt-0.5 accent-[#6b8e7d] cursor-pointer"
           />
           <span className="text-xs text-[#2c4d3f] leading-relaxed">
-            Saya telah membaca dan menyetujui ketentuan privasi di atas, serta memahami bahwa kode akses ini adalah satu-satunya kunci untuk membuka akun saya.
+            Saya telah membaca dan memahami ketentuan di atas. Saya menyetujui partisipasi sukarela dalam penelitian ini, termasuk penggunaan data anonim dan agregat untuk keperluan ilmiah. Saya mengerti bahwa kode akses ini adalah satu-satunya kunci akun saya, dan saya dapat menghentikan partisipasi serta menghapus data kapan saja.
           </span>
+
         </label>
 
         {/* Actions */}

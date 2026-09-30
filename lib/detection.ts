@@ -1,10 +1,11 @@
 // ============================================================
 // Jeda v2.0 — Deteksi Pola Otomatis
 // 
-// Referensi: Saragih & Situngkir (2022), GIAT: Teknologi untuk Masyarakat
+// Referensi: Saragih & Situngkir (2026), GIAT: Teknologi untuk Masyarakat
 // Logic diport dari jeda-omega (sudah sesuai PRD Appendix B)
 // Perubahan: field names disesuaikan dengan CheckinItem interface v2
 // ============================================================
+
 
 import type { CheckinItem, AlertRecord, DetectionResult } from '@/types/jeda';
 
@@ -82,6 +83,35 @@ export function evaluateCheckinAlerts(
   let chronicReason = '';
 
   if (recentHistory.length >= 5) {
+    // ─── Pastikan 5 check-in membentuk 5 hari BERTURUT-TURUT ──────────────
+    // Urutkan dari terbaru ke terlama berdasarkan checkinTime, lalu periksa
+    // bahwa selisih antar tanggal tepat 1 hari. Jika ada jeda / hari bolong,
+    // kondisi kronis TIDAK terpenuhi (sesuai klaim naskah penelitian).
+    const sorted = [...recentHistory].sort(
+      (a, b) => new Date(b.checkinTime).getTime() - new Date(a.checkinTime).getTime()
+    );
+    const isConsecutive = sorted.every((c, idx) => {
+      if (idx === 0) return true;
+      const prev = new Date(sorted[idx - 1].checkinTime);
+      const curr = new Date(c.checkinTime);
+      // Hitung selisih hari kalender (bukan jam) dengan flooring ke midnight UTC
+      const diffDays = Math.round(
+        (prev.setHours(0, 0, 0, 0) - curr.setHours(0, 0, 0, 0)) / (24 * 60 * 60 * 1000)
+      );
+      return diffDays === 1;
+    });
+
+    if (!isConsecutive) {
+      // 5 check-in ada tapi hari-harinya tidak beruntun → tidak kronis
+      return {
+        isAcute,
+        acuteDetails: isAcute
+          ? { combinedAnxiety, avgFatigue, reason: acuteReason }
+          : undefined,
+        isChronic: false,
+      };
+    }
+
     avgProgress5Days =
       recentHistory.reduce((acc, c) => acc + (c.progress + c.selfEfficacy) / 2, 0) /
       recentHistory.length;
@@ -114,6 +144,7 @@ export function evaluateCheckinAlerts(
       }
     }
   }
+
 
   return {
     isAcute,

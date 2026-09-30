@@ -18,6 +18,8 @@ import { useSession } from '@/hooks/useSession';
 import type { CheckinItem, AlertRecord, DetectionResult } from '@/types/jeda';
 import type { CheckinInput } from '@/lib/validations';
 import { Check } from 'lucide-react';
+import { getTodayString } from '@/lib/utils';
+
 
 export default function HomePage() {
   const { session, setSession, isLoading: isSessionLoading, refresh: refreshSession } = useSession();
@@ -270,7 +272,8 @@ export default function HomePage() {
     showToast('Data demo berhasil dimuat ke dalam dasbor.');
   };
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = getTodayString(); // Tanggal hari ini dalam WIB (Asia/Jakarta)
+
   const todayCheckin = checkins.find((c) => c.checkinDate === todayStr) || null;
   const hasCheckedInToday = !!todayCheckin;
   const firstCheckin = checkins.length > 0 ? checkins[checkins.length - 1].checkinDate : null;

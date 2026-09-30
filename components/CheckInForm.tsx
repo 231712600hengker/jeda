@@ -608,9 +608,14 @@ export default function CheckInForm({
                 rows={2}
                 className="w-full px-4 py-3 bg-[#fbf9f6] border border-[#e4e2df] rounded-2xl text-xs text-[#2d3748] placeholder:text-[#a0aec0] focus:outline-none focus:border-[#6b8e7d] focus:ring-2 focus:ring-[#6b8e7d]/10 resize-none"
               />
+              {/* Peringatan privasi catatan */}
+              <p className="text-[11px] text-[#a0aec0] leading-relaxed">
+                ⚠️ Catatan ini bersifat anonim. Hindari menulis nama, NIM, atau informasi apa pun yang dapat mengidentifikasi dirimu atau orang lain.
+              </p>
             </div>
           </div>
         )}
+
 
         {/* Footer Navigation Buttons */}
         <div className="mt-8 flex flex-col-reverse gap-3 border-t border-[#e4e2df] pt-6 sm:flex-row sm:items-center sm:justify-between">

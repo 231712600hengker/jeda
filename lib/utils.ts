@@ -24,13 +24,30 @@ export function formatDateShort(dateStr: string): string {
 }
 
 /**
- * Tanggal hari ini sebagai YYYY-MM-DD (timezone-safe)
+ * Tanggal hari ini sebagai YYYY-MM-DD dalam zona waktu Asia/Jakarta (WIB, UTC+7).
+ * Dipakai di semua tempat agar tanggal konsisten terlepas dari zona server/browser.
  */
 export function getTodayString(): string {
-  const now = new Date();
-  const y = now.getFullYear();
-  const m = String(now.getMonth() + 1).padStart(2, '0');
-  const d = String(now.getDate()).padStart(2, '0');
+  return getDateStringWIB(new Date());
+}
+
+/**
+ * Konversi objek Date ke string YYYY-MM-DD dalam zona waktu Asia/Jakarta (WIB).
+ * Gunakan fungsi ini setiap kali perlu tanggal lokal, bukan .toISOString().split('T')[0].
+ */
+export function getDateStringWIB(date: Date): string {
+  // Intl.DateTimeFormat memastikan konversi timezone dilakukan oleh engine,
+  // bukan dengan asumsi offset tetap, sehingga otomatis menangani DST (jika ada).
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Jakarta',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(date);
+
+  const y = parts.find((p) => p.type === 'year')!.value;
+  const m = parts.find((p) => p.type === 'month')!.value;
+  const d = parts.find((p) => p.type === 'day')!.value;
   return `${y}-${m}-${d}`;
 }
 

@@ -5,6 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase/server';
 import { getSessionFromRequest } from '@/lib/auth/session';
 import { evaluateCheckinAlerts, evaluateQuickCheckinAlert } from '@/lib/detection';
 import { CheckinSchema } from '@/lib/validations';
+import { getDateStringWIB, getTodayString } from '@/lib/utils';
 import type { CheckinItem, AlertRecord } from '@/types/jeda';
 
 // ─── POST /api/checkins ───────────────────────────────────
@@ -33,7 +34,7 @@ export async function POST(req: NextRequest) {
     const data = parsed.data;
     const now = new Date();
     const checkinTime = now.toISOString();
-    const checkinDate = checkinTime.split('T')[0];
+    const checkinDate = getDateStringWIB(now); // Tanggal dalam WIB (Asia/Jakarta), bukan UTC
 
     // ─── Periksa apakah sudah ada check-in hari ini (Aturan 1x per hari) ───
     const { data: existingCheckin } = await supabaseAdmin
@@ -264,10 +265,12 @@ export async function GET(req: NextRequest) {
 
     const url = new URL(req.url);
     const days = parseInt(url.searchParams.get('days') ?? '30', 10);
-    const limitDate = new Date();
-    limitDate.setDate(limitDate.getDate() - days);
-    const limitDateStr = limitDate.toISOString().split('T')[0];
-    const todayStr = new Date().toISOString().split('T')[0];
+    // Hitung tanggal batas dalam WIB agar konsisten dengan checkin_date yang disimpan
+    const limitDateWIB = new Date();
+    limitDateWIB.setDate(limitDateWIB.getDate() - days);
+    const limitDateStr = getDateStringWIB(limitDateWIB);
+    const todayStr = getTodayString(); // Hari ini dalam WIB
+
 
     // Ambil checkins dengan stressors (join manual)
     const { data: checkinRows, error } = await supabaseAdmin

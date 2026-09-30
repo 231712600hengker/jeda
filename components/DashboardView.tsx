@@ -5,6 +5,8 @@ import {
   CheckinItem,
   AlertRecord,
 } from '@/types/jeda';
+import { getTodayString } from '@/lib/utils';
+
 import {
   ResponsiveContainer,
   LineChart,
@@ -68,8 +70,9 @@ export default function DashboardView({
     return chronological.slice(chronological.length - days);
   }, [chronological, dayFilter]);
 
-  // Cek apakah hari ini sudah check-in
-  const todayStr = new Date().toISOString().split('T')[0];
+  // Cek apakah hari ini sudah check-in (tanggal dalam WIB)
+  const todayStr = getTodayString();
+
   const latestCheckin = fullCheckins.length > 0 ? fullCheckins[0] : null;
   const hasCheckedInToday = checkins.some((checkin) => checkin.checkinDate === todayStr);
 

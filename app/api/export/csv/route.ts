@@ -50,10 +50,13 @@ export async function GET(req: NextRequest) {
       `# Kode Akses: ${session.accessCode}`,
       `# Catatan: Data ini adalah riwayat check-in pribadi Anda.`,
       `# Dapat dibawa ke sesi konseling untuk diskusi berbasis data.`,
-      `# Referensi: Saragih & Situngkir (2022), GIAT: Teknologi untuk Masyarakat`,
+      `# Kolom 'Catatan Bebas' tidak disertakan untuk menjaga privasi.`,
+      `# Referensi: Saragih & Situngkir (2026), GIAT: Teknologi untuk Masyarakat`,
     ].join('\n');
 
     // ─── Header kolom CSV (sesuai PRD 5.6) ───────────────
+    // CATATAN: Kolom 'Catatan' (note) sengaja TIDAK disertakan karena
+    // merupakan teks bebas yang berpotensi mengandung informasi identitas.
     const columns = [
       'Timestamp',
       'Tanggal',
@@ -74,7 +77,6 @@ export async function GET(req: NextRequest) {
       'Sumber_Stres',
       'Peringatan_Akut',
       'Peringatan_Kronis',
-      'Catatan',
     ];
 
     // ─── Baris data ───────────────────────────────────────
@@ -90,6 +92,7 @@ export async function GET(req: NextRequest) {
 
       const dateAlerts = alertsByDate[r.checkin_date] ?? { acute: false, chronic: false };
 
+      // 'note' sengaja tidak disertakan — lihat komentar pada header columns
       const cells = [
         r.checkin_time,
         r.checkin_date,
@@ -110,7 +113,6 @@ export async function GET(req: NextRequest) {
         `"${stressors}"`,
         dateAlerts.acute ? 'Ya' : 'Tidak',
         dateAlerts.chronic ? 'Ya' : 'Tidak',
-        r.note ? `"${r.note.replace(/"/g, '""')}"` : '',
       ];
 
       return cells.join(',');
@@ -121,6 +123,7 @@ export async function GET(req: NextRequest) {
       columns.join(','),
       ...dataRows,
     ].join('\n');
+
 
     return new NextResponse(csvContent, {
       status: 200,
