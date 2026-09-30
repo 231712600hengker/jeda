@@ -98,13 +98,12 @@ export default function InformedConsentModal({
             <strong>Kendalimu tetap penuh:</strong> Kamu dapat mengunduh atau menghapus seluruh riwayat melalui Pengaturan kapan saja, tanpa syarat.
           </p>
           <p>
-            <strong>Penggunaan data untuk penelitian:</strong> Data yang kamu masukkan bersifat anonim. <strong>Data anonim dan agregat (tanpa informasi yang dapat mengidentifikasi individu) dapat digunakan dalam laporan dan publikasi ilmiah</strong> sebagai bagian dari penelitian kesejahteraan mahasiswa. Tidak ada data yang dapat dikaitkan kembali ke dirimu secara pribadi.
+            <strong>Penggunaan data:</strong> Data yang kamu masukkan bersifat anonim. <strong>Data anonim dan agregat (tanpa informasi yang dapat mengidentifikasi individu) dapat digunakan dalam laporan kegiatan pengabdian kepada masyarakat dan evaluasinya.</strong> Tidak ada data yang dapat dikaitkan kembali ke dirimu secara pribadi.
           </p>
           <p>
-            <strong>Kontak penulis:</strong> Jika ada pertanyaan tentang penelitian ini, kamu dapat menghubungi peneliti melalui email yang tertera di lembar informasi penelitian yang dibagikan sebelum kegiatan, atau bertanya langsung kepada penyelenggara.
+            <strong>Kontak penyelenggara:</strong> Jika ada pertanyaan tentang kegiatan ini, kamu dapat menghubungi penyelenggara melalui email: <strong>[TULIS EMAIL ANDA DI SINI]</strong>.
           </p>
         </div>
-
 
         {/* Checkbox agreement */}
         <label className="flex items-start gap-3 p-3 rounded-2xl bg-[#e8efea]/60 border border-[#c5ebd7] cursor-pointer mb-6 transition-colors">
@@ -115,7 +114,7 @@ export default function InformedConsentModal({
             className="w-5 h-5 rounded-md mt-0.5 accent-[#6b8e7d] cursor-pointer"
           />
           <span className="text-xs text-[#2c4d3f] leading-relaxed">
-            Saya telah membaca dan memahami ketentuan di atas. Saya menyetujui partisipasi sukarela dalam penelitian ini, termasuk penggunaan data anonim dan agregat untuk keperluan ilmiah. Saya mengerti bahwa kode akses ini adalah satu-satunya kunci akun saya, dan saya dapat menghentikan partisipasi serta menghapus data kapan saja.
+            Saya telah membaca dan memahami ketentuan di atas. Saya menyetujui partisipasi sukarela dalam kegiatan pengabdian kepada masyarakat dan evaluasinya, termasuk penggunaan data anonim dan agregat. Saya mengerti bahwa kode akses ini adalah satu-satunya kunci akun saya, dan saya dapat menghentikan partisipasi serta menghapus data kapan saja.
           </span>
 
         </label>

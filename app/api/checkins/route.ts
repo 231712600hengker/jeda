@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
     // ─── Ambil 4 check-in hari sebelumnya untuk deteksi kronis (5 hari unik) ──
     const { data: pastRows } = await supabaseAdmin
       .from('checkins')
-      .select('anxiety_q1, anxiety_q2, fatigue_mental, fatigue_physical, progress, self_efficacy, checkin_time')
+      .select('anxiety_q1, anxiety_q2, fatigue_mental, fatigue_physical, progress, self_efficacy, checkin_time, checkin_date')
       .eq('user_id', session.userId)
       .eq('checkin_type', 'full')
       .neq('id', checkinId)
@@ -124,6 +124,7 @@ export async function POST(req: NextRequest) {
       progress: r.progress,
       selfEfficacy: r.self_efficacy,
       checkinTime: r.checkin_time,
+      checkinDate: r.checkin_date,
     }));
 
     // ─── Ambil alert kronis aktif (untuk suppression) ─────
@@ -151,7 +152,9 @@ export async function POST(req: NextRequest) {
       progress: data.progress,
       selfEfficacy: data.selfEfficacy,
       checkinTime,
+      checkinDate,
     } : null;
+
 
     // Chronic detection intentionally uses full check-ins only (query above filters `checkin_type = full`).
     const detection = data.checkinType === 'full'
