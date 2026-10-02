@@ -39,8 +39,8 @@ export default function InformedConsentModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#2d3748]/40 backdrop-blur-sm p-4 overflow-y-auto animate-fade-in">
-      <div className="bg-white border border-[#e4e2df] rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-[0_20px_35px_-10px_rgba(45,55,72,0.12),0_1px_3px_0_rgba(107,142,125,0.06)] text-[#2d3748] my-8">
+    <div className="fixed inset-0 z-50 flex justify-center bg-[#2d3748]/40 backdrop-blur-sm p-4 sm:p-6 overflow-y-auto animate-fade-in">
+      <div className="m-auto bg-white border border-[#e4e2df] rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-[0_20px_35px_-10px_rgba(45,55,72,0.12),0_1px_3px_0_rgba(107,142,125,0.06)] text-[#2d3748]">
         {/* Header */}
         <div className="flex items-center gap-3.5 mb-5">
           <div className="w-11 h-11 rounded-2xl bg-[#e8efea] border border-[#c5ebd7] flex items-center justify-center text-[#4a6b5b]">
