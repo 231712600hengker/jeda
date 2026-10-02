@@ -101,7 +101,7 @@ export default function InformedConsentModal({
             <strong>Penggunaan data:</strong> Data yang kamu masukkan bersifat anonim. <strong>Data anonim dan agregat (tanpa informasi yang dapat mengidentifikasi individu) dapat digunakan dalam laporan kegiatan pengabdian kepada masyarakat dan evaluasinya.</strong> Tidak ada data yang dapat dikaitkan kembali ke dirimu secara pribadi.
           </p>
           <p>
-            <strong>Kontak penyelenggara:</strong> Jika ada pertanyaan tentang kegiatan ini, kamu dapat menghubungi penyelenggara melalui email: <strong>[TULIS EMAIL ANDA DI SINI]</strong>.
+            <strong>Kontak penyelenggara:</strong> Jika ada pertanyaan tentang kegiatan ini, kamu dapat menghubungi penyelenggara melalui email: <strong>231712600@students.uajy.ac.id</strong>.
           </p>
         </div>
 

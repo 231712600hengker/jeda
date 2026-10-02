@@ -96,57 +96,67 @@ export default function HistoryTable({
             )}
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-[#fbf9f6] border-b border-[#e4e2df] text-[#4a5568] uppercase text-[10px] tracking-wider font-semibold">
+          <div className="overflow-hidden sm:overflow-x-auto p-4 sm:p-0">
+            <table className="block sm:table w-full text-left text-xs">
+              <thead className="hidden sm:table-header-group bg-[#fbf9f6] border-b border-[#e4e2df] text-[#4a5568] uppercase text-[10px] tracking-wider font-semibold">
                 <tr>
                   <th className="py-4 px-5">Tanggal &amp; Waktu</th>
-                  <th className="py-4 px-3 text-right">Kecemasan</th>
-                  <th className="py-4 px-3 text-right">Kelelahan</th>
+                  <th className="py-4 px-3 sm:text-right">Kecemasan</th>
+                  <th className="py-4 px-3 sm:text-right">Kelelahan</th>
                   <th className="py-4 px-3">Tidur Semalam</th>
-                  <th className="py-4 px-3 text-right">Progres Skripsi</th>
+                  <th className="py-4 px-3 sm:text-right">Progres Skripsi</th>
                   <th className="py-4 px-3">Status Deteksi</th>
-                  <th className="py-4 px-5 text-right">Detail</th>
+                  <th className="py-4 px-5 sm:text-right">Detail</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#f5f0eb]">
-                {filtered.map((item) => {
-                  const isQuick = item.checkinType === 'quick';
-                  const combinedAnxiety = isQuick ? null : item.anxietyQ1! + item.anxietyQ2!;
-                  const avgFatigue = isQuick ? null : ((item.fatigueMental! + item.fatiguePhysical!) / 2).toFixed(1);
-                  const avgProg = isQuick ? null : ((item.progress! + item.selfEfficacy!) / 2).toFixed(1);
-                  const isExpanded = expandedId === item.id;
-                  const d = new Date(item.checkinTime);
-                  const formattedDate = d.toLocaleDateString('id-ID', {
-                    weekday: 'short',
-                    day: 'numeric',
-                    month: 'short',
-                    year: 'numeric',
-                  });
-                  const formattedTime = d.toLocaleTimeString('id-ID', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  });
+              {filtered.map((item, idx) => {
+                const isQuick = item.checkinType === 'quick';
+                const combinedAnxiety = isQuick ? null : item.anxietyQ1! + item.anxietyQ2!;
+                const avgFatigue = isQuick ? null : ((item.fatigueMental! + item.fatiguePhysical!) / 2).toFixed(1);
+                const avgProg = isQuick ? null : ((item.progress! + item.selfEfficacy!) / 2).toFixed(1);
+                const isExpanded = expandedId === item.id;
+                const d = new Date(item.checkinTime);
+                const formattedDate = d.toLocaleDateString('id-ID', {
+                  weekday: 'short',
+                  day: 'numeric',
+                  month: 'short',
+                  year: 'numeric',
+                });
+                const formattedTime = d.toLocaleTimeString('id-ID', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                });
 
-                  return (
-                    <React.Fragment key={item.id}>
-                      <tr
-                        onClick={() => setExpandedId(isExpanded ? null : item.id)}
-                        className={`hover:bg-[#f5f0eb]/50 transition-colors cursor-pointer ${isQuick ? 'bg-[#e8efea]/35 ' : ''}${
-                          isExpanded ? 'bg-[#f5f0eb]/70' : ''
-                        }`}
-                      >
-                        {/* Tanggal & Jam */}
-                        <td className="py-4 px-5">
-                          <div className="font-semibold text-[#2d3748]">{formattedDate}</div>
-                          <div className="text-[11px] text-[#a0aec0] font-mono tabular-nums">
-                            {formattedTime} WIB
+                return (
+                  <tbody
+                    key={item.id}
+                    className={`block sm:table-row-group ${
+                      idx !== 0 ? 'mt-4 sm:mt-0' : ''
+                    } sm:border-b sm:border-[#f5f0eb] border border-[#e4e2df] sm:border-0 rounded-2xl sm:rounded-none overflow-hidden`}
+                  >
+                    <tr
+                      onClick={() => setExpandedId(isExpanded ? null : item.id)}
+                      className={`block sm:table-row transition-colors cursor-pointer ${
+                        isQuick ? 'bg-[#e8efea]/35 hover:bg-[#e8efea]/50' : 'bg-white hover:bg-[#f5f0eb]/50'
+                      } ${isExpanded ? 'bg-[#f5f0eb]/70' : ''}`}
+                    >
+                      {/* Tanggal & Jam */}
+                      <td className="block sm:table-cell py-3 px-4 sm:py-4 sm:px-5 border-b border-[#e4e2df] sm:border-b-0 bg-[#fbf9f6] sm:bg-transparent">
+                        <div className="flex sm:block justify-between items-center">
+                          <div>
+                            <div className="font-semibold text-[#2d3748]">{formattedDate}</div>
+                            <div className="text-[11px] text-[#a0aec0] font-mono tabular-nums">
+                              {formattedTime} WIB
+                            </div>
                           </div>
-                          <span className={`mt-1 inline-flex rounded-full px-2 py-0.5 text-[9px] font-semibold ${isQuick ? 'bg-[#e8efea] text-[#4a6b5b]' : 'bg-[#f5f0eb] text-[#4a5568]'}`}>{isQuick ? 'RINGKAS' : 'LENGKAP'}</span>
-                        </td>
+                          <span className={`inline-flex rounded-full px-2 py-0.5 text-[9px] font-semibold ${isQuick ? 'bg-[#e8efea] text-[#4a6b5b]' : 'bg-[#f5f0eb] text-[#4a5568]'}`}>{isQuick ? 'RINGKAS' : 'LENGKAP'}</span>
+                        </div>
+                      </td>
 
-                        {/* Kecemasan */}
-                        <td className="py-4 px-3 text-right font-mono tabular-nums">
+                      {/* Kecemasan */}
+                      <td className="block sm:table-cell py-2.5 px-4 sm:py-4 sm:px-3 sm:text-right font-mono tabular-nums border-b border-[#f5f0eb] sm:border-b-0">
+                        <div className="flex sm:block justify-between items-center">
+                          <span className="sm:hidden text-[10px] text-[#a0aec0] uppercase font-semibold">Kecemasan</span>
                           <span
                             className={
                               (combinedAnxiety ?? 0) >= 5
@@ -156,10 +166,13 @@ export default function HistoryTable({
                           >
                             {isQuick ? `${item.quickStress}/10 stres` : `${combinedAnxiety} / 6`}
                           </span>
-                        </td>
+                        </div>
+                      </td>
 
-                        {/* Kelelahan */}
-                        <td className="py-4 px-3 text-right font-mono tabular-nums">
+                      {/* Kelelahan */}
+                      <td className="block sm:table-cell py-2.5 px-4 sm:py-4 sm:px-3 sm:text-right font-mono tabular-nums border-b border-[#f5f0eb] sm:border-b-0">
+                        <div className="flex sm:block justify-between items-center">
+                          <span className="sm:hidden text-[10px] text-[#a0aec0] uppercase font-semibold">Kelelahan</span>
                           <span
                             className={
                               Number(avgFatigue ?? 0) >= 6
@@ -169,18 +182,26 @@ export default function HistoryTable({
                           >
                             {isQuick ? `${item.quickEnergy}/10 energi` : `${avgFatigue} / 10`}
                           </span>
-                        </td>
+                        </div>
+                      </td>
 
-                        {/* Tidur */}
-                        <td className="py-4 px-3">
-                          <div className="text-[#2d3748] font-medium">{isQuick ? 'Tidak diisi' : item.sleepQuantity}</div>
-                          <div className="text-[11px] text-[#a0aec0] capitalize">
-                            {isQuick ? 'Check-in ringkas' : `Kualitas: ${item.sleepQuality}`}
+                      {/* Tidur */}
+                      <td className="block sm:table-cell py-2.5 px-4 sm:py-4 sm:px-3 border-b border-[#f5f0eb] sm:border-b-0">
+                        <div className="flex sm:block justify-between items-center">
+                          <span className="sm:hidden text-[10px] text-[#a0aec0] uppercase font-semibold">Tidur</span>
+                          <div className="text-right sm:text-left">
+                            <div className="text-[#2d3748] font-medium">{isQuick ? 'Tidak diisi' : item.sleepQuantity}</div>
+                            <div className="text-[11px] text-[#a0aec0] capitalize">
+                              {isQuick ? 'Check-in ringkas' : `Kualitas: ${item.sleepQuality}`}
+                            </div>
                           </div>
-                        </td>
+                        </div>
+                      </td>
 
-                        {/* Progres */}
-                        <td className="py-4 px-3 text-right font-mono tabular-nums">
+                      {/* Progres */}
+                      <td className="block sm:table-cell py-2.5 px-4 sm:py-4 sm:px-3 sm:text-right font-mono tabular-nums border-b border-[#f5f0eb] sm:border-b-0">
+                        <div className="flex sm:block justify-between items-center">
+                          <span className="sm:hidden text-[10px] text-[#a0aec0] uppercase font-semibold">Progres</span>
                           <span
                             className={
                               Number(avgProg) <= 2
@@ -190,100 +211,113 @@ export default function HistoryTable({
                           >
                             {isQuick ? '—' : `${avgProg} / 5`}
                           </span>
-                        </td>
+                        </div>
+                      </td>
 
-                        {/* Status Alert */}
-                        <td className="py-4 px-3">
-                          {item.acuteAlertTriggered || item.chronicAlertTriggered ? (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#f4ddd4] text-[#a6634b]">
-                              Pemicu Aktif
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-[#e8efea] text-[#4a6b5b]">
-                              Normal
-                            </span>
-                          )}
-                        </td>
+                      {/* Status Alert */}
+                      <td className="block sm:table-cell py-2.5 px-4 sm:py-4 sm:px-3 border-b border-[#f5f0eb] sm:border-b-0">
+                        <div className="flex sm:block justify-between items-center">
+                          <span className="sm:hidden text-[10px] text-[#a0aec0] uppercase font-semibold">Status Deteksi</span>
+                          <div>
+                            {item.acuteAlertTriggered || item.chronicAlertTriggered ? (
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#f4ddd4] text-[#a6634b]">
+                                Pemicu Aktif
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-[#e8efea] text-[#4a6b5b]">
+                                Normal
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </td>
 
-                        {/* Expand Icon */}
-                        <td className="py-4 px-5 text-right text-[#a0aec0]">
-                          {isExpanded ? <ChevronUp className="w-4 h-4 ml-auto" /> : <ChevronDown className="w-4 h-4 ml-auto" />}
+                      {/* Expand Icon */}
+                      <td className="block sm:table-cell py-3 px-4 sm:py-4 sm:px-5 sm:text-right text-[#a0aec0] bg-[#fbf9f6] sm:bg-transparent">
+                        <div className="flex sm:block justify-center items-center w-full">
+                          <div className="flex items-center gap-1.5 text-[11px] font-semibold sm:hidden">
+                            {isExpanded ? 'Tutup Detail' : 'Lihat Detail'}
+                            {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                          </div>
+                          <div className="hidden sm:block">
+                            {isExpanded ? <ChevronUp className="w-4 h-4 ml-auto" /> : <ChevronDown className="w-4 h-4 ml-auto" />}
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+
+                    {/* Expanded Row Detail */}
+                    {isExpanded && (
+                      <tr className="block sm:table-row bg-[#fbf9f6] border-t border-[#e4e2df] sm:border-t-0">
+                        <td colSpan={7} className="block sm:table-cell p-4 sm:p-5">
+                          <div className="space-y-4">
+                            {isQuick ? (
+                              <div className="grid grid-cols-2 gap-3"><div className="rounded-2xl border border-[#e4e2df] bg-white p-3"><div className="text-[10px] text-[#a0aec0]">Stres saat check-in</div><div className="mt-0.5 font-mono text-sm font-bold">{item.quickStress}/10</div></div><div className="rounded-2xl border border-[#e4e2df] bg-white p-3"><div className="text-[10px] text-[#a0aec0]">Energi saat check-in</div><div className="mt-0.5 font-mono text-sm font-bold">{item.quickEnergy}/10</div></div></div>
+                            ) : <>
+                            {/* 9 Items Detail Grid */}
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                              <div className="p-3 bg-white rounded-2xl border border-[#e4e2df]">
+                                <div className="text-[10px] text-[#a0aec0] font-medium">GAD-2 Item 1 (Gelisah)</div>
+                                <div className="font-mono text-sm font-bold text-[#2d3748] mt-0.5">
+                                  Skor: {item.anxietyQ1} / 3
+                                </div>
+                              </div>
+                              <div className="p-3 bg-white rounded-2xl border border-[#e4e2df]">
+                                <div className="text-[10px] text-[#a0aec0] font-medium">GAD-2 Item 2 (Khawatir)</div>
+                                <div className="font-mono text-sm font-bold text-[#2d3748] mt-0.5">
+                                  Skor: {item.anxietyQ2} / 3
+                                </div>
+                              </div>
+                              <div className="p-3 bg-white rounded-2xl border border-[#e4e2df]">
+                                <div className="text-[10px] text-[#a0aec0] font-medium">Kelelahan Mental</div>
+                                <div className="font-mono text-sm font-bold text-[#2d3748] mt-0.5">
+                                  Skor: {item.fatigueMental} / 10
+                                </div>
+                              </div>
+                              <div className="p-3 bg-white rounded-2xl border border-[#e4e2df]">
+                                <div className="text-[10px] text-[#a0aec0] font-medium">Kelelahan Fisik</div>
+                                <div className="font-mono text-sm font-bold text-[#2d3748] mt-0.5">
+                                  Skor: {item.fatiguePhysical} / 10
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Stressors */}
+                            <div>
+                              <div className="text-xs font-semibold text-[#4a5568] mb-1.5">
+                                Sumber Hambatan / Stres yang Dipilih:
+                              </div>
+                              {item.stressors && item.stressors.length > 0 ? (
+                                <div className="flex flex-wrap gap-1.5">
+                                  {item.stressors.map((s) => (
+                                    <span
+                                      key={s}
+                                      className="px-3 py-1 rounded-full text-xs font-medium bg-[#e8efea] text-[#4a6b5b] border border-[#c5ebd7]"
+                                    >
+                                      {getStressorName(s)}
+                                    </span>
+                                  ))}
+                                </div>
+                              ) : (
+                                <span className="text-xs text-[#a0aec0] italic">Tidak ada pemicu stres yang ditandai.</span>
+                              )}
+                            </div>
+
+                            {/* Note */}
+                            {item.note && (
+                              <div className="p-3.5 bg-white rounded-2xl border border-[#e4e2df] text-xs leading-relaxed text-[#4a5568]">
+                                <span className="font-semibold text-[#2d3748]">Catatan Refleksi: </span>
+                                &ldquo;{item.note}&rdquo;
+                              </div>
+                            )}
+                            </>}
+                          </div>
                         </td>
                       </tr>
-
-                      {/* Expanded Row Detail */}
-                      {isExpanded && (
-                        <tr className="bg-[#fbf9f6]">
-                          <td colSpan={7} className="p-5">
-                            <div className="space-y-4">
-                              {isQuick ? (
-                                <div className="grid grid-cols-2 gap-3"><div className="rounded-2xl border border-[#e4e2df] bg-white p-3"><div className="text-[10px] text-[#a0aec0]">Stres saat check-in</div><div className="mt-0.5 font-mono text-sm font-bold">{item.quickStress}/10</div></div><div className="rounded-2xl border border-[#e4e2df] bg-white p-3"><div className="text-[10px] text-[#a0aec0]">Energi saat check-in</div><div className="mt-0.5 font-mono text-sm font-bold">{item.quickEnergy}/10</div></div></div>
-                              ) : <>
-                              {/* 9 Items Detail Grid */}
-                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                                <div className="p-3 bg-white rounded-2xl border border-[#e4e2df]">
-                                  <div className="text-[10px] text-[#a0aec0] font-medium">GAD-2 Item 1 (Gelisah)</div>
-                                  <div className="font-mono text-sm font-bold text-[#2d3748] mt-0.5">
-                                    Skor: {item.anxietyQ1} / 3
-                                  </div>
-                                </div>
-                                <div className="p-3 bg-white rounded-2xl border border-[#e4e2df]">
-                                  <div className="text-[10px] text-[#a0aec0] font-medium">GAD-2 Item 2 (Khawatir)</div>
-                                  <div className="font-mono text-sm font-bold text-[#2d3748] mt-0.5">
-                                    Skor: {item.anxietyQ2} / 3
-                                  </div>
-                                </div>
-                                <div className="p-3 bg-white rounded-2xl border border-[#e4e2df]">
-                                  <div className="text-[10px] text-[#a0aec0] font-medium">Kelelahan Mental</div>
-                                  <div className="font-mono text-sm font-bold text-[#2d3748] mt-0.5">
-                                    Skor: {item.fatigueMental} / 10
-                                  </div>
-                                </div>
-                                <div className="p-3 bg-white rounded-2xl border border-[#e4e2df]">
-                                  <div className="text-[10px] text-[#a0aec0] font-medium">Kelelahan Fisik</div>
-                                  <div className="font-mono text-sm font-bold text-[#2d3748] mt-0.5">
-                                    Skor: {item.fatiguePhysical} / 10
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* Stressors */}
-                              <div>
-                                <div className="text-xs font-semibold text-[#4a5568] mb-1.5">
-                                  Sumber Hambatan / Stres yang Dipilih:
-                                </div>
-                                {item.stressors && item.stressors.length > 0 ? (
-                                  <div className="flex flex-wrap gap-1.5">
-                                    {item.stressors.map((s) => (
-                                      <span
-                                        key={s}
-                                        className="px-3 py-1 rounded-full text-xs font-medium bg-[#e8efea] text-[#4a6b5b] border border-[#c5ebd7]"
-                                      >
-                                        {getStressorName(s)}
-                                      </span>
-                                    ))}
-                                  </div>
-                                ) : (
-                                  <span className="text-xs text-[#a0aec0] italic">Tidak ada pemicu stres yang ditandai.</span>
-                                )}
-                              </div>
-
-                              {/* Note */}
-                              {item.note && (
-                                <div className="p-3.5 bg-white rounded-2xl border border-[#e4e2df] text-xs leading-relaxed text-[#4a5568]">
-                                  <span className="font-semibold text-[#2d3748]">Catatan Refleksi: </span>
-                                  &ldquo;{item.note}&rdquo;
-                                </div>
-                              )}
-                              </>}
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-                    </React.Fragment>
-                  );
-                })}
-              </tbody>
+                    )}
+                  </tbody>
+                );
+              })}
             </table>
           </div>
         )}
