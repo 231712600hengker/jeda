@@ -20,6 +20,7 @@ type CheckinForDetection = Required<Pick<
   | 'progress'
   | 'selfEfficacy'
   | 'checkinTime'
+  | 'checkinDate'
 >>;
 
 // ─── FUNGSI UTAMA ─────────────────────────────────────────
@@ -84,22 +85,15 @@ export function evaluateCheckinAlerts(
 
   if (recentHistory.length >= 5) {
     // ─── Pastikan 5 check-in membentuk 5 hari BERTURUT-TURUT ──────────────
-    // Urutkan dari terbaru ke terlama berdasarkan checkinTime, lalu periksa
-    // bahwa selisih antar tanggal tepat 1 hari. Jika ada jeda / hari bolong,
-    // kondisi kronis TIDAK terpenuhi (sesuai klaim naskah penelitian).
-    const sorted = [...recentHistory].sort(
-      (a, b) => new Date(b.checkinTime).getTime() - new Date(a.checkinTime).getTime()
-    );
-    const isConsecutive = sorted.every((c, idx) => {
-      if (idx === 0) return true;
-      const prev = new Date(sorted[idx - 1].checkinTime);
-      const curr = new Date(c.checkinTime);
-      // Hitung selisih hari kalender (bukan jam) dengan flooring ke midnight UTC
-      const diffDays = Math.round(
-        (prev.setHours(0, 0, 0, 0) - curr.setHours(0, 0, 0, 0)) / (24 * 60 * 60 * 1000)
-      );
-      return diffDays === 1;
-    });
+    // Memakai checkinDate (tanggal WIB, format YYYY-MM-DD) agar check-in
+    // dini hari WIB (misalnya 01:00 WIB = 18:00 UTC hari sebelumnya) tetap
+    // dihitung sebagai hari yang benar sesuai zona waktu pengguna.
+    const toDay = (s: string) => {
+      const [y, m, d] = s.split('-').map(Number);
+      return Date.UTC(y, m - 1, d) / 86400000;
+    };
+    const days = recentHistory.map(c => toDay(c.checkinDate)).sort((a, b) => b - a);
+    const isConsecutive = days.every((d, i) => i === 0 || days[i - 1] - d === 1);
 
     if (!isConsecutive) {
       // 5 check-in ada tapi hari-harinya tidak beruntun → tidak kronis

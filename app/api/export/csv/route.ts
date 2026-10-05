@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { getSessionFromRequest } from '@/lib/auth/session';
+import { getDateStringWIB } from '@/lib/utils';
 
 export async function GET(req: NextRequest) {
   try {
@@ -34,7 +35,7 @@ export async function GET(req: NextRequest) {
 
     const alertsByDate: Record<string, { acute: boolean; chronic: boolean }> = {};
     (alertRows ?? []).forEach((a) => {
-      const date = a.triggered_at.split('T')[0];
+      const date = getDateStringWIB(new Date(a.triggered_at));
       if (!alertsByDate[date]) alertsByDate[date] = { acute: false, chronic: false };
       if (a.alert_type === 'acute') alertsByDate[date].acute = true;
       if (a.alert_type === 'chronic') alertsByDate[date].chronic = true;

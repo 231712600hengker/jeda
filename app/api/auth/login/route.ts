@@ -7,23 +7,26 @@ import { createSession } from '@/lib/auth/session';
 import type { UserSession } from '@/types/jeda';
 
 // ─── Simple in-memory rate limiter ────────────────────────────────────────────
-// Membatasi percobaan login: max 5 per IP per 60 detik.
+// Membatasi percobaan login GAGAL: max 10 per IP per 60 detik.
 // Catatan: bersifat per-instance (cocok untuk single-instance/serverless cold start).
 // Untuk multi-instance / edge, ganti dengan Redis atau Upstash.
 const loginAttempts = new Map<string, { count: number; resetAt: number }>();
-const MAX_ATTEMPTS = 5;
+const MAX_ATTEMPTS = 10;
 const WINDOW_MS = 60_000; // 60 detik
 
-function checkRateLimit(ip: string): boolean {
+function isBlocked(ip: string) {
+  const e = loginAttempts.get(ip);
+  return !!e && Date.now() <= e.resetAt && e.count >= MAX_ATTEMPTS;
+}
+
+function recordFailure(ip: string) {
   const now = Date.now();
-  const entry = loginAttempts.get(ip);
-  if (!entry || now > entry.resetAt) {
+  const e = loginAttempts.get(ip);
+  if (!e || now > e.resetAt) {
     loginAttempts.set(ip, { count: 1, resetAt: now + WINDOW_MS });
-    return true; // dalam batas
+  } else {
+    e.count++;
   }
-  if (entry.count >= MAX_ATTEMPTS) return false; // melebihi batas
-  entry.count++;
-  return true;
 }
 
 // ─── Pesan error yang seragam ─────────────────────────────────────────────────
@@ -43,9 +46,9 @@ export async function POST(req: NextRequest) {
       req.headers.get('x-real-ip') ??
       'unknown';
 
-    if (!checkRateLimit(ip)) {
+    if (isBlocked(ip)) {
       return NextResponse.json(
-        { error: 'Terlalu banyak percobaan. Tunggu sebentar lalu coba lagi.' },
+        { error: 'Terlalu banyak percobaan gagal. Tunggu sebentar lalu coba lagi.' },
         { status: 429 }
       );
     }
@@ -54,6 +57,7 @@ export async function POST(req: NextRequest) {
     const parsed = LoginSchema.safeParse(body);
 
     if (!parsed.success) {
+      recordFailure(ip);
       return NextResponse.json(
         { error: parsed.error.errors[0].message },
         { status: 400 }
@@ -70,6 +74,7 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (error || !user) {
+      recordFailure(ip);
       // Kembalikan pesan yang sama apapun penyebabnya (tidak membedakan "tidak ada" vs "salah")
       return NextResponse.json(
         { error: GENERIC_LOGIN_ERROR },
